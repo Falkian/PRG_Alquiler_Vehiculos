@@ -334,12 +334,15 @@ public class Alquiler {
         System.out.print("Es un cliente VIP (S/N)? ");
         String vip = scanner.next().toUpperCase();
         scanner.nextLine();
-        if (vip.equals("S") || vip.equals("SI")) {
-            return true;
-        } else if (vip.equals("N") || vip.equals("NO")) {
-            return false;
-        } else {
-            throw new FormatoIncorrectoException("Debes ser una afirmacion o negacion.");
+        switch (vip) {
+            case "S":
+            case "SI":
+                return true;
+            case "N":
+            case "NO":
+                return false;
+            default:
+                throw new FormatoIncorrectoException("Debes ser una afirmacion o negacion.");
         }
     }
 
