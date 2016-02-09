@@ -115,8 +115,8 @@ public class Alquiler {
         System.out.println("- - - Obtener Precio de Alquler - - -");
         try {
             String matricula = leerMatricula();
+            Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);            
             int dias = obtenerDias();
-            Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);
             double alquiler = vehiculo.alquilerTotal(dias);
             vehiculo.mostrarInfoAlquiler(dias, alquiler);
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException e) {
@@ -352,14 +352,13 @@ public class Alquiler {
      * @return un entero valido.
      */
     private static int leerInt() {
-        boolean valido;
+        boolean valido = false;
         int ret = 0;
         do {
             try {
-                valido = true;
                 ret = scanner.nextInt();
+                valido = true;
             } catch (InputMismatchException e) {
-                valido = false;
                 System.out.print("Debes introducir un entero: ");
             } finally {
                 scanner.nextLine();
@@ -374,14 +373,13 @@ public class Alquiler {
      * @return un numero decimal valido.
      */
     private static double leerDouble() {
-        boolean valido;
+        boolean valido = false;
         double ret = 0;
         do {
             try {
-                valido = true;
                 ret = scanner.nextDouble();
+                valido = true;
             } catch (InputMismatchException e) {
-                valido = false;
                 System.out.print("Debes introducir un número: ");
             } finally {
                 scanner.nextLine();
