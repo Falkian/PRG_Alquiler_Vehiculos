@@ -3,6 +3,7 @@ package Estructuras;
 import Abstractas.Vehiculo;
 import Excepciones.AlmacenVehiculosLlenoException;
 import Excepciones.ObjetoNoExistenteException;
+import Excepciones.ObjetoYaExistenteException;
 
 /**
  * Coleccion de objetos de la clase Objeto.
@@ -29,14 +30,14 @@ public class ColeccionVehiculos {
      *
      * @param v el vechiulo a anyadir.
      * @throws AlmacenVehiculosLlenoException si la coleccion ya esta llena.
+     * @throws ObjetoYaExistenteException si el objeto ya existe en la coleccion.
      */
     //TODO excepcion "existente"; Replantear ambas listas como una de object??
-    public void anyadirVehiculo(Vehiculo v) throws AlmacenVehiculosLlenoException {
+    public void anyadirVehiculo(Vehiculo v) throws AlmacenVehiculosLlenoException, ObjetoYaExistenteException {
         if (primeraPosicionLibre < vehiculos.length) {
             for (Vehiculo vehiculo : vehiculos) {
                 if (vehiculo != null && vehiculo.getMatricula().equals(v.getMatricula())) {
-                    System.out.println("Ya existe un vehiculo con esa matricula.");
-                    return;
+                    throw new ObjetoYaExistenteException("Ya existe un vehiculo con esa matricula.");
                 }
             }
             vehiculos[primeraPosicionLibre++] = v;
@@ -61,9 +62,5 @@ public class ColeccionVehiculos {
             }
         }
         throw new ObjetoNoExistenteException("El vehiculo no existe en el almacen.");
-    }
-
-    public boolean isFull() {
-        return primeraPosicionLibre >= vehiculos.length;
     }
 }

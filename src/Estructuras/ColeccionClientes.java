@@ -3,6 +3,7 @@ package Estructuras;
 import Clases.Cliente;
 import Excepciones.ListaClientesLlenaException;
 import Excepciones.ObjetoNoExistenteException;
+import Excepciones.ObjetoYaExistenteException;
 
 /**
  * Coleccion de objetos de la clase Cliente.
@@ -29,14 +30,14 @@ public class ColeccionClientes {
      *
      * @param c el cliente a anyadir.
      * @throws ListaClientesLlenaException si la coleccion y aesta llena.
+     * @throws ObjetoYaExistenteException si el objeto a añadir ya existe.
      */
     //TODO excepcion "existente"; Replantear ambas listas como una de object??
-    public void anyadirCliente(Cliente c) throws ListaClientesLlenaException {
+    public void anyadirCliente(Cliente c) throws ListaClientesLlenaException, ObjetoYaExistenteException {
         if (primeraPosicionLibre < clientes.length) {
             for (Cliente vehiculo : clientes) {
                 if (vehiculo != null && vehiculo.getDni().equals(c.getDni())) {
-                    System.out.println("Ya existe un cliente con ese DNI.");
-                    return;
+                    throw new ObjetoYaExistenteException("Ya existe un cliente con ese DNI.");
                 }
             }
             clientes[primeraPosicionLibre++] = c;

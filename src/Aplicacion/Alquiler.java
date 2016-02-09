@@ -99,7 +99,7 @@ public class Alquiler {
                     vehiculos.anyadirVehiculo(camion);
                     break;
             }
-        } catch (AlmacenVehiculosLlenoException | FormatoIncorrectoException e) {
+        } catch (AlmacenVehiculosLlenoException | ObjetoYaExistenteException | FormatoIncorrectoException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");
@@ -142,7 +142,7 @@ public class Alquiler {
             cliente.setTlf(leerTlf());
             cliente.setVip(leerVip());
             clientes.anyadirCliente(cliente);
-        } catch (ListaClientesLlenaException | FormatoIncorrectoException e) {
+        } catch (ListaClientesLlenaException | ObjetoYaExistenteException | FormatoIncorrectoException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");
