@@ -1,7 +1,7 @@
 package Excepciones;
 
 public class AlquilerVehiculoException extends Exception {
-    
+
     public AlquilerVehiculoException() {
     }
 
