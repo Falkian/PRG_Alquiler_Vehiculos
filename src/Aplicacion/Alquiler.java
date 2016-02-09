@@ -4,8 +4,9 @@ import Abstractas.Vehiculo;
 import Clases.*;
 import Estructuras.*;
 import Excepciones.*;
+import Utilidades.MiScanner;
 import java.util.InputMismatchException;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 /**
  * Clase encargada de gestionar la logica del programa.
@@ -18,10 +19,12 @@ public class Alquiler {
     private static final String BUS = "MICROBUS";       //Valor de la cadena BUS
     private static final String FURGO = "FURGONETA";    //Valor de la cadena FURGNETA
     private static final String CAMION = "CAMION";      //Valor de la cadena CAMION
+    private static final String[] TIPOS = {"COCHE", "MICROBUS", "FURGONETA", "CAMION"};
 
     private static final int TAMANYO = 50;              //Tamanyo predeterminado de las colecciones de la aplicacion.
 
-    private static Scanner scanner = new Scanner(System.in);                        //Scanner utilizado en toda la aplicacion.
+    //private static Scanner scanner = new Scanner(System.in);                        //Scanner utilizado en toda la aplicacion.
+    private static MiScanner scanner = new MiScanner();
     private static ColeccionVehiculos vehiculos = new ColeccionVehiculos(TAMANYO);  //Coleccion de vehiculos.
     private static ColeccionClientes clientes = new ColeccionClientes(TAMANYO);     //Coleccion de clientes.
 
@@ -39,7 +42,7 @@ public class Alquiler {
                     + "5.)Devolver vehiculo.\n"
                     + "9.)Salir\n"
                     + "Introduzca su opcion: ");
-            opcion = leerInt();
+            opcion = scanner.leerInt();
             System.out.println("");
             switch (opcion) {
                 case 1:
@@ -72,8 +75,9 @@ public class Alquiler {
      */
     private static void anyadirVehiculo() {
         System.out.println("- - - Anyadir Vechiulo - - -");
-        String tipo = obtenerTipo();
         try {
+            String msgtipo = "Introduce el tipo de vehiculo a introducir (Coche, Microbus, Furgoneta, Camion): ";
+            String tipo = scanner.leerEntrePosibles(TIPOS, msgtipo, "Tipo no valido.", true);
             String matricula = leerMatricula();
             int plazas;
             double pma;
@@ -115,7 +119,7 @@ public class Alquiler {
         System.out.println("- - - Obtener Precio de Alquler - - -");
         try {
             String matricula = leerMatricula();
-            Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);            
+            Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);
             int dias = obtenerDias();
             double alquiler = vehiculo.alquilerTotal(dias);
             vehiculo.mostrarInfoAlquiler(dias, alquiler);
@@ -135,10 +139,8 @@ public class Alquiler {
         try {
             Cliente cliente = new Cliente();
             cliente.setDni(leerDNI());
-            System.out.print("Introduce el nombre del cliente: ");
-            cliente.setNombre(scanner.nextLine());
-            System.out.print("Introduce la direccion del cliente: ");
-            cliente.setDireccion(scanner.nextLine());
+            cliente.setNombre(scanner.leerSegunPatron("\\.+", "Introduce el nombre del cliente: ", "", true));
+            cliente.setDireccion(scanner.leerSegunPatron("\\.+", "Introduce la direccion del cliente: ", ".", true));
             cliente.setTlf(leerTlf());
             cliente.setVip(leerVip());
             clientes.anyadirCliente(cliente);
@@ -197,24 +199,6 @@ public class Alquiler {
         }
     }
 
-    /**
-     * Pide al usuario que intoduzca un tipo de vehiculo hasta que lo introduzca
-     * correctamente, entonces lo devuelve.
-     *
-     * @return El String que representa un tipo de vehiculo.
-     */
-    private static String obtenerTipo() {
-        System.out.print("Introduce el tipo de vehiculo a introducir (Coche, Microbus, Furgoneta, Camion): ");
-        String tipo = scanner.next().toUpperCase();
-        scanner.nextLine();
-        while (!tipo.equals(COCHE) && !tipo.equals(BUS) && !tipo.equals(FURGO) && !tipo.equals(CAMION)) {
-            System.out.println("Tipo no valido.");
-            System.out.print("Introduce el tipo de vehiculo a introducir (Coche, Microbus, Furgoneta, Camion):");
-            tipo = scanner.next().toUpperCase();
-            scanner.nextLine();
-        }
-        return tipo;
-    }
 
     /**
      * Pide una matricula y la devuleve si es valida, lanza una excepcion en
@@ -224,15 +208,10 @@ public class Alquiler {
      * @throws FormatoIncorrectoException si la matricula no es valida.
      */
     private static String leerMatricula() throws FormatoIncorrectoException {
-        System.out.print("Introduce la matricula (4 numeros y 3 letras): ");
-        String matricula = scanner.next();
-        scanner.nextLine();
-        matricula = matricula.toUpperCase();
-        if (matricula.matches("\\d{4}[A-Z]{3}")) {
-            return matricula;
-        } else {
-            throw new FormatoIncorrectoException("La matricula debe tener 4 numeros seguidos de 3 letras.");
-        }
+        String msg = "Introduce la matricula (4 numeros y 3 letras): ";
+        String errmsg = "La matricula debe tener 4 numeros seguidos de 3 letras.";
+        String regex = "\\d{4}[A-Z]{3}";
+        return scanner.leerSegunPatron(regex, msg, errmsg, false);
     }
 
     /**
@@ -244,11 +223,11 @@ public class Alquiler {
      */
     private static int obtenerPlazas(int max) {
         System.out.print("Introduce las plazas del vehiculo: ");
-        int plazas = leerInt();
+        int plazas = scanner.leerInt();
         while (plazas < 2 || plazas > max) {
             System.out.println("Cantidad de plazas no permitida. Deben estar entre 2 y " + max + ".");
             System.out.print("Introduce las plazas del vehiculo: ");
-            plazas = leerInt();
+            plazas = scanner.leerInt();
         }
         return plazas;
     }
@@ -262,11 +241,11 @@ public class Alquiler {
      */
     private static double obtenerPMA(double max) {
         System.out.print("Introduce el Peso Maximo Autorizado del vehiculo: ");
-        double pma = leerDouble();
+        double pma = scanner.leerDouble();
         while (pma < 1000 || pma > max) {
             System.out.println("PMA no permitido. Debe estar entre 1000 y " + max + ".");
             System.out.print("Introduce el Peso Maximo Autorizado del vehiculo: ");
-            pma = leerDouble();
+            pma = scanner.leerDouble();
         }
         return pma;
     }
@@ -278,11 +257,11 @@ public class Alquiler {
      */
     private static int obtenerDias() {
         System.out.print("Introduce los dias del alquiler: ");
-        int dias = leerInt();
+        int dias = scanner.leerInt();
         while (dias < 1) {
             System.out.println("No se puede alquilar un vehiculo para menos de 1 dia.");
             System.out.print("Introduce los dias del alquiler: ");
-            dias = leerInt();
+            dias = scanner.leerInt();
         }
         return dias;
     }
@@ -295,15 +274,10 @@ public class Alquiler {
      * @throws FormatoIncorrectoException si el dni no es valido.
      */
     private static String leerDNI() throws FormatoIncorrectoException {
-        System.out.print("Introduce el DNI (8 numeros y 1 letra): ");
-        String dni = scanner.next();
-        dni = dni.toUpperCase();
-        scanner.nextLine();
-        if (dni.matches("\\d{8}[A-Z]")) {
-            return dni;
-        } else {
-            throw new FormatoIncorrectoException("El DNI debe tener 8 numeros seguidos de una letra.");
-        }
+        String msg = "Introduce el DNI (8 numeros y 1 letra): ";
+        String errmsg = "El DNI debe tener 8 numeros seguidos de una letra.";
+        String regex = "\\d{8}[A-Z]";
+        return scanner.leerSegunPatron(regex, msg, errmsg, false);
     }
 
     /**
@@ -314,14 +288,10 @@ public class Alquiler {
      * @throws FormatoIncorrectoException si el telefono no es valido.
      */
     private static String leerTlf() throws FormatoIncorrectoException {
-        System.out.print("introduce el telefono (prefijo opcional + 9 numeros): ");
-        String tlf = scanner.next();
-        scanner.nextLine();
-        if (tlf.matches("(\\(?\\+\\d{2}\\)?)?\\d{9}")) {
-            return tlf;
-        } else {
-            throw new FormatoIncorrectoException("El telefono debe tener 9 numeros y un prefijo opccional.");
-        }
+        String msg = "Introduce el telefono (prefijo opcional + 9 numeros): ";
+        String errmsg = "El telefono debe tener 9 numeros y un prefijo opccional.";
+        String regex = "(\\(?\\+\\d{2}\\)?)?\\d{9}";
+        return scanner.leerSegunPatron(regex, msg, errmsg, false);
     }
 
     /**
@@ -331,60 +301,8 @@ public class Alquiler {
      * @throws FormatoIncorrectoException la introduccion no es valida.
      */
     private static boolean leerVip() throws FormatoIncorrectoException {
-        System.out.print("Es un cliente VIP (S/N)? ");
-        String vip = scanner.next().toUpperCase();
-        scanner.nextLine();
-        switch (vip) {
-            case "S":
-            case "SI":
-                return true;
-            case "N":
-            case "NO":
-                return false;
-            default:
-                throw new FormatoIncorrectoException("Debes ser una afirmacion o negacion.");
-        }
-    }
-
-    /**
-     * Pide un numero hasta que se introduzca un entero ´alido.
-     *
-     * @return un entero valido.
-     */
-    private static int leerInt() {
-        boolean valido = false;
-        int ret = 0;
-        do {
-            try {
-                ret = scanner.nextInt();
-                valido = true;
-            } catch (InputMismatchException e) {
-                System.out.print("Debes introducir un entero: ");
-            } finally {
-                scanner.nextLine();
-            }
-        } while (!valido);
-        return ret;
-    }
-
-    /**
-     * Pide un numero hasta que se introduzca uno valido.
-     *
-     * @return un numero decimal valido.
-     */
-    private static double leerDouble() {
-        boolean valido = false;
-        double ret = 0;
-        do {
-            try {
-                ret = scanner.nextDouble();
-                valido = true;
-            } catch (InputMismatchException e) {
-                System.out.print("Debes introducir un número: ");
-            } finally {
-                scanner.nextLine();
-            }
-        } while (!valido);
-        return ret;
+        String msg = "Es un cliente VIP (S/N)? ";
+        String errmsg = "Debes ser una afirmacion o negacion.";
+        return scanner.leerSN(msg, errmsg);
     }
 }
