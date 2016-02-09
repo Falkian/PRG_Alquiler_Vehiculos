@@ -58,46 +58,4 @@ public class MiScanner {
         }
         throw new FormatoIncorrectoException(errmsg);
     }
-    
-    /**
-     * Pide un numero hasta que se introduzca un entero ´alido.
-     *
-     * @return un entero valido.
-     */
-    public int leerInt() {
-        boolean valido = false;
-        int ret = 0;
-        do {
-            try {
-                ret = scanner.nextInt();
-                valido = true;
-            } catch (InputMismatchException e) {
-                System.out.print("Debes introducir un entero: ");
-            } finally {
-                scanner.nextLine();
-            }
-        } while (!valido);
-        return ret;
-    }
-    
-    /**
-     * Pide un numero hasta que se introduzca uno valido.
-     *
-     * @return un numero decimal valido.
-     */
-    public double leerDouble() {
-        boolean valido = false;
-        double ret = 0;
-        do {
-            try {
-                ret = scanner.nextDouble();
-                valido = true;
-            } catch (InputMismatchException e) {
-                System.out.print("Debes introducir un número: ");
-            } finally {
-                scanner.nextLine();
-            }
-        } while (!valido);
-        return ret;
-    }
 }

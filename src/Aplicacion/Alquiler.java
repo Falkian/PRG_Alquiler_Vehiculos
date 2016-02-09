@@ -40,9 +40,8 @@ public class Alquiler {
                     + "3.)Anyadir un cliente.\n"
                     + "4.)Alquilar vechiulo.\n"
                     + "5.)Devolver vehiculo.\n"
-                    + "9.)Salir\n"
-                    + "Introduzca su opcion: ");
-            opcion = scanner.leerInt();
+                    + "9.)Salir\n");
+            opcion = leerInt();
             System.out.println("");
             switch (opcion) {
                 case 1:
@@ -199,7 +198,6 @@ public class Alquiler {
         }
     }
 
-
     /**
      * Pide una matricula y la devuleve si es valida, lanza una excepcion en
      * caso contrario.
@@ -222,12 +220,10 @@ public class Alquiler {
      * @return una cantidad deplazas valida.
      */
     private static int obtenerPlazas(int max) {
-        System.out.print("Introduce las plazas del vehiculo: ");
-        int plazas = scanner.leerInt();
+        int plazas = scanner.leerInt("Introduce las plazas del vehiculo: ");
         while (plazas < 2 || plazas > max) {
             System.out.println("Cantidad de plazas no permitida. Deben estar entre 2 y " + max + ".");
-            System.out.print("Introduce las plazas del vehiculo: ");
-            plazas = scanner.leerInt();
+            plazas = scanner.leerInt("Introduce las plazas del vehiculo: ");
         }
         return plazas;
     }
@@ -240,12 +236,10 @@ public class Alquiler {
      * @return un PMA valido.
      */
     private static double obtenerPMA(double max) {
-        System.out.print("Introduce el Peso Maximo Autorizado del vehiculo: ");
-        double pma = scanner.leerDouble();
+        double pma = scanner.leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
         while (pma < 1000 || pma > max) {
             System.out.println("PMA no permitido. Debe estar entre 1000 y " + max + ".");
-            System.out.print("Introduce el Peso Maximo Autorizado del vehiculo: ");
-            pma = scanner.leerDouble();
+            pma = scanner.leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
         }
         return pma;
     }
@@ -256,12 +250,10 @@ public class Alquiler {
      * @return la cantidad de dias.
      */
     private static int obtenerDias() {
-        System.out.print("Introduce los dias del alquiler: ");
-        int dias = scanner.leerInt();
+        int dias = scanner.leerInt("Introduce los dias del alquiler: ");
         while (dias < 1) {
             System.out.println("No se puede alquilar un vehiculo para menos de 1 dia.");
-            System.out.print("Introduce los dias del alquiler: ");
-            dias = scanner.leerInt();
+            dias = scanner.leerInt("Introduce los dias del alquiler: ");
         }
         return dias;
     }
@@ -304,5 +296,31 @@ public class Alquiler {
         String msg = "Es un cliente VIP (S/N)? ";
         String errmsg = "Debes ser una afirmacion o negacion.";
         return scanner.leerSN(msg, errmsg);
+    }
+    
+    /**
+     * Pide un entero y lo devulve si es valido
+     *
+     * @return un entero valido.
+     * @throws FormatoIncorrectoException si el numero no es valido.
+     */
+    private static int leerInt() throws FormatoIncorrectoException {
+        String msg = "Introduce un entero: ";
+        String errmsg = "Debe ser un entero.";
+        String regex = "\\d+";
+        return Integer.parseInt(scanner.leerSegunPatron(regex, msg, errmsg, false));
+    }
+    
+    /**
+     * Pide un numero y lo devulve si es valido
+     *
+     * @return un entero valido.
+     * @throws FormatoIncorrectoException si el numero no es valido.
+     */
+    private static int leerDouble() throws FormatoIncorrectoException {
+        String msg = "Introduce un numero: ";
+        String errmsg = "Debe ser un numero.";
+        String regex = "(\\d+\\.)*\\d+";
+        return Integer.parseInt(scanner.leerSegunPatron(regex, msg, errmsg, false));
     }
 }
