@@ -4,6 +4,7 @@ import Abstractas.Vehiculo;
 import Clases.*;
 import Estructuras.*;
 import Excepciones.*;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -39,7 +40,7 @@ public class Alquiler {
                     + "9.)Salir\n"
                     + "Introduzca su opcion: ");
             opcion = leerInt();
-
+            System.out.println("");
             switch (opcion) {
                 case 1:
                     anyadirVehiculo();
@@ -110,36 +111,14 @@ public class Alquiler {
      * y muestra por pantalla el precio de alquilar el vehiculo durante los dias
      * introducidos.
      */
-    //TODO Duda: esclarecer uso de instanceof en este caso.
     private static void obtenerAlquiler() {
         System.out.println("- - - Obtener Precio de Alquler - - -");
         try {
             String matricula = leerMatricula();
             int dias = obtenerDias();
-
             Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);
-            double alquiler;
-            if (vehiculo instanceof Coche) {
-                Coche coche = (Coche) vehiculo;
-                alquiler = coche.alquilerTotal(dias);
-                System.out.println("El vehiculo es un coche de " + coche.getPlazas() + " plazas "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-            } else if (vehiculo instanceof Microbus) {
-                Microbus bus = (Microbus) vehiculo;
-                alquiler = bus.alquilerTotal(dias);
-                System.out.println("El vehiculo es un microbus de " + bus.getPlazas() + " plazas "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + "euros.");
-            } else if (vehiculo instanceof Furgoneta) {
-                Furgoneta furgoneta = (Furgoneta) vehiculo;
-                alquiler = furgoneta.alquilerTotal(dias);
-                System.out.println("El vehiculo es una furgoneta con PMA " + furgoneta.getPMA() + "kilos "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-            } else if (vehiculo instanceof Camion) {
-                Camion camion = (Camion) vehiculo;
-                alquiler = camion.alquilerTotal(dias);
-                System.out.println("El vehiculo es un camion con PMA " + camion.getPMA() + "kilos "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-            }
+            double alquiler = vehiculo.alquilerTotal(dias);
+            vehiculo.mostrarInfoAlquiler(dias, alquiler);
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException e) {
             System.out.println(e.getMessage());
         } finally {
@@ -195,45 +174,22 @@ public class Alquiler {
      * alquilado y devulve qué coste ha tenido. Se le aplica un descuento del
      * 25% si el cliente es vIP.
      */
-    //TODO Duda: escalrecer uso de instanceof, tanto para el precio del alquiler como para VIP
-    public static void devolverVehiculo() {
+    //TODO intentar devolver antes de pedir los dias.
+    private static void devolverVehiculo() {
         System.out.println("- - - Devolver Vechiulo - - -");
         try {
             String matricula = leerMatricula();
             Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);
-            int dias = obtenerDias();
+            boolean vip = vehiculo.getCliente().isVip();
             vehiculo.devolver();
-            double alquiler = 0;
-            if (vehiculo instanceof Coche) {
-                Coche coche = (Coche) vehiculo;
-                alquiler = coche.alquilerTotal(dias);
-                System.out.println("El vehiculo es un coche de " + coche.getPlazas() + " plazas "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-                if (coche.getCliente().isVip()) {
-                    alquiler += 0.75;
-                }
-            } else if (vehiculo instanceof Microbus) {
-                Microbus bus = (Microbus) vehiculo;
-                alquiler = bus.alquilerTotal(dias);
-                System.out.println("El vehiculo es un microbus de " + bus.getPlazas() + " plazas "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + "euros.");
-            } else if (vehiculo instanceof Furgoneta) {
-                Furgoneta furgoneta = (Furgoneta) vehiculo;
-                alquiler = furgoneta.alquilerTotal(dias);
-                System.out.println("El vehiculo es una furgoneta con PMA " + furgoneta.getPMA() + "kilos "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-            } else if (vehiculo instanceof Camion) {
-                Camion camion = (Camion) vehiculo;
-                alquiler = camion.alquilerTotal(dias);
-                System.out.println("El vehiculo es un camion con PMA " + camion.getPMA() + "kilos "
-                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-            }
-            if (vehiculo.getCliente().isVip()) {
+            int dias = obtenerDias();
+            double alquiler = vehiculo.alquilerTotal(dias);
+            vehiculo.mostrarInfoAlquiler(dias, alquiler);
+            if (vip) {
                 alquiler *= 0.75;
                 System.out.println("El cliente es VIP, por lo que se le aplica un descuento del 25%.");
                 System.out.println("El alquiler es de " + alquiler + "euros.");
             }
-
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
         } finally {
@@ -271,7 +227,8 @@ public class Alquiler {
         System.out.print("Introduce la matricula (4 numeros y 3 letras): ");
         String matricula = scanner.next();
         scanner.nextLine();
-        if (matricula.matches("\\d{4}[a-zA-Z]{3}")) {
+        matricula = matricula.toUpperCase();
+        if (matricula.matches("\\d{4}[A-Z]{3}")) {
             return matricula;
         } else {
             throw new FormatoIncorrectoException("La matricula debe tener 4 numeros seguidos de 3 letras.");
@@ -398,7 +355,7 @@ public class Alquiler {
             try {
                 valido = true;
                 ret = scanner.nextInt();
-            } catch (NumberFormatException e) {
+            } catch (InputMismatchException e) {
                 valido = false;
                 System.out.print("Debes introducir un entero: ");
             } finally {
@@ -420,7 +377,7 @@ public class Alquiler {
             try {
                 valido = true;
                 ret = scanner.nextDouble();
-            } catch (NumberFormatException e) {
+            } catch (InputMismatchException e) {
                 valido = false;
                 System.out.print("Debes introducir un número: ");
             } finally {

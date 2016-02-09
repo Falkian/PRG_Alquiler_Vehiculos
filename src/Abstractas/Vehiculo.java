@@ -24,6 +24,7 @@ public abstract class Vehiculo {
 
     /**
      * Inicializa el vehiculo con la matricula dad como no alquilado.
+     *
      * @param matricula matricula del vehiculo.
      */
     public Vehiculo(String matricula) {
@@ -33,6 +34,7 @@ public abstract class Vehiculo {
 
     /**
      * Devuelve la matricula del vehiculo.
+     *
      * @return la matricula del vehiculo.
      */
     public String getMatricula() {
@@ -41,6 +43,7 @@ public abstract class Vehiculo {
 
     /**
      * Establece la matricula del vehiculo.
+     *
      * @param matricula la matricual a asignarle al vehiulo.
      */
     public void setMatricula(String matricula) {
@@ -49,6 +52,7 @@ public abstract class Vehiculo {
 
     /**
      * Devuelve si el vechiculo esta alquilado o no.
+     *
      * @return true si el vechiulo esta alquilado; false en caso contrario.
      */
     public boolean isAlquilado() {
@@ -57,6 +61,7 @@ public abstract class Vehiculo {
 
     /**
      * Alquila el vehiculo al cliente pasado.
+     *
      * @param c el cliente al que se le alquila el vehiculo.
      * @throws AlquilerVehiculoException si el vehiculo ya esta alquilado.
      */
@@ -71,6 +76,7 @@ public abstract class Vehiculo {
 
     /**
      * Devuelve el vehiculo al almacen.
+     *
      * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
      */
     public void devolver() throws AlquilerVehiculoException {
@@ -84,6 +90,7 @@ public abstract class Vehiculo {
 
     /**
      * Devuelve el cliente al que esta alquilado el vehiculo.
+     *
      * @return el cliente al que esta alquilado el vehiculo.
      * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
      */
@@ -97,10 +104,20 @@ public abstract class Vehiculo {
 
     /**
      * Devuelve el precio base de alquilar un vehiculo para los dias dados.
+     *
      * @param dias los dias por los que va a estar alquilado el vehiculo.
      * @return el precio de alquilar el vehiculo durante dias dias.
      */
-    protected double alquilerTotal(int dias) {
+    public double alquilerTotal(int dias) {
         return 50 * dias;
     }
+
+    /**
+     * Muestra incoformacion sobre el precio de alquilar el vechiulo durante una
+     * cantidad de dias.
+     *
+     * @param dias los dias por los que se alquilara.
+     * @param alquiler el precio del alquiler del vechiculo.
+     */
+    public abstract void mostrarInfoAlquiler(int dias, double alquiler);
 }

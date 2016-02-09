@@ -30,6 +30,7 @@ public class ColeccionVehiculos {
      * @param v el vechiulo a anyadir.
      * @throws AlmacenVehiculosLlenoException si la coleccion ya esta llena.
      */
+    //TODO excepcion "existente"; Replantear ambas listas como una de object??
     public void anyadirVehiculo(Vehiculo v) throws AlmacenVehiculosLlenoException {
         if (primeraPosicionLibre < vehiculos.length) {
             for (Vehiculo vehiculo : vehiculos) {

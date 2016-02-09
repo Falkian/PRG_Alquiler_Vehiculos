@@ -35,4 +35,10 @@ public class Microbus extends V_Transporte {
     public double alquilerTotal(int dias) {
         return super.alquilerTotal( + 2 * super.getPlazas());
     }
+
+    @Override
+    public void mostrarInfoAlquiler(int dias, double alquiler) {
+        System.out.println("El vehiculo es un microbus de " + getPlazas() + " plazas "
+                        + "y el alquiler para " + dias + " dias es de " + alquiler + "euros.");
+    }
 }

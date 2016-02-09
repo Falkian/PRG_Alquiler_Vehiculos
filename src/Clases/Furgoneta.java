@@ -25,4 +25,10 @@ public class Furgoneta extends V_Carga {
     public Furgoneta(String matricula, double PMA) {
         super(matricula, PMA);
     }
+
+    @Override
+    public void mostrarInfoAlquiler(int dias, double alquiler) {
+        System.out.println("El vehiculo es una furgoneta con PMA " + getPMA() + "kilos "
+                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
+    }
 }

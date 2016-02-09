@@ -35,4 +35,10 @@ public class Camion extends V_Carga{
     public double alquilerTotal(int dias) {
         return super.alquilerTotal(dias) + 40;
     }
+
+    @Override
+    public void mostrarInfoAlquiler(int dias, double alquiler) {
+        System.out.println("El vehiculo es un camion con PMA " + getPMA() + "kilos "
+                        + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
+    }
 }

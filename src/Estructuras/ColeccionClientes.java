@@ -30,6 +30,7 @@ public class ColeccionClientes {
      * @param c el cliente a anyadir.
      * @throws ListaClientesLlenaException si la coleccion y aesta llena.
      */
+    //TODO excepcion "existente"; Replantear ambas listas como una de object??
     public void anyadirCliente(Cliente c) throws ListaClientesLlenaException {
         if (primeraPosicionLibre < clientes.length) {
             for (Cliente vehiculo : clientes) {
@@ -39,7 +40,7 @@ public class ColeccionClientes {
                 }
             }
             clientes[primeraPosicionLibre++] = c;
-            System.out.println("Cliente anyadido.");
+            System.out.println("Cliente" + (c.isVip() ? " VIP " : " " )+ "anyadido.");
         } else {
             throw new ListaClientesLlenaException();
         }
