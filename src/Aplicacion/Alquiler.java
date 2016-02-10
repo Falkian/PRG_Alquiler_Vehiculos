@@ -32,7 +32,7 @@ public class Alquiler {
      * Ejecuta el menu principal de programa.
      */
     public static void ejecutar() {
-        int opcion;
+        int opcion = 0;
         do {
             System.out.print("===== MENU =====\n"
                     + "1.)Anyadir un vehiculo.\n"
@@ -41,8 +41,13 @@ public class Alquiler {
                     + "4.)Alquilar vechiulo.\n"
                     + "5.)Devolver vehiculo.\n"
                     + "9.)Salir\n");
-            opcion = leerInt();
-            System.out.println("");
+            try {
+                opcion = leerInt("Introduzzca su opcion: ");
+            } catch (FormatoIncorrectoException e) {
+                System.out.println(e.getMessage());
+            } finally {
+                System.out.println("");
+            }
             switch (opcion) {
                 case 1:
                     anyadirVehiculo();
@@ -220,10 +225,17 @@ public class Alquiler {
      * @return una cantidad deplazas valida.
      */
     private static int obtenerPlazas(int max) {
-        int plazas = scanner.leerInt("Introduce las plazas del vehiculo: ");
-        while (plazas < 2 || plazas > max) {
-            System.out.println("Cantidad de plazas no permitida. Deben estar entre 2 y " + max + ".");
-            plazas = scanner.leerInt("Introduce las plazas del vehiculo: ");
+        int plazas = 0;
+        try {
+            plazas = leerInt("Introduce las plazas del vehiculo: ");
+            while (plazas < 2 || plazas > max) {
+                System.out.println("Cantidad de plazas no permitida. Deben estar entre 2 y " + max + ".");
+                plazas = leerInt("Introduce las plazas del vehiculo: ");
+            }
+        } catch (FormatoIncorrectoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("");
         }
         return plazas;
     }
@@ -236,10 +248,17 @@ public class Alquiler {
      * @return un PMA valido.
      */
     private static double obtenerPMA(double max) {
-        double pma = scanner.leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
-        while (pma < 1000 || pma > max) {
-            System.out.println("PMA no permitido. Debe estar entre 1000 y " + max + ".");
-            pma = scanner.leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
+        double pma = 0;
+        try {
+            pma = leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
+            while (pma < 1000 || pma > max) {
+                System.out.println("PMA no permitido. Debe estar entre 1000 y " + max + ".");
+                pma = leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
+            }
+        } catch (FormatoIncorrectoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("");
         }
         return pma;
     }
@@ -250,10 +269,17 @@ public class Alquiler {
      * @return la cantidad de dias.
      */
     private static int obtenerDias() {
-        int dias = scanner.leerInt("Introduce los dias del alquiler: ");
-        while (dias < 1) {
-            System.out.println("No se puede alquilar un vehiculo para menos de 1 dia.");
-            dias = scanner.leerInt("Introduce los dias del alquiler: ");
+        int dias = 0;
+        try {
+            dias = leerInt("Introduce los dias del alquiler: ");
+            while (dias < 1) {
+                System.out.println("No se puede alquilar un vehiculo para menos de 1 dia.");
+                dias = leerInt("Introduce los dias del alquiler: ");
+            }
+        } catch (FormatoIncorrectoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("");
         }
         return dias;
     }
@@ -297,28 +323,26 @@ public class Alquiler {
         String errmsg = "Debes ser una afirmacion o negacion.";
         return scanner.leerSN(msg, errmsg);
     }
-    
+
     /**
      * Pide un entero y lo devulve si es valido
      *
      * @return un entero valido.
      * @throws FormatoIncorrectoException si el numero no es valido.
      */
-    private static int leerInt() throws FormatoIncorrectoException {
-        String msg = "Introduce un entero: ";
+    private static int leerInt(String msg) throws FormatoIncorrectoException {
         String errmsg = "Debe ser un entero.";
         String regex = "\\d+";
         return Integer.parseInt(scanner.leerSegunPatron(regex, msg, errmsg, false));
     }
-    
+
     /**
      * Pide un numero y lo devulve si es valido
      *
      * @return un entero valido.
      * @throws FormatoIncorrectoException si el numero no es valido.
      */
-    private static int leerDouble() throws FormatoIncorrectoException {
-        String msg = "Introduce un numero: ";
+    private static int leerDouble(String msg) throws FormatoIncorrectoException {
         String errmsg = "Debe ser un numero.";
         String regex = "(\\d+\\.)*\\d+";
         return Integer.parseInt(scanner.leerSegunPatron(regex, msg, errmsg, false));
