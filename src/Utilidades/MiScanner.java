@@ -87,7 +87,7 @@ public class MiScanner {
      */
     public String leerEntrePosibles(String[] validos, String msg, String errmsg, boolean caseSen)
             throws FormatoIncorrectoException {
-        System.out.print("msg");
+        System.out.print(msg);
         String ret = scanner.next();
         scanner.nextLine();
         if (!caseSen) {

@@ -5,8 +5,6 @@ import Clases.*;
 import Estructuras.*;
 import Excepciones.*;
 import Utilidades.MiScanner;
-import java.util.InputMismatchException;
-//import java.util.Scanner;
 
 /**
  * Clase encargada de gestionar la logica del programa.
@@ -19,12 +17,11 @@ public class Alquiler {
     private static final String BUS = "MICROBUS";       //Valor de la cadena BUS
     private static final String FURGO = "FURGONETA";    //Valor de la cadena FURGNETA
     private static final String CAMION = "CAMION";      //Valor de la cadena CAMION
-    private static final String[] TIPOS = {"COCHE", "MICROBUS", "FURGONETA", "CAMION"};
+    private static final String[] TIPOS = {COCHE, BUS, FURGO, CAMION};
 
     private static final int TAMANYO = 50;              //Tamanyo predeterminado de las colecciones de la aplicacion.
-
-    //private static Scanner scanner = new Scanner(System.in);                        //Scanner utilizado en toda la aplicacion.
-    private static MiScanner scanner = new MiScanner();
+    
+    private static MiScanner scanner = new MiScanner();                             //Scanner utilizado.
     private static ColeccionVehiculos vehiculos = new ColeccionVehiculos(TAMANYO);  //Coleccion de vehiculos.
     private static ColeccionClientes clientes = new ColeccionClientes(TAMANYO);     //Coleccion de clientes.
 
@@ -42,7 +39,7 @@ public class Alquiler {
                     + "5.)Devolver vehiculo.\n"
                     + "9.)Salir\n");
             try {
-                opcion = leerInt("Introduzzca su opcion: ");
+                opcion = leerInt("Introduzca su opcion: ");
             } catch (FormatoIncorrectoException e) {
                 System.out.println(e.getMessage());
             } finally {
@@ -81,7 +78,7 @@ public class Alquiler {
         System.out.println("- - - Anyadir Vechiulo - - -");
         try {
             String msgtipo = "Introduce el tipo de vehiculo a introducir (Coche, Microbus, Furgoneta, Camion): ";
-            String tipo = scanner.leerEntrePosibles(TIPOS, msgtipo, "Tipo no valido.", true);
+            String tipo = scanner.leerEntrePosibles(TIPOS, msgtipo, "Tipo no valido.", false);
             String matricula = leerMatricula();
             int plazas;
             double pma;
@@ -143,8 +140,8 @@ public class Alquiler {
         try {
             Cliente cliente = new Cliente();
             cliente.setDni(leerDNI());
-            cliente.setNombre(scanner.leerSegunPatron("\\.+", "Introduce el nombre del cliente: ", "", true));
-            cliente.setDireccion(scanner.leerSegunPatron("\\.+", "Introduce la direccion del cliente: ", ".", true));
+            cliente.setNombre(scanner.leerSegunPatron("\\w+", "Introduce el nombre del cliente: ", "Nombre no valido", true));
+            cliente.setDireccion(scanner.leerSegunPatron("\\w+", "Introduce la direccion del cliente: ", "Direccion no valida", true));
             cliente.setTlf(leerTlf());
             cliente.setVip(leerVip());
             clientes.anyadirCliente(cliente);
@@ -187,13 +184,19 @@ public class Alquiler {
             String matricula = leerMatricula();
             Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);
             boolean vip = vehiculo.getCliente().isVip();
+            boolean primera = vehiculo.isPrimerAlquiler();
             vehiculo.devolver();
             int dias = obtenerDias();
             double alquiler = vehiculo.alquilerTotal(dias);
             vehiculo.mostrarInfoAlquiler(dias, alquiler);
             if (vip) {
-                alquiler *= 0.75;
+                alquiler *= 0.85;
                 System.out.println("El cliente es VIP, por lo que se le aplica un descuento del 25%.");
+                System.out.println("El alquiler es de " + alquiler + "euros.");
+            }
+            if (primera) {
+                alquiler *= 0.75;
+                System.out.println("Como es la primera vez que se alquila el vehiculo tiene un descuento del 75%.");
                 System.out.println("El alquiler es de " + alquiler + "euros.");
             }
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
@@ -342,9 +345,9 @@ public class Alquiler {
      * @return un entero valido.
      * @throws FormatoIncorrectoException si el numero no es valido.
      */
-    private static int leerDouble(String msg) throws FormatoIncorrectoException {
+    private static double leerDouble(String msg) throws FormatoIncorrectoException {
         String errmsg = "Debe ser un numero.";
-        String regex = "(\\d+\\.)*\\d+";
-        return Integer.parseInt(scanner.leerSegunPatron(regex, msg, errmsg, false));
+        String regex = "(\\d+\\.)?\\d+";
+        return Double.parseDouble(scanner.leerSegunPatron(regex, msg, errmsg, false));
     }
 }

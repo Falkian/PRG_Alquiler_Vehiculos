@@ -14,12 +14,15 @@ public abstract class Vehiculo {
     private String matricula;           //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
     private Cliente cliente;            //Cliente al que se le ha alquilado
+    //TODO añadir descuento por primer alquiler
+    private boolean primer;
 
     /**
      * Contructor vacio, inicializa el vehiculo como no alquilado.
      */
     public Vehiculo() {
         alquilado = false;
+        primer = true;
     }
 
     /**
@@ -28,7 +31,7 @@ public abstract class Vehiculo {
      * @param matricula matricula del vehiculo.
      */
     public Vehiculo(String matricula) {
-        alquilado = false;
+        this();
         this.matricula = matricula;
     }
 
@@ -58,6 +61,13 @@ public abstract class Vehiculo {
     public boolean isAlquilado() {
         return alquilado;
     }
+    /**
+     * Devuleve si es la primera vez que se alquila el vehiculo.
+     * @return true si es la primera vez; false en caso contrario.
+     */
+    public boolean isPrimerAlquiler() {
+        return primer;
+    }
 
     /**
      * Alquila el vehiculo al cliente pasado.
@@ -70,7 +80,7 @@ public abstract class Vehiculo {
             throw new AlquilerVehiculoException("El vehiculo ya esta alquilado.");
         } else {
             cliente = c;
-            alquilado = true;
+            alquilado = true;            
         }
     }
 
@@ -83,6 +93,8 @@ public abstract class Vehiculo {
         if (alquilado) {
             alquilado = false;
             cliente = null;
+            //TODO primer alquiler
+            primer = false;
         } else {
             throw new AlquilerVehiculoException("El vechiculo no esta alquilado.");
         }
