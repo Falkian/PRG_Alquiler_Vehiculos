@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 public class ColeccionVehiculos {
 
-    private ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
+    private final ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.

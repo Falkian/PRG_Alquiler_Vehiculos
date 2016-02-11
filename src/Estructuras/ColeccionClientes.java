@@ -17,8 +17,6 @@ public class ColeccionClientes {
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
-     *
-     * @param tamanyo el tamanyo de la coleccion.
      */
     public ColeccionClientes() {
         clientes = new ArrayList<>();
