@@ -11,18 +11,10 @@ import Excepciones.AlquilerVehiculoException;
  */
 public abstract class Vehiculo {
 
-    private String matricula;           //Maricula del vehiculo
+    private final String matricula;           //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
     private Cliente cliente;            //Cliente al que se le ha alquilado
     private boolean primer;
-
-    /**
-     * Contructor vacio, inicializa el vehiculo como no alquilado.
-     */
-    public Vehiculo() {
-        alquilado = false;
-        primer = true;
-    }
 
     /**
      * Inicializa el vehiculo con la matricula dad como no alquilado.
@@ -30,7 +22,8 @@ public abstract class Vehiculo {
      * @param matricula matricula del vehiculo.
      */
     public Vehiculo(String matricula) {
-        this();
+        alquilado = false;
+        primer = true;
         this.matricula = matricula;
     }
 
@@ -41,15 +34,6 @@ public abstract class Vehiculo {
      */
     public String getMatricula() {
         return matricula;
-    }
-
-    /**
-     * Establece la matricula del vehiculo.
-     *
-     * @param matricula la matricual a asignarle al vehiulo.
-     */
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
     }
 
     /**

@@ -11,13 +11,6 @@ public abstract class V_Transporte extends Vehiculo {
     private int plazas;             //Numero de plazas del vehiculo.
 
     /**
-     * Constructor vacio, inicializa el vehiculo de carga como no alquilado.
-     */
-    public V_Transporte() {
-        super();
-    }
-
-    /**
      * Inicializa el vehiculo de transporte como no alquilado con la matricula y
      * las plazas dados.
      *

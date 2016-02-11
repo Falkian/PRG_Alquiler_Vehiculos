@@ -11,13 +11,6 @@ public class Camion extends V_Carga{
     public static final int PMA_MAX = 100000;       //PMA maxima para los camiones.
 
     /**
-     * Inicializa el camion como no alquilado.
-     */
-    public Camion() {
-        super();
-    }
-
-    /**
      * Inicializa el camion con la matricula y PMA dados.
      * @param matricula la matricula del camion.
      * @param PMA el peso mazimo autorizado del camion.

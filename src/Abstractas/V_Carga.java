@@ -11,13 +11,6 @@ public abstract class V_Carga extends Vehiculo {
     private double PMA;         //Peso maximo autorizado
 
     /**
-     * Constructor vacio, inicializa el vehiculo de carga como no alquilado.
-     */
-    public V_Carga() {
-        super();
-    }
-
-    /**
      * Inicializa el vehiculo de carga como no alquilado con la matricula y PMA
      * dados.
      *

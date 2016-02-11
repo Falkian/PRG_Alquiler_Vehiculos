@@ -9,13 +9,6 @@ import Abstractas.V_Carga;
 public class Furgoneta extends V_Carga {
 
     public static final int PMA_MAX = 10000;    //PMA maxima para las furgonetas.
-    
-    /**
-     * Inicializa la furgoneta como no alquilada.
-     */
-    public Furgoneta() {
-        super();
-    }
 
     /**
      * Inicializa la furgoneta con la matricula y PMA dados.

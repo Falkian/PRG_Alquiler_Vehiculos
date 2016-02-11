@@ -21,9 +21,9 @@ public class Alquiler {
 
     private static final int TAMANYO = 50;              //Tamanyo predeterminado de las colecciones de la aplicacion.
     
-    private static MiScanner scanner = new MiScanner();                             //Scanner utilizado.
-    private static ColeccionVehiculos vehiculos = new ColeccionVehiculos();  //Coleccion de vehiculos.
-    private static ColeccionClientes clientes = new ColeccionClientes(TAMANYO);     //Coleccion de clientes.
+    private static final MiScanner scanner = new MiScanner();                             //Scanner utilizado.
+    private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();  //Coleccion de vehiculos.
+    private static final ColeccionClientes clientes = new ColeccionClientes(TAMANYO);     //Coleccion de clientes.
 
     /**
      * Ejecuta el menu principal de programa.
@@ -138,8 +138,7 @@ public class Alquiler {
     private static void anyadirCliente() {
         System.out.println("- - - Anyadir Cliente - - -");
         try {
-            Cliente cliente = new Cliente();
-            cliente.setDni(leerDNI());
+            Cliente cliente = new Cliente(leerDNI());
             cliente.setNombre(scanner.leerSegunPatron(".+", "Introduce el nombre del cliente: ", "Nombre no valido", true));
             cliente.setDireccion(scanner.leerSegunPatron(".+", "Introduce la direccion del cliente: ", "Direccion no valida", true));
             cliente.setTlf(leerTlf());

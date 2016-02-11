@@ -10,12 +10,6 @@ public class Microbus extends V_Transporte {
     
     public static final int PLAZAS_MAX = 50;    //Plazas maximas para los coches.
     
-    /**
-     * Inicializa el bus como no alquilado.
-     */
-    public Microbus() {
-        super();
-    }
     
     /**
      * Inicializa el bus con la matricula y el numero de plazas dados.
