@@ -140,8 +140,8 @@ public class Alquiler {
         try {
             Cliente cliente = new Cliente();
             cliente.setDni(leerDNI());
-            cliente.setNombre(scanner.leerSegunPatron("\\w+", "Introduce el nombre del cliente: ", "Nombre no valido", true));
-            cliente.setDireccion(scanner.leerSegunPatron("\\w+", "Introduce la direccion del cliente: ", "Direccion no valida", true));
+            cliente.setNombre(scanner.leerSegunPatron(".+", "Introduce el nombre del cliente: ", "Nombre no valido", true));
+            cliente.setDireccion(scanner.leerSegunPatron(".+", "Introduce la direccion del cliente: ", "Direccion no valida", true));
             cliente.setTlf(leerTlf());
             cliente.setVip(leerVip());
             clientes.anyadirCliente(cliente);
@@ -318,7 +318,7 @@ public class Alquiler {
     private static String leerTlf() throws FormatoIncorrectoException {
         String msg = "Introduce el telefono (prefijo opcional + 9 numeros): ";
         String errmsg = "El telefono debe tener 9 numeros y un prefijo opccional.";
-        String regex = "(\\(?\\+\\d{2}\\)?)?\\d{9}";
+        String regex = "(\\(?\\+\\d{2,3}\\)?)?\\d{9}";
         return scanner.leerSegunPatron(regex, msg, errmsg, false);
     }
 
