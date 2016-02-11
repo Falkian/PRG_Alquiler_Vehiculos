@@ -14,7 +14,6 @@ public abstract class Vehiculo {
     private String matricula;           //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
     private Cliente cliente;            //Cliente al que se le ha alquilado
-    //TODO añadir descuento por primer alquiler
     private boolean primer;
 
     /**
@@ -93,7 +92,6 @@ public abstract class Vehiculo {
         if (alquilado) {
             alquilado = false;
             cliente = null;
-            //TODO primer alquiler
             primer = false;
         } else {
             throw new AlquilerVehiculoException("El vechiculo no esta alquilado.");

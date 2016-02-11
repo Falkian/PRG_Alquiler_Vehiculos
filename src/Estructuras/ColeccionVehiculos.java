@@ -32,7 +32,6 @@ public class ColeccionVehiculos {
      * @throws AlmacenVehiculosLlenoException si la coleccion ya esta llena.
      * @throws ObjetoYaExistenteException si el objeto ya existe en la coleccion.
      */
-    //TODO excepcion "existente"; Replantear ambas listas como una de object??
     public void anyadirVehiculo(Vehiculo v) throws AlmacenVehiculosLlenoException, ObjetoYaExistenteException {
         if (primeraPosicionLibre < vehiculos.length) {
             for (Vehiculo vehiculo : vehiculos) {

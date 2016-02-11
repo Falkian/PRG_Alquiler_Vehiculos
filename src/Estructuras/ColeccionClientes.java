@@ -32,7 +32,6 @@ public class ColeccionClientes {
      * @throws ListaClientesLlenaException si la coleccion y aesta llena.
      * @throws ObjetoYaExistenteException si el objeto a añadir ya existe.
      */
-    //TODO excepcion "existente"; Replantear ambas listas como una de object??
     public void anyadirCliente(Cliente c) throws ListaClientesLlenaException, ObjetoYaExistenteException {
         if (primeraPosicionLibre < clientes.length) {
             for (Cliente vehiculo : clientes) {

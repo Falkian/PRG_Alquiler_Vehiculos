@@ -177,7 +177,6 @@ public class Alquiler {
      * alquilado y devulve qué coste ha tenido. Se le aplica un descuento del
      * 25% si el cliente es vIP.
      */
-    //TODO intentar devolver antes de pedir los dias.
     private static void devolverVehiculo() {
         System.out.println("- - - Devolver Vechiulo - - -");
         try {
@@ -189,15 +188,23 @@ public class Alquiler {
             int dias = obtenerDias();
             double alquiler = vehiculo.alquilerTotal(dias);
             vehiculo.mostrarInfoAlquiler(dias, alquiler);
+            double descuentovip = 0, descuentoprim = 0;
+            boolean descontado = false;
             if (vip) {
-                alquiler *= 0.85;
+                descuentovip = alquiler * 0.15;
+                descontado = true;
                 System.out.println("El cliente es VIP, por lo que se le aplica un descuento del 25%.");
-                System.out.println("El alquiler es de " + alquiler + "euros.");
+                System.out.println("El descuento es de " + descuentovip + "euros.");
             }
             if (primera) {
-                alquiler *= 0.75;
+                descuentoprim = alquiler * 0.25;
+                descontado = true;
                 System.out.println("Como es la primera vez que se alquila el vehiculo tiene un descuento del 75%.");
-                System.out.println("El alquiler es de " + alquiler + "euros.");
+                System.out.println("El descuento es de " + descuentoprim + "euros.");
+            }
+            if (descontado) {
+                alquiler -= descuentoprim + descuentovip;
+                System.out.println("El precio tras los descuentos es de " + alquiler + "euros.");
             }
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
