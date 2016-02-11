@@ -20,7 +20,7 @@ public class ColeccionClientes {
      *
      * @param tamanyo el tamanyo de la coleccion.
      */
-    public ColeccionClientes(int tamanyo) {
+    public ColeccionClientes() {
         clientes = new ArrayList<>();
     }
 

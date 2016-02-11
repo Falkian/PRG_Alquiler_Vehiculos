@@ -18,12 +18,10 @@ public class Alquiler {
     private static final String FURGO = "FURGONETA";    //Valor de la cadena FURGNETA
     private static final String CAMION = "CAMION";      //Valor de la cadena CAMION
     private static final String[] TIPOS = {COCHE, BUS, FURGO, CAMION};
-
-    private static final int TAMANYO = 50;              //Tamanyo predeterminado de las colecciones de la aplicacion.
     
     private static final MiScanner scanner = new MiScanner();                             //Scanner utilizado.
     private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();  //Coleccion de vehiculos.
-    private static final ColeccionClientes clientes = new ColeccionClientes(TAMANYO);     //Coleccion de clientes.
+    private static final ColeccionClientes clientes = new ColeccionClientes();     //Coleccion de clientes.
 
     /**
      * Ejecuta el menu principal de programa.
