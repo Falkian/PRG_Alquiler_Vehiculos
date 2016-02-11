@@ -22,7 +22,7 @@ public class Alquiler {
     private static final int TAMANYO = 50;              //Tamanyo predeterminado de las colecciones de la aplicacion.
     
     private static MiScanner scanner = new MiScanner();                             //Scanner utilizado.
-    private static ColeccionVehiculos vehiculos = new ColeccionVehiculos(TAMANYO);  //Coleccion de vehiculos.
+    private static ColeccionVehiculos vehiculos = new ColeccionVehiculos();  //Coleccion de vehiculos.
     private static ColeccionClientes clientes = new ColeccionClientes(TAMANYO);     //Coleccion de clientes.
 
     /**
@@ -104,7 +104,7 @@ public class Alquiler {
                     vehiculos.anyadirVehiculo(camion);
                     break;
             }
-        } catch (AlmacenVehiculosLlenoException | ObjetoYaExistenteException | FormatoIncorrectoException e) {
+        } catch (ObjetoYaExistenteException | FormatoIncorrectoException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");

@@ -4,6 +4,7 @@ import Clases.Cliente;
 import Excepciones.ListaClientesLlenaException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import java.util.ArrayList;
 
 /**
  * Coleccion de objetos de la clase Cliente.
@@ -12,8 +13,7 @@ import Excepciones.ObjetoYaExistenteException;
  */
 public class ColeccionClientes {
 
-    private Cliente[] clientes;             //Array de objetos Cliente.
-    private int primeraPosicionLibre;       //Indice de la primera posicion vacia en el array.
+    private final ArrayList<Cliente> clientes;             //Coleccion de clientes
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
@@ -21,8 +21,7 @@ public class ColeccionClientes {
      * @param tamanyo el tamanyo de la coleccion.
      */
     public ColeccionClientes(int tamanyo) {
-        clientes = new Cliente[tamanyo];
-        primeraPosicionLibre = 0;
+        clientes = new ArrayList<>();
     }
 
     /**
@@ -33,16 +32,10 @@ public class ColeccionClientes {
      * @throws ObjetoYaExistenteException si el objeto a añadir ya existe.
      */
     public void anyadirCliente(Cliente c) throws ListaClientesLlenaException, ObjetoYaExistenteException {
-        if (primeraPosicionLibre < clientes.length) {
-            for (Cliente vehiculo : clientes) {
-                if (vehiculo != null && vehiculo.getDni().equals(c.getDni())) {
-                    throw new ObjetoYaExistenteException("Ya existe un cliente con ese DNI.");
-                }
-            }
-            clientes[primeraPosicionLibre++] = c;
-            System.out.println("Cliente" + (c.isVip() ? " VIP " : " " )+ "anyadido.");
+        if (posicionCliente(c.getDni()) < 0) {
+            clientes.add(c);
         } else {
-            throw new ListaClientesLlenaException();
+            throw new ObjetoYaExistenteException();
         }
     }
 
@@ -61,5 +54,21 @@ public class ColeccionClientes {
             }
         }
         throw new ObjetoNoExistenteException("El cliente no existe.");
+    }
+
+    /**
+     * Devuelve la posicion del cliente identificado por el dni introducido en
+     * la coleccion.
+     *
+     * @param dni del cliente a buscar.
+     * @return la posicion del cliente; -1 si no existe en la coleccion.
+     */
+    public int posicionCliente(String dni) {
+        for (int i = 0; i < clientes.size(); i++) {
+            if (clientes.get(i).getDni().equals(dni)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

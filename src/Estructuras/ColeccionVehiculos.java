@@ -1,9 +1,9 @@
 package Estructuras;
 
 import Abstractas.Vehiculo;
-import Excepciones.AlmacenVehiculosLlenoException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import java.util.ArrayList;
 
 /**
  * Coleccion de objetos de la clase Objeto.
@@ -12,37 +12,28 @@ import Excepciones.ObjetoYaExistenteException;
  */
 public class ColeccionVehiculos {
 
-    private Vehiculo[] vehiculos;           //Array de objetos Vehiculo.
-    private int primeraPosicionLibre;       //Indice de la primera posicion vacia en el array.
+    private ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
-     *
-     * @param tamanyo el tamanyo de la coleccion.
      */
-    public ColeccionVehiculos(int tamanyo) {
-        vehiculos = new Vehiculo[tamanyo];
-        primeraPosicionLibre = 0;
+    public ColeccionVehiculos() {
+        vehiculos = new ArrayList<>();
     }
 
     /**
      * Anayade un vehiculo a la coleccion.
      *
      * @param v el vechiulo a anyadir.
-     * @throws AlmacenVehiculosLlenoException si la coleccion ya esta llena.
-     * @throws ObjetoYaExistenteException si el objeto ya existe en la coleccion.
+     * @throws ObjetoYaExistenteException si el objeto ya existe en la
+     * coleccion.
      */
-    public void anyadirVehiculo(Vehiculo v) throws AlmacenVehiculosLlenoException, ObjetoYaExistenteException {
-        if (primeraPosicionLibre < vehiculos.length) {
-            for (Vehiculo vehiculo : vehiculos) {
-                if (vehiculo != null && vehiculo.getMatricula().equals(v.getMatricula())) {
-                    throw new ObjetoYaExistenteException("Ya existe un vehiculo con esa matricula.");
-                }
-            }
-            vehiculos[primeraPosicionLibre++] = v;
-            System.out.println("Vehiculo anyadido.");
+    //TODO averiguar si el vehiculo ya esta antes de insertar
+    public void anyadirVehiculo(Vehiculo v) throws ObjetoYaExistenteException {
+        if (posicionVehiculo(v.getMatricula()) < 0) {
+            vehiculos.add(v);
         } else {
-            throw new AlmacenVehiculosLlenoException();
+            throw new ObjetoYaExistenteException();
         }
     }
 
@@ -56,10 +47,26 @@ public class ColeccionVehiculos {
      */
     public Vehiculo obtenerVechiculo(String matricula) throws ObjetoNoExistenteException {
         for (Vehiculo vehiculo : vehiculos) {
-            if (vehiculo != null && vehiculo.getMatricula().equals(matricula)) {
+            if (vehiculo.getMatricula().equals(matricula)) {
                 return vehiculo;
             }
         }
         throw new ObjetoNoExistenteException("El vehiculo no existe en el almacen.");
+    }
+
+    /**
+     * Devuelve la posicion del vehiculo identificado por la matricula
+     * introducida en la coleccion.
+     *
+     * @param matricula del vehiculo a buscar.
+     * @return la posicion del vehiculo; -1 si no existe en la coleccion.
+     */
+    public int posicionVehiculo(String matricula) {
+        for (int i = 0; i < vehiculos.size(); i++) {
+            if (vehiculos.get(i).getMatricula().equals(matricula)) {
+                return i;
+            }
+        }
+        return -1;
     }
 }
