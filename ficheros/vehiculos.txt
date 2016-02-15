@@ -1,0 +1,2 @@
+Vehiculo		Matricula		NumPlazas / PMA
+Coche			1234ASD			4

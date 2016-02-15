@@ -33,8 +33,10 @@ public class Alquiler {
                     + "1.)Anyadir un vehiculo.\n"
                     + "2.)Obtener el alquiler de un vehiculo.\n"
                     + "3.)Anyadir un cliente.\n"
-                    + "4.)Alquilar vechiulo.\n"
+                    + "4.)Alquilar vehiculo.\n"
                     + "5.)Devolver vehiculo.\n"
+                    + "6.)Eliminar vehiculo.\n"
+                    + "7.)Eliminar cliente.\n"
                     + "9.)Salir\n");
             try {
                 opcion = leerInt("Introduzca su opcion: ");
@@ -59,6 +61,12 @@ public class Alquiler {
                 case 5:
                     devolverVehiculo();
                     break;
+                case 6:
+                    eliminarVehiculo();
+                    break;
+                case 7:
+                    eliminarCliente();
+                    break;
                 case 9:
                     break;
                 default:
@@ -66,6 +74,7 @@ public class Alquiler {
                     break;
             }
         } while (opcion != 9);
+        vehiculos.guardar();
     }
 
     /**
@@ -170,7 +179,7 @@ public class Alquiler {
     }
 
     /**
-     * Pide al usuario la matricula de un coche y los dias que ha estado
+     * Pide al usuario la matricula de un vehiculo y los dias que ha estado
      * alquilado y devulve qué coste ha tenido. Se le aplica un descuento del
      * 25% si el cliente es vIP.
      */
@@ -204,6 +213,38 @@ public class Alquiler {
                 System.out.println("El precio tras los descuentos es de " + alquiler + "euros.");
             }
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("");
+        }
+    }
+    
+    /**
+     * Pide al usuario la matricula de un vehiculo y lo elimina del almacen.
+     */
+    private static void eliminarVehiculo() {
+        System.out.println("- - - Eliminar Vehiculo - - -");
+        try {
+            String matricula = leerMatricula();
+            vehiculos.eliminarVehiculo(matricula);
+            System.out.println("Vehiculo eliminado.");
+        } catch (FormatoIncorrectoException | ObjetoNoExistenteException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("");
+        }
+    }
+    
+    /**
+     * Pide al usuario un DNI y elimina al cliente que identifica.
+     */
+    private static void eliminarCliente() {
+        System.out.println("- - - Eliminar Cliente - - -");
+        try {
+            String dni = leerDNI();
+            clientes.eliminarCliente(dni);
+            System.out.println("Cliente eliminado.");
+        } catch (FormatoIncorrectoException | ObjetoNoExistenteException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");

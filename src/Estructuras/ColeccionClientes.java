@@ -53,6 +53,22 @@ public class ColeccionClientes {
         }
         throw new ObjetoNoExistenteException("El cliente no existe.");
     }
+    
+    /**
+     * Elimina el cliente identificado por el DNI dado.
+     *
+     * @param dni el DNI del cliente.
+     * @throws ObjetoNoExistenteException so no existe el cliente en la
+     * coleccion,
+     */
+    public void eliminarCliente(String dni) throws ObjetoNoExistenteException {
+        int index = posicionCliente(dni);
+        if (index >= 0) {
+            clientes.remove(index);
+        } else {
+            throw new ObjetoNoExistenteException("El cliente no existe.");
+        }
+    }
 
     /**
      * Devuelve la posicion del cliente identificado por el dni introducido en
@@ -61,7 +77,7 @@ public class ColeccionClientes {
      * @param dni del cliente a buscar.
      * @return la posicion del cliente; -1 si no existe en la coleccion.
      */
-    public int posicionCliente(String dni) {
+    private int posicionCliente(String dni) {
         for (int i = 0; i < clientes.size(); i++) {
             if (clientes.get(i).getDni().equals(dni)) {
                 return i;
