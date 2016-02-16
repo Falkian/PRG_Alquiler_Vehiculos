@@ -20,8 +20,9 @@ public class Alquiler {
     private static final String[] TIPOS = {COCHE, BUS, FURGO, CAMION};
 
     private static final MiScanner scanner = new MiScanner();                             //Scanner utilizado.
-    private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();  //Coleccion de vehiculos.
-    private static final ColeccionClientes clientes = new ColeccionClientes();     //Coleccion de clientes.
+    private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();       //Coleccion de vehiculos.
+    private static final ColeccionClientes clientes = new ColeccionClientes();          //Coleccion de clientes.
+    private static final ColeccionAlquileres alquileres =  new ColeccionAlquileres();   //Coleccion de alquileres
 
     /**
      * Ejecuta el menu principal de programa.
@@ -185,7 +186,8 @@ public class Alquiler {
             Vehiculo v = vehiculos.obtenerVechiculo(matricula);
             String dni = leerDNI();
             Cliente c = clientes.obtenerCliente(dni);
-            v.alquilar(c);
+            //v.alquilar(c);
+            alquileres.anyadirAlquiler(v, c);
             System.out.println("El vechiculo " + v.getMatricula() + " se le ha alquilado al cliente " + c.getDni());
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
@@ -203,10 +205,12 @@ public class Alquiler {
         System.out.println("- - - Devolver Vechiulo - - -");
         try {
             String matricula = leerMatricula();
-            Vehiculo vehiculo = vehiculos.obtenerVechiculo(matricula);
-            boolean vip = vehiculo.getCliente().isVip();
+            Vehiculo vehiculo = alquileres.obtenerAlquiler(matricula).getVehiculo();
+            //boolean vip = vehiculo.getCliente().isVip(); TODO lista alquiler
+            boolean vip = alquileres.obtenerAlquiler(matricula).getCliente().isVip();
             boolean primera = vehiculo.isPrimerAlquiler();
-            vehiculo.devolver();
+            //vehiculo.devolver();
+            vehiculos.eliminarVehiculo(matricula);
             int dias = obtenerDias();
             double alquiler = vehiculo.alquilerTotal(dias);
             vehiculo.mostrarInfoAlquiler(dias, alquiler);

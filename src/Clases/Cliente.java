@@ -1,5 +1,7 @@
 package Clases;
 
+import Excepciones.AlquilerVehiculoException;
+
 public class Cliente {
 
     private final String dni;
@@ -7,6 +9,7 @@ public class Cliente {
     private String direccion;
     private String tlf;
     private boolean vip;
+    private boolean alquilado;
     
     public Cliente(String dni) {
         this.dni = dni;
@@ -17,6 +20,7 @@ public class Cliente {
         this.nombre = nombre;
         this.direccion = direccion;
         this.tlf = tlf;
+        alquilado = false;
     }
 
     public String getDni() {
@@ -53,5 +57,25 @@ public class Cliente {
 
     public void setVip(boolean vip) {
         this.vip = vip;
+    }
+    
+    public boolean isAlquilado() {
+        return alquilado;
+    }
+    
+    public void alquilar() throws AlquilerVehiculoException {
+        if (!alquilado) {
+            alquilado = true;
+        } else {
+            throw new AlquilerVehiculoException("El cliente ya tiene un vehiculo alquilado.");
+        }
+    }
+    
+    public void devolver() throws AlquilerVehiculoException {
+        if(alquilado) {
+            alquilado = false;
+        } else {
+            throw new AlquilerVehiculoException("El cliente no tiene ningun vehiculo alquilado.");
+        }
     }
 }

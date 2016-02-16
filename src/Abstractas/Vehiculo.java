@@ -11,9 +11,9 @@ import Excepciones.AlquilerVehiculoException;
  */
 public abstract class Vehiculo {
 
-    private final String matricula;     //Maricula del vehiculo
+    private final String matricula;           //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
-    private Cliente cliente;            //Cliente al que se le ha alquilado
+    //private Cliente cliente;            //Cliente al que se le ha alquilado
     private boolean primer;
 
     /**
@@ -55,14 +55,14 @@ public abstract class Vehiculo {
     /**
      * Alquila el vehiculo al cliente pasado.
      *
-     * @param c el cliente al que se le alquila el vehiculo.
+     //* @param c el cliente al que se le alquila el vehiculo.
      * @throws AlquilerVehiculoException si el vehiculo ya esta alquilado.
      */
-    public void alquilar(Cliente c) throws AlquilerVehiculoException {
+    public void alquilar(/*Cliente c*/) throws AlquilerVehiculoException {
         if (alquilado) {
             throw new AlquilerVehiculoException("El vehiculo ya esta alquilado.");
         } else {
-            cliente = c;
+            //cliente = c;
             alquilado = true;            
         }
     }
@@ -75,7 +75,7 @@ public abstract class Vehiculo {
     public void devolver() throws AlquilerVehiculoException {
         if (alquilado) {
             alquilado = false;
-            cliente = null;
+            //cliente = null;
             primer = false;
         } else {
             throw new AlquilerVehiculoException("El vechiculo no esta alquilado.");
@@ -87,14 +87,14 @@ public abstract class Vehiculo {
      *
      * @return el cliente al que esta alquilado el vehiculo.
      * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
-     */
+     *
     public Cliente getCliente() throws AlquilerVehiculoException {
         if (alquilado) {
             return cliente;
         } else {
             throw new AlquilerVehiculoException("El vehiculo no esta alquilado.");
         }
-    }
+    }*/
 
     /**
      * Devuelve el precio base de alquilar un vehiculo para los dias dados.
