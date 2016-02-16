@@ -70,7 +70,7 @@ public class ColeccionAlquileres {
                     System.out.println("El archivo de laquileres no contiene informacion.");
                 }
                 while (str != null) {
-                    //Escribir cada linea
+                    //TODO Leer cada linea
                 }
             }
             reader.close();
