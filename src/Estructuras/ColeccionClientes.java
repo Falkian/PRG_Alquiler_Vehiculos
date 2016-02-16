@@ -4,6 +4,12 @@ import Clases.Cliente;
 import Excepciones.ListaClientesLlenaException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
@@ -12,7 +18,9 @@ import java.util.ArrayList;
  * @author Kevin
  */
 public class ColeccionClientes {
-
+    
+    private static final String PATH = "ficheros/clientes.txt";
+    
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes
 
     /**
@@ -53,7 +61,7 @@ public class ColeccionClientes {
         }
         throw new ObjetoNoExistenteException("El cliente no existe.");
     }
-    
+
     /**
      * Elimina el cliente identificado por el DNI dado.
      *
@@ -67,6 +75,70 @@ public class ColeccionClientes {
             clientes.remove(index);
         } else {
             throw new ObjetoNoExistenteException("El cliente no existe.");
+        }
+    }
+
+    /**
+     * Carga la informacion del fichero en el programa
+     */
+    public void cargar() {
+        File archivo = new File(PATH);
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(archivo));
+            
+            //Lee el encabezado del archivo e informa si esta vacio.
+            String str = reader.readLine();
+            if (str == null) {
+                System.out.println("Archivo de clientes en blanco.");
+                return;
+            } else {
+                //Lee la primera linea del archivo e informa si no contiene datos.
+                str = reader.readLine();
+                if (str == null) {
+                    System.out.println("El archivo de clientes no contiene informacion.");
+                }
+                while (str != null) {
+                    String[] datos = str.split("\\t+");
+                    Cliente c = new Cliente(datos[0], datos[1], datos[2], datos[3]);
+                    if (datos[4].equals("S")) {
+                        c.setVip(true);
+                    }
+                    clientes.add(c);
+                    str = reader.readLine();
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("Fin de la carga de clientes.");
+        }
+    }
+
+    /**
+     * Guarda la informacion almacenada en la lista en un fichero.
+     */
+    public void guardar() {
+        File archivo = new File(PATH);
+        PrintWriter writer = null;
+        try {
+            archivo.createNewFile();
+            writer = new PrintWriter(new FileWriter(archivo));
+            
+            writer.println("NumDNI\t\tNombre\t\tDireccion\t\tTelefono\t\tVIP");
+            
+            for (Cliente cliente : clientes) {
+                writer.printf("%-9s\t%-7s\t\t%-12s\t\t%-14s\t\t%s%n"
+                        + "", cliente.getDni(), cliente.getNombre(), cliente.getDireccion(), cliente.getTlf(),
+                        (cliente.isVip() ? "S" : "N"));
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
         }
     }
 

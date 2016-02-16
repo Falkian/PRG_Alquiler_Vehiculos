@@ -3,9 +3,16 @@ package Estructuras;
 import Abstractas.V_Carga;
 import Abstractas.V_Transporte;
 import Abstractas.Vehiculo;
+import Clases.Camion;
+import Clases.Coche;
+import Clases.Furgoneta;
+import Clases.Microbus;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,7 +25,7 @@ import java.util.ArrayList;
  */
 public class ColeccionVehiculos {
 
-    private static final String PATH = "/ficheros/vehiculos.txt";
+    private static final String PATH = "ficheros/vehiculos.txt";
 
     private final ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
 
@@ -36,7 +43,6 @@ public class ColeccionVehiculos {
      * @throws ObjetoYaExistenteException si el objeto ya existe en la
      * coleccion.
      */
-    //TODO averiguar si el vehiculo ya esta antes de insertar
     public void anyadirVehiculo(Vehiculo v) throws ObjetoYaExistenteException {
         if (posicionVehiculo(v.getMatricula()) < 0) {
             vehiculos.add(v);
@@ -78,37 +84,84 @@ public class ColeccionVehiculos {
         }
     }
 
-    //TODO Cargar de fichero
+    /**
+     * Carga la informacion del fichero en el programa
+     */
     public void cargar() {
+        File archivo = new File(PATH);
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new FileReader(archivo));
 
+            //Lee el encabezado del archivo e informa si esta vacio.
+            String str = reader.readLine();
+            if (str == null) {
+                System.out.println("Archivo de vehiclos en blanco.");
+                return;
+            } else {
+                //Lee la primera linea del archivo e informa si no contiene datos.
+                str = reader.readLine();
+                if (str == null) {
+                    System.out.println("El archivo de vechiculos no contiene informacion.");
+                }
+                while (str != null) {
+                    String[] datos = str.split("\\t+");
+                    String tipo = datos[0].trim();
+                    String matricula = datos[1];
+                    switch (tipo) {
+                        case "Coche":
+                            vehiculos.add(new Coche(matricula, Integer.parseInt(datos[2])));
+                            break;
+                        case "Microbus":
+                            vehiculos.add(new Microbus(matricula, Integer.parseInt(datos[2])));
+                            break;
+                        case "Furgoneta":
+                            vehiculos.add(new Furgoneta(matricula, Double.parseDouble(datos[2])));
+                            break;
+                        case "Camion":
+                            vehiculos.add(new Camion(matricula, Double.parseDouble(datos[2])));
+                            break;
+                    }
+                    str = reader.readLine();
+                }
+            }
+            reader.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("Fin de la carga de vehiculos.");
+        }
     }
 
     /**
      * Guarda la informacion almacenada en la lista en un fichero.
      */
-    //TODO repasar, falla el formato
     public void guardar() {
-        File archivo = new File("ficheros/vehiculos.txt");
-        try {        
-            
-            archivo.createNewFile();            
-            PrintWriter writer = new PrintWriter(new FileWriter(archivo, false));
+        File archivo = new File(PATH);
+        PrintWriter writer = null;
+        try {
+            archivo.createNewFile();
+            writer = new PrintWriter(new FileWriter(archivo, false));
 
             writer.println("Vehiculo\t\tMatricula\t\tNumPlazas / PMA");
 
             for (Vehiculo vehiculo : vehiculos) {
                 String tipo = vehiculo.getClass().getName().split("\\.", 2)[1];
+                writer.printf("%-9s\t\t%-9s\t\t", tipo, vehiculo.getMatricula());
                 if (vehiculo instanceof V_Transporte) {
                     V_Transporte v = (V_Transporte) vehiculo;
-                    writer.println(tipo + (tipo.length() < 8 ? "\t" : "" ) + "\t\t" + v.getMatricula() + "\t\t\t" + v.getPlazas());
+                    writer.println(v.getPlazas());
                 } else {
                     V_Carga v = (V_Carga) vehiculo;
-                    writer.println(tipo + (tipo.length() < 8 ? "\t" : "" ) + "\t\t" + v.getMatricula() + "\t\t\t" + v.getPMA());
+                    writer.println(v.getPMA());
                 }
             }
-            writer.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
         }
     }
 

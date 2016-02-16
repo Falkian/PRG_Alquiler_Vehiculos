@@ -34,8 +34,7 @@ public class MiScanner {
     public String leerSegunPatron(String regex, String msg, String errmsg, boolean caseSen)
             throws FormatoIncorrectoException {
         System.out.print(msg);
-        String ret = scanner.next();
-        scanner.nextLine();
+        String ret = scanner.nextLine();
         if (!caseSen) {
             ret = ret.toUpperCase();
         }

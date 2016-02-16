@@ -27,6 +27,8 @@ public class Alquiler {
      * Ejecuta el menu principal de programa.
      */
     public static void ejecutar() {
+        vehiculos.cargar();
+        clientes.cargar();
         int opcion = 0;
         do {
             System.out.print("===== MENU =====\n"
@@ -75,6 +77,7 @@ public class Alquiler {
             }
         } while (opcion != 9);
         vehiculos.guardar();
+        clientes.guardar();
     }
 
     /**
@@ -222,6 +225,7 @@ public class Alquiler {
     /**
      * Pide al usuario la matricula de un vehiculo y lo elimina del almacen.
      */
+    //TODO descincular cliente si estaba alquilado.
     private static void eliminarVehiculo() {
         System.out.println("- - - Eliminar Vehiculo - - -");
         try {
@@ -238,6 +242,7 @@ public class Alquiler {
     /**
      * Pide al usuario un DNI y elimina al cliente que identifica.
      */
+    //TODO desvincular vehiculo si estba alquilando
     private static void eliminarCliente() {
         System.out.println("- - - Eliminar Cliente - - -");
         try {
@@ -299,7 +304,7 @@ public class Alquiler {
         double pma = 0;
         try {
             pma = leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
-            while (pma < 1000 || pma > max) {
+            while (pma < 500 || pma > max) {
                 System.out.println("PMA no permitido. Debe estar entre 1000 y " + max + ".");
                 pma = leerDouble("Introduce el Peso Maximo Autorizado del vehiculo: ");
             }
