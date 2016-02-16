@@ -11,7 +11,7 @@ import Excepciones.AlquilerVehiculoException;
  */
 public abstract class Vehiculo {
 
-    private final String matricula;           //Maricula del vehiculo
+    private final String matricula;     //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
     private Cliente cliente;            //Cliente al que se le ha alquilado
     private boolean primer;

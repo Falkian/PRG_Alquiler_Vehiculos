@@ -18,7 +18,7 @@ public class Alquiler {
     private static final String FURGO = "FURGONETA";    //Valor de la cadena FURGNETA
     private static final String CAMION = "CAMION";      //Valor de la cadena CAMION
     private static final String[] TIPOS = {COCHE, BUS, FURGO, CAMION};
-    
+
     private static final MiScanner scanner = new MiScanner();                             //Scanner utilizado.
     private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();  //Coleccion de vehiculos.
     private static final ColeccionClientes clientes = new ColeccionClientes();     //Coleccion de clientes.
@@ -27,8 +27,21 @@ public class Alquiler {
      * Ejecuta el menu principal de programa.
      */
     public static void ejecutar() {
-        vehiculos.cargar();
-        clientes.cargar();
+        System.out.println("- - - Carga de archivos - - -");
+        try {       //Carga los vehiculos del fichero.
+            vehiculos.cargar();
+        } catch (FormatoArchivoException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Se trabajara sin datos de vehiculos.");
+        }
+        try {       //Carga los clientes del archivo
+            clientes.cargar();
+        } catch (FormatoArchivoException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Se trabajara sin datos de clientes.");
+        } finally {
+            System.out.println("\n- - - Fin de la carga - - -\n");
+        }
         int opcion = 0;
         do {
             System.out.print("===== MENU =====\n"
@@ -221,7 +234,7 @@ public class Alquiler {
             System.out.println("");
         }
     }
-    
+
     /**
      * Pide al usuario la matricula de un vehiculo y lo elimina del almacen.
      */
@@ -238,7 +251,7 @@ public class Alquiler {
             System.out.println("");
         }
     }
-    
+
     /**
      * Pide al usuario un DNI y elimina al cliente que identifica.
      */

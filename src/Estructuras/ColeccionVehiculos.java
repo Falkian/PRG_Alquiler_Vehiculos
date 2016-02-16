@@ -9,9 +9,9 @@ import Clases.Furgoneta;
 import Clases.Microbus;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import Excepciones.FormatoArchivoException;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -86,8 +86,11 @@ public class ColeccionVehiculos {
 
     /**
      * Carga la informacion del fichero en el programa
+     * 
+     * @throws FormatoArchivoException si la informacion del archivo no tiene el
+     * formato adecuado.
      */
-    public void cargar() {
+    public void cargar() throws FormatoArchivoException {
         File archivo = new File(PATH);
         BufferedReader reader;
         try {
@@ -106,8 +109,12 @@ public class ColeccionVehiculos {
                 }
                 while (str != null) {
                     String[] datos = str.split("\\t+");
+                    if (datos.length != 3) {
+                        vehiculos.clear();
+                        throw new FormatoArchivoException("Fallo en el formato de los datos de los vehiculos.");
+                    }
                     String tipo = datos[0].trim();
-                    String matricula = datos[1];
+                    String matricula = datos[1].trim();
                     switch (tipo) {
                         case "Coche":
                             vehiculos.add(new Coche(matricula, Integer.parseInt(datos[2])));
@@ -136,6 +143,7 @@ public class ColeccionVehiculos {
     /**
      * Guarda la informacion almacenada en la lista en un fichero.
      */
+    //TODO comprobar que la informacion tenga la longitud adecuada.
     public void guardar() {
         File archivo = new File(PATH);
         PrintWriter writer = null;

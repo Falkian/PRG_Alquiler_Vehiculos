@@ -4,6 +4,7 @@ import Clases.Cliente;
 import Excepciones.ListaClientesLlenaException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import Excepciones.FormatoArchivoException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,9 +19,9 @@ import java.util.ArrayList;
  * @author Kevin
  */
 public class ColeccionClientes {
-    
+
     private static final String PATH = "ficheros/clientes.txt";
-    
+
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes
 
     /**
@@ -80,13 +81,16 @@ public class ColeccionClientes {
 
     /**
      * Carga la informacion del fichero en el programa
+     *
+     * @throws FormatoArchivoException si la informacion del archivo no tiene el
+     * formato adecuado.
      */
-    public void cargar() {
+    public void cargar() throws FormatoArchivoException {
         File archivo = new File(PATH);
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(archivo));
-            
+
             //Lee el encabezado del archivo e informa si esta vacio.
             String str = reader.readLine();
             if (str == null) {
@@ -100,7 +104,11 @@ public class ColeccionClientes {
                 }
                 while (str != null) {
                     String[] datos = str.split("\\t+");
-                    Cliente c = new Cliente(datos[0], datos[1], datos[2], datos[3]);
+                    if (datos.length != 5) {
+                        clientes.clear();
+                        throw new FormatoArchivoException("Fallo en el formato de los datos de los clientes.");
+                    }
+                    Cliente c = new Cliente(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
                     if (datos[4].equals("S")) {
                         c.setVip(true);
                     }
@@ -119,19 +127,23 @@ public class ColeccionClientes {
     /**
      * Guarda la informacion almacenada en la lista en un fichero.
      */
+    //TODO comprobar que la informacion tenga la longitud adecuada.
     public void guardar() {
         File archivo = new File(PATH);
         PrintWriter writer = null;
         try {
             archivo.createNewFile();
             writer = new PrintWriter(new FileWriter(archivo));
-            
+
             writer.println("NumDNI\t\tNombre\t\tDireccion\t\tTelefono\t\tVIP");
-            
+
             for (Cliente cliente : clientes) {
-                writer.printf("%-9s\t%-7s\t\t%-12s\t\t%-14s\t\t%s%n"
-                        + "", cliente.getDni(), cliente.getNombre(), cliente.getDireccion(), cliente.getTlf(),
-                        (cliente.isVip() ? "S" : "N"));
+                String dni = cliente.getDni();
+                String nombre = cliente.getNombre();
+                String dir = cliente.getDireccion();
+                String tlf = cliente.getTlf();
+                String vip = cliente.isVip() ? "S" : "N";
+                writer.printf("%-9s\t%-7s\t\t%-12s\t%-12s\t%s%n", dni, nombre, dir, tlf, vip);
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
