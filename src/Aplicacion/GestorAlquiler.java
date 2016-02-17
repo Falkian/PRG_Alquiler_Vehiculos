@@ -11,7 +11,7 @@ import Utilidades.MiScanner;
  *
  * @author Kevin
  */
-public class Alquiler {
+public class GestorAlquiler {
 
     private static final String COCHE = "COCHE";        //Valor de la cadena COCHE
     private static final String BUS = "MICROBUS";       //Valor de la cadena BUS
@@ -22,7 +22,7 @@ public class Alquiler {
     private static final MiScanner scanner = new MiScanner();                             //Scanner utilizado.
     private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();       //Coleccion de vehiculos.
     private static final ColeccionClientes clientes = new ColeccionClientes();          //Coleccion de clientes.
-    private static final ColeccionAlquileres alquileres =  new ColeccionAlquileres();   //Coleccion de alquileres
+    private static final ColeccionAlquileres alquileres = new ColeccionAlquileres();   //Coleccion de alquileres
 
     /**
      * Ejecuta el menu principal de programa.
@@ -40,6 +40,12 @@ public class Alquiler {
         } catch (FormatoArchivoException e) {
             System.out.println(e.getMessage());
             System.out.println("Se trabajara sin datos de clientes.");
+        } 
+        try {   //Carga los alquileres del archivo
+            alquileres.cargar(vehiculos, clientes); //TODO existe algun problema con la carga de alquileres
+        } catch (FormatoArchivoException e) {
+            System.out.println(e.getMessage());
+            System.out.println("Se trabajara sin datos de alquiler.");
         } finally {
             System.out.println("\n- - - Fin de la carga - - -\n");
         }
@@ -92,6 +98,7 @@ public class Alquiler {
         } while (opcion != 9);
         vehiculos.guardar();
         clientes.guardar();
+        alquileres.guardar();
     }
 
     /**
@@ -204,13 +211,15 @@ public class Alquiler {
     private static void devolverVehiculo() {
         System.out.println("- - - Devolver Vechiulo - - -");
         try {
+            //Lee la matricula y obtiene el vechiculo
             String matricula = leerMatricula();
-            Vehiculo vehiculo = alquileres.obtenerAlquiler(matricula).getVehiculo();
-            //boolean vip = vehiculo.getCliente().isVip(); TODO lista alquiler
-            boolean vip = alquileres.obtenerAlquiler(matricula).getCliente().isVip();
+            Vehiculo vehiculo = alquileres.obtenerAlquilerPorMatricula(matricula).getVehiculo();            
+            //Guarda la informacion necesaria para calcular el precio del alquiler
+            boolean vip = alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().isVip();
             boolean primera = vehiculo.isPrimerAlquiler();
-            //vehiculo.devolver();
-            vehiculos.eliminarVehiculo(matricula);
+            //Devuelve el alquiler.
+            alquileres.eliminarAlquiler(matricula);
+            //Lee los dias y calcula el precio final
             int dias = obtenerDias();
             double alquiler = vehiculo.alquilerTotal(dias);
             vehiculo.mostrarInfoAlquiler(dias, alquiler);
@@ -242,14 +251,24 @@ public class Alquiler {
     /**
      * Pide al usuario la matricula de un vehiculo y lo elimina del almacen.
      */
-    //TODO descincular cliente si estaba alquilado.
     private static void eliminarVehiculo() {
         System.out.println("- - - Eliminar Vehiculo - - -");
         try {
             String matricula = leerMatricula();
-            vehiculos.eliminarVehiculo(matricula);
-            System.out.println("Vehiculo eliminado.");
-        } catch (FormatoIncorrectoException | ObjetoNoExistenteException e) {
+            if (vehiculos.obtenerVechiculo(matricula).isAlquilado()) {
+                String dni = alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().getDni();
+                System.out.println("El vehiculo que quiere eliminar esta alquilado por el cliente " + dni);
+                boolean eliminar = scanner.leerSN("Seguro que quiere eliminarlo (S/N)? ", "Debe responder adirmativa o negativamente.");
+                if (eliminar) {
+                    alquileres.obtenerAlquilerPorMatricula(matricula).getVehiculo().devolver();
+                    alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().devolver();
+                    vehiculos.eliminarVehiculo(matricula);
+                    System.out.println("Vehiculo eliminado.");
+                } else {
+                    System.out.println("No se eliminara el vechiculo");
+                }
+            }
+        } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");
@@ -259,14 +278,24 @@ public class Alquiler {
     /**
      * Pide al usuario un DNI y elimina al cliente que identifica.
      */
-    //TODO desvincular vehiculo si estba alquilando
     private static void eliminarCliente() {
         System.out.println("- - - Eliminar Cliente - - -");
         try {
             String dni = leerDNI();
-            clientes.eliminarCliente(dni);
-            System.out.println("Cliente eliminado.");
-        } catch (FormatoIncorrectoException | ObjetoNoExistenteException e) {
+            if (alquileres.obtenerAlquilerPorDni(dni).getCliente().isAlquilado()) {
+                String matricula = alquileres.obtenerAlquilerPorDni(dni).getVehiculo().getMatricula();
+                System.out.println("El cliente tiene alquilado el vehiculo " + matricula);
+                boolean eliminar = scanner.leerSN("Seguro que quiere eliminarlo (S/N))? ", "Debe responder afirmativa o negativamente.");
+                if (eliminar) {
+                    alquileres.obtenerAlquilerPorDni(dni).getCliente().devolver();
+                    alquileres.obtenerAlquilerPorDni(dni).getVehiculo().devolver();
+                    clientes.eliminarCliente(dni);
+                    System.out.println("Cliente eliminado.");
+                } else {
+                    System.out.println("No se eliminara el cliente.");
+                }
+            }
+        } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");

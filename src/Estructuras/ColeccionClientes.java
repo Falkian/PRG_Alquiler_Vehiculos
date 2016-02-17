@@ -60,7 +60,7 @@ public class ColeccionClientes {
                 return cliente;
             }
         }
-        throw new ObjetoNoExistenteException("El cliente no existe.");
+        throw new ObjetoNoExistenteException("El cliente con dni " + dni + " no existe.");
     }
 
     /**
@@ -75,7 +75,7 @@ public class ColeccionClientes {
         if (index >= 0) {
             clientes.remove(index);
         } else {
-            throw new ObjetoNoExistenteException("El cliente no existe.");
+            throw new ObjetoNoExistenteException("El cliente con dni " + dni + " no existe.");
         }
     }
 
@@ -127,7 +127,6 @@ public class ColeccionClientes {
     /**
      * Guarda la informacion almacenada en la lista en un fichero.
      */
-    //TODO comprobar que la informacion tenga la longitud adecuada.
     public void guardar() {
         File archivo = new File(PATH);
         PrintWriter writer = null;
@@ -143,7 +142,7 @@ public class ColeccionClientes {
                 String dir = cliente.getDireccion();
                 String tlf = cliente.getTlf();
                 String vip = cliente.isVip() ? "S" : "N";
-                writer.printf("%-9s\t%-7s\t\t%-12s\t%-12s\t%s%n", dni, nombre, dir, tlf, vip);
+                writer.printf("%-9s\t%-7s\t\t%-12s\t\t%-18s\t%s%n", dni, nombre, dir, tlf, vip);
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());

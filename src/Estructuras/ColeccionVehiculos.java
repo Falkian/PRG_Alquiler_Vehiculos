@@ -65,7 +65,7 @@ public class ColeccionVehiculos {
                 return vehiculo;
             }
         }
-        throw new ObjetoNoExistenteException("El vehiculo no existe en el almacen.");
+        throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
     }
 
     /**
@@ -73,14 +73,14 @@ public class ColeccionVehiculos {
      *
      * @param matricula la matricula del vehiculo.
      * @throws ObjetoNoExistenteException so no existe el vehiculo en la
-     * coleccion,
+     * coleccion.
      */
     public void eliminarVehiculo(String matricula) throws ObjetoNoExistenteException {
         int index = posicionVehiculo(matricula);
         if (index >= 0) {
             vehiculos.remove(index);
         } else {
-            throw new ObjetoNoExistenteException("El vehiculo no existe en el almacen.");
+            throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
         }
     }
 
@@ -143,7 +143,6 @@ public class ColeccionVehiculos {
     /**
      * Guarda la informacion almacenada en la lista en un fichero.
      */
-    //TODO comprobar que la informacion tenga la longitud adecuada.
     public void guardar() {
         File archivo = new File(PATH);
         PrintWriter writer = null;

@@ -11,6 +11,6 @@ class AplicacionAlquiler {
      * @param args argumentos de la aplicacion. (No acepta ninguno)
      */
     public static void main(String[] args) {
-        Alquiler.ejecutar();
+        GestorAlquiler.ejecutar();
     }
 }
