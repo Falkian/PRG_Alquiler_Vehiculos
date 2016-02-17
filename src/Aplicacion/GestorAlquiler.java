@@ -42,7 +42,7 @@ public class GestorAlquiler {
             System.out.println("Se trabajara sin datos de clientes.");
         } 
         try {   //Carga los alquileres del archivo
-            alquileres.cargar(vehiculos, clientes); //TODO existe algun problema con la carga de alquileres
+            alquileres.cargar(vehiculos, clientes);
         } catch (FormatoArchivoException e) {
             System.out.println(e.getMessage());
             System.out.println("Se trabajara sin datos de alquiler.");

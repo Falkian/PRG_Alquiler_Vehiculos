@@ -92,9 +92,9 @@ public class ColeccionAlquileres {
                         throw new FormatoArchivoException("Fallo en el formato de los datos de los alquileres.");
                     }
                     try {
-                        String matricula = datos[0];
+                        String matricula = datos[0].trim();
                         Vehiculo v = vehiculos.obtenerVechiculo(matricula);
-                        String dni = datos[1];
+                        String dni = datos[1].trim();
                         Cliente c = clientes.obtenerCliente(dni);
                         alquileres.add(new Alquiler(v, c));
                     } catch (ObjetoNoExistenteException e) {
