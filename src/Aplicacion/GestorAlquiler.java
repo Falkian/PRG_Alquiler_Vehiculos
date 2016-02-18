@@ -29,26 +29,14 @@ public class GestorAlquiler {
      */
     public static void ejecutar() {
         System.out.println("- - - Carga de archivos - - -");
-        try {       //Carga los vehiculos del fichero.
-            vehiculos.cargar();
-        } catch (FormatoArchivoException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Se trabajara sin datos de vehiculos.");
-        }
-        try {       //Carga los clientes del archivo
-            clientes.cargar();
-        } catch (FormatoArchivoException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Se trabajara sin datos de clientes.");
-        } 
-        try {   //Carga los alquileres del archivo
-            alquileres.cargar(vehiculos, clientes);
-        } catch (FormatoArchivoException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Se trabajara sin datos de alquiler.");
-        } finally {
-            System.out.println("\n- - - Fin de la carga - - -\n");
-        }
+        //Carga los vehiculos del fichero.
+        vehiculos.cargar();
+        //Carga los clientes del archivo
+        clientes.cargar();
+        //Carga los alquileres del archivo
+        alquileres.cargar(vehiculos, clientes);
+        System.out.println("- - - Fin de la carga - - -\n");
+
         int opcion = 0;
         do {
             System.out.print("===== MENU =====\n"
@@ -213,7 +201,7 @@ public class GestorAlquiler {
         try {
             //Lee la matricula y obtiene el vechiculo
             String matricula = leerMatricula();
-            Vehiculo vehiculo = alquileres.obtenerAlquilerPorMatricula(matricula).getVehiculo();            
+            Vehiculo vehiculo = alquileres.obtenerAlquilerPorMatricula(matricula).getVehiculo();
             //Guarda la informacion necesaria para calcular el precio del alquiler
             boolean vip = alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().isVip();
             boolean primera = vehiculo.isPrimerAlquiler();

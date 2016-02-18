@@ -4,7 +4,6 @@ import Clases.Cliente;
 import Excepciones.ListaClientesLlenaException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
-import Excepciones.FormatoArchivoException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
  */
 public class ColeccionClientes {
 
-    private static final String PATH = "ficheros/clientes.txt";
+    private static final String PATH = "ficheros/listaClientes.txt";
 
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes
 
@@ -81,11 +80,8 @@ public class ColeccionClientes {
 
     /**
      * Carga la informacion del fichero en el programa
-     *
-     * @throws FormatoArchivoException si la informacion del archivo no tiene el
-     * formato adecuado.
      */
-    public void cargar() throws FormatoArchivoException {
+    public void cargar() {
         File archivo = new File(PATH);
         BufferedReader reader;
         try {
@@ -101,26 +97,29 @@ public class ColeccionClientes {
                 str = reader.readLine();
                 if (str == null) {
                     System.out.println("El archivo de clientes no contiene informacion.");
+                    return;
                 }
-                while (str != null) {
-                    String[] datos = str.split("\\t+");
+                int linea = 1;
+                while (str != null && !str.equals("")) {
+                    String[] datos = str.split("\\t\\t");
                     if (datos.length != 5) {
-                        clientes.clear();
-                        throw new FormatoArchivoException("Fallo en el formato de los datos de los clientes.");
+                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                    } else {
+                        Cliente c = new Cliente(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
+                        if (datos[4].equals("S")) {
+                            c.setVip(true);
+                        }
+                        clientes.add(c);
                     }
-                    Cliente c = new Cliente(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
-                    if (datos[4].equals("S")) {
-                        c.setVip(true);
-                    }
-                    clientes.add(c);
                     str = reader.readLine();
+                    linea++;
                 }
             }
             reader.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } finally {
-            System.out.println("Fin de la carga de clientes.");
+            System.out.println("Fin de la carga de clientes.\n");
         }
     }
 
@@ -142,7 +141,7 @@ public class ColeccionClientes {
                 String dir = cliente.getDireccion();
                 String tlf = cliente.getTlf();
                 String vip = cliente.isVip() ? "S" : "N";
-                writer.printf("%-9s\t%-7s\t\t%-12s\t\t%-18s\t%s%n", dni, nombre, dir, tlf, vip);
+                writer.printf("%s\t\t%s\t\t%s\t\t%s\t\t%s%n", dni, nombre, dir, tlf, vip);
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());

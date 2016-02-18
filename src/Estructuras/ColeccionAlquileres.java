@@ -3,7 +3,6 @@ package Estructuras;
 import Abstractas.Vehiculo;
 import Clases.Cliente;
 import Excepciones.AlquilerVehiculoException;
-import Excepciones.FormatoArchivoException;
 import Excepciones.ObjetoNoExistenteException;
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,22 +12,43 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+/**
+ * Coleccion de objetos de la clase Alquiler.
+ */
 public class ColeccionAlquileres {
 
-    private static final String PATH = "ficheros/alquileres.txt";
+    private static final String PATH = "ficheros/listaAlquileres.txt";
 
-    private final ArrayList<Alquiler> alquileres;
+    private final ArrayList<Alquiler> alquileres;       //COleccion de alquielres
 
+    /**
+     * Constructor de la coleccion de alquileres.
+     */
     public ColeccionAlquileres() {
         alquileres = new ArrayList<>();
     }
 
+    /**
+     * Añade un alquiler con un cliente y un vechiculo dados.
+     *
+     * @param v el vechiculo que se alquila.
+     * @param c el cliente que alquila.
+     * @throws AlquilerVehiculoException si el vehiculo o cliente ya estan
+     * alquilados.
+     */
     public void anyadirAlquiler(Vehiculo v, Cliente c) throws AlquilerVehiculoException {
         alquileres.add(new Alquiler(v, c));
         v.alquilar();
         c.alquilar();
     }
 
+    /**
+     * Dada una matricula devuleve el alquiler del vehiculo que representa.
+     *
+     * @param matricula que identifica al vehiculo.
+     * @return el aluiler que involucra al vehiculo.
+     * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
+     */
     public Alquiler obtenerAlquilerPorMatricula(String matricula) throws AlquilerVehiculoException {
         for (Alquiler alquiler : alquileres) {
             if (alquiler.getVehiculo().getMatricula().equals(matricula)) {
@@ -38,6 +58,14 @@ public class ColeccionAlquileres {
         throw new AlquilerVehiculoException("El vechiculo no esta alquilado.");
     }
 
+    /**
+     * Dado un dni devuelve el alquiler del cliente que representa,
+     *
+     * @param dni que identifica al cliente.
+     * @return el alquiler que involucra al cliente.
+     * @throws AlquilerVehiculoException si el cliente no tiene un vehiculo
+     * alquilado.
+     */
     public Alquiler obtenerAlquilerPorDni(String dni) throws AlquilerVehiculoException {
         for (Alquiler alquiler : alquileres) {
             if (alquiler.getCliente().getDni().equals(dni)) {
@@ -47,6 +75,14 @@ public class ColeccionAlquileres {
         throw new AlquilerVehiculoException("El cliente no tiene vechiculos alquilados.");
     }
 
+    /**
+     * Dada una matricula eliminina un alquiler. El cliente devuelve el vehiculo
+     * y finaliza ael alquiler.
+     *
+     * @param matricula que identifica al vehiculo.
+     * @throws ObjetoNoExistenteException si el vehiculo no existe.
+     * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
+     */
     public void eliminarAlquiler(String matricula) throws ObjetoNoExistenteException, AlquilerVehiculoException {
         for (Alquiler alquiler : alquileres) {
             if (alquiler.getVehiculo().getMatricula().equals(matricula)) {
@@ -65,10 +101,8 @@ public class ColeccionAlquileres {
      * existentes.
      * @param clientes la coleccion en la que se laquilan los clientes
      * existentes.
-     * @throws FormatoArchivoException si la informacion del archivo no tiene el
-     * formato adecuado.
      */
-    public void cargar(ColeccionVehiculos vehiculos, ColeccionClientes clientes) throws FormatoArchivoException {
+    public void cargar(ColeccionVehiculos vehiculos, ColeccionClientes clientes) {
         File archivo = new File(PATH);
         BufferedReader reader;
         try {
@@ -81,34 +115,36 @@ public class ColeccionAlquileres {
                 return;
             } else {
                 //Lee la primera linea e informa si esta vacia
-                str = reader.readLine();
-                if (str == null) {
+                if ((str = reader.readLine()) == null && str.equals("")) {
                     System.out.println("El archivo de alquileres no contiene informacion.");
+                    return;
                 }
-                while (str != null) {
-                    String[] datos = str.split("\\t+");
+                int linea = 1;
+                while (str != null && !str.equals("")) {
+                    String[] datos = str.split("\\t\\t");
                     if (datos.length != 2) {
-                        alquileres.clear();
-                        throw new FormatoArchivoException("Fallo en el formato de los datos de los alquileres.");
+                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                    } else {
+                        try {
+                            String matricula = datos[0].trim();
+                            Vehiculo v = vehiculos.obtenerVechiculo(matricula);
+                            String dni = datos[1].trim();
+                            Cliente c = clientes.obtenerCliente(dni);
+                            alquileres.add(new Alquiler(v, c));
+                        } catch (ObjetoNoExistenteException e) {
+                            System.out.println("Datos en la linea " + linea + " incorrectos: ");
+                            System.out.println(e.getMessage());
+                        }
                     }
-                    try {
-                        String matricula = datos[0].trim();
-                        Vehiculo v = vehiculos.obtenerVechiculo(matricula);
-                        String dni = datos[1].trim();
-                        Cliente c = clientes.obtenerCliente(dni);
-                        alquileres.add(new Alquiler(v, c));
-                    } catch (ObjetoNoExistenteException e) {
-                        System.out.println(e.getMessage());
-                    } finally {
-                        str = reader.readLine();
-                    }
+                    str = reader.readLine();
+                    linea++;
                 }
             }
             reader.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } finally {
-            System.out.println("Fin de la carga de clientes.");
+            System.out.println("Fin de la carga de alquileres.\n");
         }
     }
 
@@ -125,7 +161,7 @@ public class ColeccionAlquileres {
             writer.println("Matricula\t\tCliente");
 
             for (Alquiler alquiler : alquileres) {
-                writer.printf("%-9s\t\t%-9s%n", alquiler.getVehiculo().getMatricula(), alquiler.getCliente().getDni());
+                writer.printf("%s\t\t%s%n", alquiler.getVehiculo().getMatricula(), alquiler.getCliente().getDni());
             }
 
         } catch (IOException e) {

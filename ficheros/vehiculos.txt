@@ -1,7 +1,0 @@
-Vehiculo		Matricula		NumPlazas / PMA
-Coche    		1111AAA  		3
-Camion   		2222BBB  		1550.0
-Furgoneta		3333CCC  		650.0
-Coche    		4444DDD  		5
-Camion   		5555EEE  		2750.32
-Microbus 		6666FFF  		20

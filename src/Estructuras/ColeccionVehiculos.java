@@ -9,7 +9,6 @@ import Clases.Furgoneta;
 import Clases.Microbus;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
-import Excepciones.FormatoArchivoException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
  */
 public class ColeccionVehiculos {
 
-    private static final String PATH = "ficheros/vehiculos.txt";
+    private static final String PATH = "ficheros/listaVehiculos.txt";
 
     private final ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
 
@@ -86,11 +85,8 @@ public class ColeccionVehiculos {
 
     /**
      * Carga la informacion del fichero en el programa
-     * 
-     * @throws FormatoArchivoException si la informacion del archivo no tiene el
-     * formato adecuado.
      */
-    public void cargar() throws FormatoArchivoException {
+    public void cargar() {
         File archivo = new File(PATH);
         BufferedReader reader;
         try {
@@ -106,37 +102,40 @@ public class ColeccionVehiculos {
                 str = reader.readLine();
                 if (str == null) {
                     System.out.println("El archivo de vechiculos no contiene informacion.");
+                    return;
                 }
-                while (str != null) {
-                    String[] datos = str.split("\\t+");
+                int linea = 1;
+                while (str != null && !str.equals("")) {
+                    String[] datos = str.split("\\t\\t");
                     if (datos.length != 3) {
-                        vehiculos.clear();
-                        throw new FormatoArchivoException("Fallo en el formato de los datos de los vehiculos.");
-                    }
-                    String tipo = datos[0].trim();
-                    String matricula = datos[1].trim();
-                    switch (tipo) {
-                        case "Coche":
-                            vehiculos.add(new Coche(matricula, Integer.parseInt(datos[2])));
-                            break;
-                        case "Microbus":
-                            vehiculos.add(new Microbus(matricula, Integer.parseInt(datos[2])));
-                            break;
-                        case "Furgoneta":
-                            vehiculos.add(new Furgoneta(matricula, Double.parseDouble(datos[2])));
-                            break;
-                        case "Camion":
-                            vehiculos.add(new Camion(matricula, Double.parseDouble(datos[2])));
-                            break;
+                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                    } else {
+                        String tipo = datos[0].trim();
+                        String matricula = datos[1].trim();
+                        switch (tipo) {
+                            case "Coche":
+                                vehiculos.add(new Coche(matricula, Integer.parseInt(datos[2])));
+                                break;
+                            case "Microbus":
+                                vehiculos.add(new Microbus(matricula, Integer.parseInt(datos[2])));
+                                break;
+                            case "Furgoneta":
+                                vehiculos.add(new Furgoneta(matricula, Double.parseDouble(datos[2])));
+                                break;
+                            case "Camion":
+                                vehiculos.add(new Camion(matricula, Double.parseDouble(datos[2])));
+                                break;
+                        }
                     }
                     str = reader.readLine();
+                    linea++;
                 }
             }
             reader.close();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } finally {
-            System.out.println("Fin de la carga de vehiculos.");
+            System.out.println("Fin de la carga de vehiculos.\n");
         }
     }
 
@@ -154,7 +153,7 @@ public class ColeccionVehiculos {
 
             for (Vehiculo vehiculo : vehiculos) {
                 String tipo = vehiculo.getClass().getName().split("\\.", 2)[1];
-                writer.printf("%-9s\t\t%-9s\t\t", tipo, vehiculo.getMatricula());
+                writer.printf("%s\t\t%s\t\t", tipo, vehiculo.getMatricula());
                 if (vehiculo instanceof V_Transporte) {
                     V_Transporte v = (V_Transporte) vehiculo;
                     writer.println(v.getPlazas());

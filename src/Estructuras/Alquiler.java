@@ -23,10 +23,19 @@ public class Alquiler {
         this.cliente = cliente;
     }
     
+    /**
+     * Devuelve el cliente.
+     * 
+     * @return el cliente.
+     */
     public Cliente getCliente() {
         return cliente;
     }
     
+    /**
+     * Devuelve el vehiculo.
+     * @return  el vehiculo.
+     */
     public Vehiculo getVehiculo() {
         return vehiculo;
     }
