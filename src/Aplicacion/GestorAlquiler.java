@@ -28,7 +28,7 @@ public class GestorAlquiler {
      * Ejecuta el menu principal de programa.
      */
     public static void ejecutar() {
-        System.out.println("- - - Carga de archivos - - -");
+        System.out.println("- - - Carga de archivos - - -\n");
         //Carga los vehiculos del fichero.
         vehiculos.cargar();
         //Carga los clientes del archivo
