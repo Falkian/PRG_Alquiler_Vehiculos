@@ -59,7 +59,7 @@ public class ColeccionClientes {
                 return cliente;
             }
         }
-        throw new ObjetoNoExistenteException("El cliente con dni " + dni + " no existe.");
+        throw new ObjetoNoExistenteException("El cliente con DNI " + dni + " no existe.");
     }
 
     /**
@@ -95,7 +95,7 @@ public class ColeccionClientes {
             } else {
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 str = reader.readLine();
-                if (str == null) {
+                if (str == null || str.equals("")) {
                     System.out.println("El archivo de clientes no contiene informacion.");
                     return;
                 }

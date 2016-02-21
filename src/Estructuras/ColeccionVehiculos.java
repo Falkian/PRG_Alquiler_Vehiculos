@@ -100,7 +100,7 @@ public class ColeccionVehiculos {
             } else {
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 str = reader.readLine();
-                if (str == null) {
+                if (str == null || str.equals("")) {
                     System.out.println("El archivo de vechiculos no contiene informacion.");
                     return;
                 }

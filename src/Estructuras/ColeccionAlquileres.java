@@ -115,7 +115,7 @@ public class ColeccionAlquileres {
                 return;
             } else {
                 //Lee la primera linea e informa si esta vacia
-                if ((str = reader.readLine()) == null && str.equals("")) {
+                if ((str = reader.readLine()) == null || str.equals("")) {
                     System.out.println("El archivo de alquileres no contiene informacion.");
                     return;
                 }
