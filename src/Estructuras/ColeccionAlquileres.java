@@ -20,7 +20,7 @@ public class ColeccionAlquileres {
 
     private static final String PATH = "ficheros/listaAlquileres.txt";
 
-    private final ArrayList<Alquiler> alquileres;       //COleccion de alquielres
+    private final ArrayList<Alquiler> alquileres;       //Coleccion de alquielres
 
     /**
      * Constructor de la coleccion de alquileres.
