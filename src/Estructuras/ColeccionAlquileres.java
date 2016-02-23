@@ -91,7 +91,6 @@ public class ColeccionAlquileres {
                 alquileres.remove(alquiler);
             }
         }
-        throw new AlquilerVehiculoException("El vehiculo no esta alquilado.");
     }
 
     /**
