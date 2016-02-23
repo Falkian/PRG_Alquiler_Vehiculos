@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Coleccion de objetos de la clase Alquiler.
@@ -77,21 +78,39 @@ public class ColeccionAlquileres {
 
     /**
      * Dada una matricula eliminina un alquiler. El cliente devuelve el vehiculo
-     * y finaliza ael alquiler.
+     * y finaliza el alquiler.
      *
      * @param matricula que identifica al vehiculo.
-     * @throws ObjetoNoExistenteException si el vehiculo no existe.
      * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
      */
-    public void eliminarAlquiler(String matricula) throws ObjetoNoExistenteException, AlquilerVehiculoException {
+    public void eliminarAlquilerPorMatricula(String matricula) throws AlquilerVehiculoException {
         for (Alquiler alquiler : alquileres) {
             if (alquiler.getVehiculo().getMatricula().equals(matricula)) {
-                alquiler.getCliente().devolver();
+                alquiler.getCliente().devolverVehiculo();
                 alquiler.getVehiculo().devolver();
                 alquileres.remove(alquiler);
             }
         }
-        throw new ObjetoNoExistenteException("El vehiculo no esta alquilado.");
+        throw new AlquilerVehiculoException("El vehiculo no esta alquilado.");
+    }
+
+    /**
+     * Dado un dni elimina todos los alquileres que tenga el cliente
+     * identidicado por dicho dni.
+     *
+     * @param dni que identifica al cliente.
+     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos alquilados.
+     */
+    public void eliminarAlquilerPorDni(String dni) throws AlquilerVehiculoException {
+        Iterator<Alquiler> i = alquileres.iterator();
+        while (i.hasNext()) {
+            Alquiler alquiler = i.next();
+            if (alquiler.getCliente().getDni().equals(dni)) {
+                alquiler.getCliente().devolverVehiculo();
+                alquiler.getVehiculo().devolver();
+                i.remove();
+            }
+        }
     }
 
     /**
@@ -130,9 +149,11 @@ public class ColeccionAlquileres {
                             Vehiculo v = vehiculos.obtenerVechiculo(matricula);
                             String dni = datos[1].trim();
                             Cliente c = clientes.obtenerCliente(dni);
-                            alquileres.add(new Alquiler(v, c));
+                            anyadirAlquiler(v, c);
                         } catch (ObjetoNoExistenteException e) {
                             System.out.println("Datos en la linea " + linea + " incorrectos: ");
+                            System.out.println(e.getMessage());
+                        } catch (AlquilerVehiculoException e) {
                             System.out.println(e.getMessage());
                         }
                     }

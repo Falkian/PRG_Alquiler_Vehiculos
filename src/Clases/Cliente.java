@@ -9,7 +9,8 @@ public class Cliente {
     private String direccion;
     private String tlf;
     private boolean vip;
-    private boolean alquilado;
+    //private boolean alquilado;
+    private int vehiculosAlquilados;
     
     public Cliente(String dni) {
         this.dni = dni;
@@ -20,7 +21,8 @@ public class Cliente {
         this.nombre = nombre;
         this.direccion = direccion;
         this.tlf = tlf;
-        alquilado = false;
+        //alquilado = false;
+        vehiculosAlquilados = 0;
     }
 
     public String getDni() {
@@ -60,20 +62,16 @@ public class Cliente {
     }
     
     public boolean isAlquilado() {
-        return alquilado;
+        return vehiculosAlquilados > 0;
     }
     
-    public void alquilar() throws AlquilerVehiculoException {
-        if (!alquilado) {
-            alquilado = true;
-        } else {
-            throw new AlquilerVehiculoException("El cliente ya tiene un vehiculo alquilado.");
-        }
+    public void alquilar() {
+        vehiculosAlquilados++;
     }
     
-    public void devolver() throws AlquilerVehiculoException {
-        if(alquilado) {
-            alquilado = false;
+    public void devolverVehiculo() throws AlquilerVehiculoException {
+        if (vehiculosAlquilados > 0) {
+            vehiculosAlquilados--;
         } else {
             throw new AlquilerVehiculoException("El cliente no tiene ningun vehiculo alquilado.");
         }
