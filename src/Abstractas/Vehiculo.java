@@ -1,6 +1,5 @@
 package Abstractas;
 
-import Clases.Cliente;
 import Excepciones.AlquilerVehiculoException;
 
 /**
@@ -13,7 +12,7 @@ public abstract class Vehiculo {
 
     private final String matricula;           //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
-    private boolean primer;
+    //private boolean primer;
 
     /**
      * Inicializa el vehiculo con la matricula dad como no alquilado.
@@ -22,7 +21,7 @@ public abstract class Vehiculo {
      */
     public Vehiculo(String matricula) {
         alquilado = false;
-        primer = true;
+        //primer = true;
         this.matricula = matricula;
     }
 
@@ -43,25 +42,26 @@ public abstract class Vehiculo {
     public boolean isAlquilado() {
         return alquilado;
     }
-    /**
+    /*
      * Devuleve si es la primera vez que se alquila el vehiculo.
      * @return true si es la primera vez; false en caso contrario.
-     */
-    public boolean isPrimerAlquiler() {
-        return primer;
-    }
+     *
+     public boolean isPrimerAlquiler() {
+     return primer;
+     }*/
 
     /**
      * Alquila el vehiculo al cliente pasado.
      *
-     //* @param c el cliente al que se le alquila el vehiculo.
+     * //* @param c el cliente al que se le alquila el vehiculo.
+     *
      * @throws AlquilerVehiculoException si el vehiculo ya esta alquilado.
      */
     public void alquilar() throws AlquilerVehiculoException {
         if (alquilado) {
             throw new AlquilerVehiculoException("El vehiculo ya esta alquilado.");
         } else {
-            alquilado = true;            
+            alquilado = true;
         }
     }
 
@@ -73,25 +73,11 @@ public abstract class Vehiculo {
     public void devolver() throws AlquilerVehiculoException {
         if (alquilado) {
             alquilado = false;
-            primer = false;
+            //primer = false;
         } else {
             throw new AlquilerVehiculoException("El vechiculo no esta alquilado.");
         }
     }
-
-    /**
-     * Devuelve el cliente al que esta alquilado el vehiculo.
-     *
-     * @return el cliente al que esta alquilado el vehiculo.
-     * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
-     *
-    public Cliente getCliente() throws AlquilerVehiculoException {
-        if (alquilado) {
-            return cliente;
-        } else {
-            throw new AlquilerVehiculoException("El vehiculo no esta alquilado.");
-        }
-    }*/
 
     /**
      * Devuelve el precio base de alquilar un vehiculo para los dias dados.
@@ -101,6 +87,17 @@ public abstract class Vehiculo {
      */
     public double alquilerTotal(int dias) {
         return 50 * dias;
+    }
+
+    /**
+     * Devuleve una cadena con informacion sobre el vehiculo.
+     *
+     * @return una cadena con informacion sobre el vehiculo.
+     */
+    public String obtenerInformacion() {
+        String info = "Matricula: " + matricula;
+        info += "Tipo: " + this.getClass().getSimpleName();
+        return info;
     }
 
     /**

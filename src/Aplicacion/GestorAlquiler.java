@@ -5,6 +5,7 @@ import Clases.*;
 import Estructuras.*;
 import Excepciones.*;
 import Utilidades.MiScanner;
+import java.util.ArrayList;
 
 /**
  * Clase encargada de gestionar la logica del programa.
@@ -19,10 +20,11 @@ public class GestorAlquiler {
     private static final String CAMION = "CAMION";      //Valor de la cadena CAMION
     private static final String[] TIPOS = {COCHE, BUS, FURGO, CAMION};
 
-    private static final MiScanner scanner = new MiScanner();                             //Scanner utilizado.
+    private static final MiScanner scanner = new MiScanner();                           //Scanner utilizado.
     private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();       //Coleccion de vehiculos.
     private static final ColeccionClientes clientes = new ColeccionClientes();          //Coleccion de clientes.
-    private static final ColeccionAlquileres alquileres = new ColeccionAlquileres();   //Coleccion de alquileres
+    private static final ColeccionAlquileres alquileres = new ColeccionAlquileres();    //Coleccion de alquileres
+    private static final HistorialAlquileres historial = new HistorialAlquileres();     //Registro de alquileres realizados
 
     /**
      * Ejecuta el menu principal de programa.
@@ -84,9 +86,9 @@ public class GestorAlquiler {
                     break;
             }
         } while (opcion != 9);
-        vehiculos.guardar();
-        clientes.guardar();
-        alquileres.guardar();
+        //vehiculos.guardar();
+        //clientes.guardar();
+        //alquileres.guardar();
     }
 
     /**
@@ -123,6 +125,7 @@ public class GestorAlquiler {
                     vehiculos.anyadirVehiculo(camion);
                     break;
             }
+            vehiculos.guardar();
         } catch (ObjetoYaExistenteException | FormatoIncorrectoException e) {
             System.out.println(e.getMessage());
         } finally {
@@ -163,7 +166,8 @@ public class GestorAlquiler {
             cliente.setTlf(leerTlf());
             cliente.setVip(leerVip());
             clientes.anyadirCliente(cliente);
-        } catch (ListaClientesLlenaException | ObjetoYaExistenteException | FormatoIncorrectoException e) {
+            clientes.guardar();
+        } catch (ObjetoYaExistenteException | FormatoIncorrectoException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");
@@ -181,8 +185,8 @@ public class GestorAlquiler {
             Vehiculo v = vehiculos.obtenerVechiculo(matricula);
             String dni = leerDNI();
             Cliente c = clientes.obtenerCliente(dni);
-            //v.alquilar(c);
             alquileres.anyadirAlquiler(v, c);
+            alquileres.guardar();
             System.out.println("El vechiculo " + v.getMatricula() + " se le ha alquilado al cliente " + c.getDni());
         } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
@@ -202,33 +206,37 @@ public class GestorAlquiler {
             //Lee la matricula y obtiene el vechiculo
             String matricula = leerMatricula();
             Vehiculo vehiculo = alquileres.obtenerAlquilerPorMatricula(matricula).getVehiculo();
-            //Guarda la informacion necesaria para calcular el precio del alquiler
+            //Guarda la informacion necesaria para calcular el precio del alquiler y registrarlo
             boolean vip = alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().isVip();
-            boolean primera = vehiculo.isPrimerAlquiler();
+            boolean primera = historial.isPrimerAlquiler(matricula);
+            Alquiler alquiler = alquileres.obtenerAlquilerPorMatricula(matricula);
             //Devuelve el alquiler.
             alquileres.eliminarAlquilerPorMatricula(matricula);
             //Lee los dias y calcula el precio final
             int dias = obtenerDias();
-            double alquiler = vehiculo.alquilerTotal(dias);
-            vehiculo.mostrarInfoAlquiler(dias, alquiler);
+            double precioAlquiler = vehiculo.alquilerTotal(dias);
+            vehiculo.mostrarInfoAlquiler(dias, precioAlquiler);
             double descuentovip = 0, descuentoprim = 0;
             boolean descontado = false;
             if (vip) {
-                descuentovip = alquiler * 0.15;
+                descuentovip = precioAlquiler * 0.15;
                 descontado = true;
                 System.out.println("El cliente es VIP, por lo que se le aplica un descuento del 25%.");
                 System.out.println("El descuento es de " + descuentovip + "euros.");
             }
             if (primera) {
-                descuentoprim = alquiler * 0.25;
+                descuentoprim = precioAlquiler * 0.25;
                 descontado = true;
                 System.out.println("Como es la primera vez que se alquila el vehiculo tiene un descuento del 75%.");
                 System.out.println("El descuento es de " + descuentoprim + "euros.");
             }
             if (descontado) {
-                alquiler -= descuentoprim + descuentovip;
-                System.out.println("El precio tras los descuentos es de " + alquiler + "euros.");
+                precioAlquiler -= descuentoprim + descuentovip;
+                System.out.println("El precio tras los descuentos es de " + precioAlquiler + "euros.");
             }
+            //Añade el alquiler y su precio al registro de alquileres
+            alquileres.guardar();
+            historial.anyadirRegistro(alquiler, dias, precioAlquiler);
         } catch (FormatoIncorrectoException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
         } finally {
@@ -253,6 +261,7 @@ public class GestorAlquiler {
                     alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().devolverVehiculo();
                     alquileres.eliminarAlquilerPorMatricula(matricula);
                     vehiculos.eliminarVehiculo(matricula);
+                    //TODO: actualizar registro?
                     System.out.println("Vehiculo eliminado.");
                 } else {
                     System.out.println("No se eliminara el vechiculo");
@@ -283,6 +292,7 @@ public class GestorAlquiler {
                     alquileres.eliminarAlquilerPorDni(dni);
                     clientes.eliminarCliente(dni);
                     System.out.println("Cliente eliminado.");
+                    //TODO: actualizar registro?
                 } else {
                     System.out.println("No se eliminara el cliente.");
                 }
@@ -295,6 +305,77 @@ public class GestorAlquiler {
         } finally {
             System.out.println("");
         }
+    }
+
+    /**
+     * Muestra información sobre un vehiculo. Si esta alquilado muestra
+     * informacion sobre el cliente que lo tiene alquilado. Si no lo esta indica
+     * si ha sidod alquilado alguna vez.
+     */
+    public void mostrarVehiculo() {
+        System.out.println("- - - Mostrar Vehiculo - - -");
+        try {
+            String matricula = leerMatricula();
+            Vehiculo v = vehiculos.obtenerVechiculo(matricula);
+            //Mostrar información del vehiculo
+            System.out.printf(v.obtenerInformacion());
+            //Si esta alquilado mostrar quien lo tiene alquilado
+            if (v.isAlquilado()) {
+                String dni = alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().getDni();
+                String nombre = alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().getNombre();
+                System.out.println("El vehiculo esta alquilado por " + nombre + ", con DNI: " + dni);
+            } else {
+                //Si no esta alquilado indicar si ha sido alquilado
+                if (historial.isPrimerAlquiler(matricula)) {
+                    System.out.println("Es la primera vez que se alquila.");
+                } else {
+                    System.out.println("Ya ha sido alquilado con anterioridad.");
+                }
+            }
+        } catch (FormatoIncorrectoException | ObjetoNoExistenteException | AlquilerVehiculoException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("");
+        }
+    }
+
+    /**
+     * Muestra informacion sobre un cliente. Si tiene vehiculos alquilados
+     * muestra informacion sobre dichos vehiculos.
+     */
+    public void mostrarCliente() {
+        System.out.println("- - - Mostrar Cliente - - ");
+        try {
+            String dni = leerDNI();
+            Cliente c = clientes.obtenerCliente(dni);
+            System.out.println(c.obtenerInformacion());
+            if (c.isAlquilado()) {
+                //TODO mostrar vehiculos que tiene alquilados
+                try {
+                    ArrayList<Vehiculo> ac = alquileres.obtenerAlquileresCliente(dni);
+                    for (Vehiculo vehiculo : ac) {
+                        System.out.println(vehiculo.obtenerInformacion());
+                    }
+                } catch (AlquilerVehiculoException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+
+        } catch (FormatoIncorrectoException | ObjetoNoExistenteException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            System.out.println("");
+        }
+    }
+
+    /**
+     * Muestra por pantalla cuanto costo cada alquiler realizado y el total de
+     * los precios de sichos alquileres.
+     */
+    public void mostrarIngresos() {
+        System.out.println("- - - Mostrar ingresos - - -");
+        double total = historial.ingresos();
+        System.out.println("Total: " + total + "€");
     }
 
     /**

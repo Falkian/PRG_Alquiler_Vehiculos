@@ -37,6 +37,16 @@ public abstract class V_Transporte extends Vehiculo {
     public void setPlazas(int plazas) {
         this.plazas = plazas;
     }
+    
+    /**
+     * Devuleve una cadena con informacion sobre el vehiculo.
+     *
+     * @return una cadena con informacion sobre el vehiculo.
+     */
+    @Override
+    public String obtenerInformacion() {
+        return super.obtenerInformacion() + "Plazas: " + plazas;
+    }
 
     /**
      * Devuelve el precio de alquilar el vehiculo durante los dias dados.

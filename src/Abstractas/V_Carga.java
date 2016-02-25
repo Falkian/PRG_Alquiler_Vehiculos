@@ -37,6 +37,16 @@ public abstract class V_Carga extends Vehiculo {
     public void setPMA(double PMA) {
         this.PMA = PMA;
     }
+    
+    /**
+     * Devuleve una cadena con informacion sobre el vehiculo.
+     *
+     * @return una cadena con informacion sobre el vehiculo.
+     */
+    @Override
+    public String obtenerInformacion() {
+        return super.obtenerInformacion() + "PMA: " + PMA;
+    }
 
     /**
      * Calcula el precio de alquilar el vechiulo durante los dias dados.

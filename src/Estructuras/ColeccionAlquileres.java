@@ -41,6 +41,7 @@ public class ColeccionAlquileres {
         alquileres.add(new Alquiler(v, c));
         v.alquilar();
         c.alquilar();
+        guardar();
     }
 
     /**
@@ -77,6 +78,27 @@ public class ColeccionAlquileres {
     }
 
     /**
+     * Devuleve una coleccion con los vehiculos que tiene alquilados un cliente
+     *
+     * @param dni que identifica al cliente.
+     * @return una coleccion con los vehiculos que tiene alquilados el cliente.
+     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos alquilados.
+     */
+    public ArrayList<Vehiculo> obtenerAlquileresCliente(String dni) throws AlquilerVehiculoException {
+        ArrayList<Vehiculo> ac = new ArrayList<>();
+        boolean existe = false;
+        for (Alquiler alquiler : alquileres) {
+            if (alquiler.getCliente().getDni().equals(dni)) {
+                ac.add(alquiler.getVehiculo());
+            }
+        }
+        if (!existe) {
+            throw new AlquilerVehiculoException("El cliente no tiene vehiculos alquilados.");
+        }
+        return ac;
+    }
+
+    /**
      * Dada una matricula eliminina un alquiler. El cliente devuelve el vehiculo
      * y finaliza el alquiler.
      *
@@ -89,6 +111,7 @@ public class ColeccionAlquileres {
                 alquiler.getCliente().devolverVehiculo();
                 alquiler.getVehiculo().devolver();
                 alquileres.remove(alquiler);
+                guardar();
             }
         }
     }
@@ -98,7 +121,8 @@ public class ColeccionAlquileres {
      * identidicado por dicho dni.
      *
      * @param dni que identifica al cliente.
-     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos alquilados.
+     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos
+     * alquilados.
      */
     public void eliminarAlquilerPorDni(String dni) throws AlquilerVehiculoException {
         Iterator<Alquiler> i = alquileres.iterator();
@@ -110,6 +134,7 @@ public class ColeccionAlquileres {
                 i.remove();
             }
         }
+        guardar();
     }
 
     /**

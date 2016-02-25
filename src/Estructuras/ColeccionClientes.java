@@ -34,12 +34,12 @@ public class ColeccionClientes {
      * Anayade un cliente a la coleccion.
      *
      * @param c el cliente a anyadir.
-     * @throws ListaClientesLlenaException si la coleccion y aesta llena.
      * @throws ObjetoYaExistenteException si el objeto a añadir ya existe.
      */
-    public void anyadirCliente(Cliente c) throws ListaClientesLlenaException, ObjetoYaExistenteException {
+    public void anyadirCliente(Cliente c) throws ObjetoYaExistenteException {
         if (posicionCliente(c.getDni()) < 0) {
             clientes.add(c);
+            guardar();
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -73,6 +73,7 @@ public class ColeccionClientes {
         int index = posicionCliente(dni);
         if (index >= 0) {
             clientes.remove(index);
+            guardar();
         } else {
             throw new ObjetoNoExistenteException("El cliente con dni " + dni + " no existe.");
         }

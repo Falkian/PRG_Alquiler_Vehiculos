@@ -45,6 +45,7 @@ public class ColeccionVehiculos {
     public void anyadirVehiculo(Vehiculo v) throws ObjetoYaExistenteException {
         if (posicionVehiculo(v.getMatricula()) < 0) {
             vehiculos.add(v);
+            guardar();
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -78,6 +79,7 @@ public class ColeccionVehiculos {
         int index = posicionVehiculo(matricula);
         if (index >= 0) {
             vehiculos.remove(index);
+            guardar();
         } else {
             throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
         }
