@@ -350,7 +350,6 @@ public class GestorAlquiler {
             Cliente c = clientes.obtenerCliente(dni);
             System.out.println(c.obtenerInformacion());
             if (c.isAlquilado()) {
-                //TODO mostrar vehiculos que tiene alquilados
                 try {
                     ArrayList<Vehiculo> ac = alquileres.obtenerAlquileresCliente(dni);
                     for (Vehiculo vehiculo : ac) {
@@ -370,7 +369,7 @@ public class GestorAlquiler {
 
     /**
      * Muestra por pantalla cuanto costo cada alquiler realizado y el total de
-     * los precios de sichos alquileres.
+     * los precios de dichos alquileres.
      */
     public void mostrarIngresos() {
         System.out.println("- - - Mostrar ingresos - - -");
