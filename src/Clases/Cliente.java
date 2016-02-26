@@ -4,6 +4,8 @@ import Excepciones.AlquilerVehiculoException;
 
 /**
  * Clase que representa a un cliente.
+ * 
+ * @author Kevin
  */
 public class Cliente {
 
@@ -16,6 +18,7 @@ public class Cliente {
 
     /**
      * Crea un cliente con el dni dado como parametro.
+     *
      * @param dni que tendra el cliente.
      */
     public Cliente(String dni) {
@@ -24,8 +27,9 @@ public class Cliente {
 
     /**
      * Crea un cliente con toda la informacion.
+     *
      * @param dni dni del cliente.
-     * @param nombre nombre  del cliente.
+     * @param nombre nombre del cliente.
      * @param direccion direccion del cliente.
      * @param tlf telefono del cliente.
      */
@@ -39,6 +43,7 @@ public class Cliente {
 
     /**
      * Devuleve el DNI del cliente.
+     *
      * @return del DNI del cliente.
      */
     public String getDni() {
@@ -47,6 +52,7 @@ public class Cliente {
 
     /**
      * Devuleve el nombre del cliente.
+     *
      * @return el nombre del cliente.
      */
     public String getNombre() {
@@ -55,6 +61,7 @@ public class Cliente {
 
     /**
      * Establece el nombre del cliente.
+     *
      * @param nombre el nombre a asignarle al cliente.
      */
     public void setNombre(String nombre) {
@@ -63,6 +70,7 @@ public class Cliente {
 
     /**
      * Devuelve la direccion del cliente.
+     *
      * @return la direccion del cliente:
      */
     public String getDireccion() {
@@ -71,6 +79,7 @@ public class Cliente {
 
     /**
      * Establece la direccion del cliente.
+     *
      * @param direccion la direccion a asignarle al cliente.
      */
     public void setDireccion(String direccion) {
@@ -79,6 +88,7 @@ public class Cliente {
 
     /**
      * Devulelve el telefono del cliente.
+     *
      * @return el telefono del cliente.
      */
     public String getTlf() {
@@ -87,6 +97,7 @@ public class Cliente {
 
     /**
      * Establece el telefono del cliente.
+     *
      * @param tlf el telefono a asignarle al cliente.
      */
     public void setTlf(String tlf) {
@@ -95,6 +106,7 @@ public class Cliente {
 
     /**
      * Devuelve si el cliente es VIP.
+     *
      * @return true si el cliente es VIP; false en caso contrario.
      */
     public boolean isVip() {
@@ -103,6 +115,7 @@ public class Cliente {
 
     /**
      * Establece si el cliente es VIP.
+     *
      * @param vip true si el cliente sera VIP; false si no lo sera.
      */
     public void setVip(boolean vip) {
@@ -111,6 +124,7 @@ public class Cliente {
 
     /**
      * Indica si el cliente tiene vehiculos alquilados.
+     *
      * @return ture si tiene vehiculos alquildos; false en caso contrario.
      */
     public boolean isAlquilado() {
@@ -126,7 +140,9 @@ public class Cliente {
 
     /**
      * Disminuye en uno la cantidad de vehiculos alquilados.
-     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos alquilados.
+     *
+     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos
+     * alquilados.
      */
     public void devolverVehiculo() throws AlquilerVehiculoException {
         if (vehiculosAlquilados > 0) {
@@ -138,6 +154,7 @@ public class Cliente {
 
     /**
      * Devuelve una cadena con la informacion del cliente.
+     *
      * @return una cadena con la informacion del cliente.
      */
     public String obtenerInformacion() {

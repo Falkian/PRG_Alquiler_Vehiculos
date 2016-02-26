@@ -12,7 +12,6 @@ public abstract class Vehiculo {
 
     private final String matricula;           //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
-    //private boolean primer;
 
     /**
      * Inicializa el vehiculo con la matricula dad como no alquilado.
@@ -42,13 +41,6 @@ public abstract class Vehiculo {
     public boolean isAlquilado() {
         return alquilado;
     }
-    /*
-     * Devuleve si es la primera vez que se alquila el vehiculo.
-     * @return true si es la primera vez; false en caso contrario.
-     *
-     public boolean isPrimerAlquiler() {
-     return primer;
-     }*/
 
     /**
      * Alquila el vehiculo al cliente pasado.

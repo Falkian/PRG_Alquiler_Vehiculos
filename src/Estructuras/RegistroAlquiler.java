@@ -14,7 +14,6 @@ public class RegistroAlquiler {
     public RegistroAlquiler() {
         alquiler = null;
         dias = 0;
-        //precio = 0;
     }
 
     /**

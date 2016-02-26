@@ -24,6 +24,7 @@ public abstract class V_Carga extends Vehiculo {
 
     /**
      * Devuleve el peso maximo autorizado.
+     *
      * @return el peso maximo autorizado.
      */
     public double getPMA() {
@@ -32,12 +33,13 @@ public abstract class V_Carga extends Vehiculo {
 
     /**
      * Establece el peso maximo autorizado.
+     *
      * @param PMA el peso maximo autorizado del vehiculo.
      */
     public void setPMA(double PMA) {
         this.PMA = PMA;
     }
-    
+
     /**
      * Devuleve una cadena con informacion sobre el vehiculo.
      *
@@ -50,6 +52,7 @@ public abstract class V_Carga extends Vehiculo {
 
     /**
      * Calcula el precio de alquilar el vechiulo durante los dias dados.
+     *
      * @param dias los dias por los que se alquila el vehiculo.
      * @return el pecio de alquilar el vehiculo durante dias dias.
      */

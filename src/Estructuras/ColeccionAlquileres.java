@@ -15,6 +15,8 @@ import java.util.Iterator;
 
 /**
  * Coleccion de objetos de la clase Alquiler.
+ *
+ * @author Kevin
  */
 public class ColeccionAlquileres {
 
@@ -61,28 +63,12 @@ public class ColeccionAlquileres {
     }
 
     /**
-     * Dado un dni devuelve el alquiler del cliente que representa,
-     *
-     * @param dni que identifica al cliente.
-     * @return el alquiler que involucra al cliente.
-     * @throws AlquilerVehiculoException si el cliente no tiene un vehiculo
-     * alquilado.
-     */
-    public Alquiler obtenerAlquilerPorDni(String dni) throws AlquilerVehiculoException {
-        for (Alquiler alquiler : alquileres) {
-            if (alquiler.getCliente().getDni().equals(dni)) {
-                return alquiler;
-            }
-        }
-        throw new AlquilerVehiculoException("El cliente no tiene vechiculos alquilados.");
-    }
-
-    /**
      * Devuleve una coleccion con los vehiculos que tiene alquilados un cliente
      *
      * @param dni que identifica al cliente.
      * @return una coleccion con los vehiculos que tiene alquilados el cliente.
-     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos alquilados.
+     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos
+     * alquilados.
      */
     public ArrayList<Vehiculo> obtenerAlquileresCliente(String dni) throws AlquilerVehiculoException {
         ArrayList<Vehiculo> ac = new ArrayList<>();

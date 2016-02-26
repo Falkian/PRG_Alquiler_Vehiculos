@@ -24,6 +24,7 @@ public abstract class V_Transporte extends Vehiculo {
 
     /**
      * Devuelve el numero de plazas del vehiculo.
+     *
      * @return el numero de plazas del vehiculo.
      */
     public int getPlazas() {
@@ -32,12 +33,13 @@ public abstract class V_Transporte extends Vehiculo {
 
     /**
      * Establece el numero de plazas.
+     *
      * @param plazas el numero de plazas del vehiculo.
      */
     public void setPlazas(int plazas) {
         this.plazas = plazas;
     }
-    
+
     /**
      * Devuleve una cadena con informacion sobre el vehiculo.
      *
@@ -50,6 +52,7 @@ public abstract class V_Transporte extends Vehiculo {
 
     /**
      * Devuelve el precio de alquilar el vehiculo durante los dias dados.
+     *
      * @param dias el numero de dias por los que se alquila el vechiculo.
      * @return el precio de alquilar el vechiculo por dias dias.
      */

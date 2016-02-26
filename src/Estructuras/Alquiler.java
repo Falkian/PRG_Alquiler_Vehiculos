@@ -6,6 +6,8 @@ import Clases.Cliente;
 /**
  * Representa un alquiler emparejando la matricula de un vehiculo con el dni de
  * un cliente.
+ * 
+ * @author Kevin
  */
 public class Alquiler {
 
@@ -22,19 +24,20 @@ public class Alquiler {
         this.vehiculo = vehiculo;
         this.cliente = cliente;
     }
-    
+
     /**
      * Devuelve el cliente.
-     * 
+     *
      * @return el cliente.
      */
     public Cliente getCliente() {
         return cliente;
     }
-    
+
     /**
      * Devuelve el vehiculo.
-     * @return  el vehiculo.
+     *
+     * @return el vehiculo.
      */
     public Vehiculo getVehiculo() {
         return vehiculo;

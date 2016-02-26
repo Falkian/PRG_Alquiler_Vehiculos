@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 /**
  * Clase que representa el histórico de todos los alquileres relizados.
+ * 
+ * @author Kevin
  */
 public class HistorialAlquileres {
 
@@ -32,10 +34,10 @@ public class HistorialAlquileres {
      *
      * @param alquiler el alquiler a registrar.
      * @param dias la duración del alquiler.
-     * @param precio el precio del alquiler.
      */
-    public void anyadirRegistro(Alquiler alquiler, int dias, double precio) {
-        historial.add(new RegistroAlquiler(alquiler, dias/*, precio*/));
+    public void anyadirRegistro(Alquiler alquiler, int dias) {
+        historial.add(new RegistroAlquiler(alquiler, dias));
+        guardar();
     }
 
     /**
