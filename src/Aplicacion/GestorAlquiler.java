@@ -163,7 +163,7 @@ public class GestorAlquiler {
             cliente.setTlf(leerTlf());
             cliente.setVip(leerVip());
             clientes.anyadirCliente(cliente);
-        } catch (ListaClientesLlenaException | ObjetoYaExistenteException | FormatoIncorrectoException e) {
+        } catch (ObjetoYaExistenteException | FormatoIncorrectoException e) {
             System.out.println(e.getMessage());
         } finally {
             System.out.println("");
