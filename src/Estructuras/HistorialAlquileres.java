@@ -18,9 +18,9 @@ import java.util.ArrayList;
  */
 public class HistorialAlquileres {
 
-    private final ArrayList<RegistroAlquiler> historial;
-
     private static final String PATH = "ficheros/historialAlquileres.txt";
+
+    private final ArrayList<RegistroAlquiler> historial;
 
     /**
      * Constructor por defecto.
