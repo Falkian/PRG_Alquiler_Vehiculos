@@ -1,7 +1,6 @@
 package Estructuras;
 
 import Clases.Cliente;
-import Excepciones.ListaClientesLlenaException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
 import java.io.BufferedReader;

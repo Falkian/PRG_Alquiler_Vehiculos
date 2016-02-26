@@ -37,6 +37,8 @@ public class GestorAlquiler {
         clientes.cargar();
         //Carga los alquileres del archivo
         alquileres.cargar(vehiculos, clientes);
+        //Carga el historial de registros
+        historial.cargar(vehiculos, clientes);
         System.out.println("- - - Fin de la carga - - -\n");
 
         int opcion = 0;
@@ -86,9 +88,6 @@ public class GestorAlquiler {
                     break;
             }
         } while (opcion != 9);
-        //vehiculos.guardar();
-        //clientes.guardar();
-        //alquileres.guardar();
     }
 
     /**
@@ -234,9 +233,10 @@ public class GestorAlquiler {
                 precioAlquiler -= descuentoprim + descuentovip;
                 System.out.println("El precio tras los descuentos es de " + precioAlquiler + "euros.");
             }
-            //Añade el alquiler y su precio al registro de alquileres
             alquileres.guardar();
+            //Añade el alquiler y su precio al registro de alquileres
             historial.anyadirRegistro(alquiler, dias, precioAlquiler);
+            historial.guardar();
         } catch (FormatoIncorrectoException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
         } finally {
@@ -261,7 +261,9 @@ public class GestorAlquiler {
                     alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().devolverVehiculo();
                     alquileres.eliminarAlquilerPorMatricula(matricula);
                     vehiculos.eliminarVehiculo(matricula);
-                    //TODO: actualizar registro?
+                    vehiculos.guardar();
+                    alquileres.guardar();
+                    //TODO actualizar historial?
                     System.out.println("Vehiculo eliminado.");
                 } else {
                     System.out.println("No se eliminara el vechiculo");
@@ -291,8 +293,10 @@ public class GestorAlquiler {
                 if (eliminar) {
                     alquileres.eliminarAlquilerPorDni(dni);
                     clientes.eliminarCliente(dni);
+                    alquileres.guardar();
+                    clientes.guardar();
+                    //TODO: actualizar historial?
                     System.out.println("Cliente eliminado.");
-                    //TODO: actualizar registro?
                 } else {
                     System.out.println("No se eliminara el cliente.");
                 }

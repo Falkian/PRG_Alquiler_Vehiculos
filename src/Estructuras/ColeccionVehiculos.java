@@ -155,7 +155,7 @@ public class ColeccionVehiculos {
 
             for (Vehiculo vehiculo : vehiculos) {
                 String tipo = vehiculo.getClass().getName().split("\\.", 2)[1];
-                writer.printf("%s\t\t%s\t\t", tipo, vehiculo.getMatricula());
+                writer.printf("%s\t\t%s\t\t%n", tipo, vehiculo.getMatricula());
                 if (vehiculo instanceof V_Transporte) {
                     V_Transporte v = (V_Transporte) vehiculo;
                     writer.println(v.getPlazas());
