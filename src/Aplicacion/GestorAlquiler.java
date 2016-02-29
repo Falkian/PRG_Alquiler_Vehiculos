@@ -226,8 +226,8 @@ public class GestorAlquiler {
             vehiculo.mostrarInfoAlquiler(dias, precioAlquiler);
             double descuentovip = 0, descuentoprim = 0;
             boolean descontado = false;
-            if (vip) {
-                descuentovip = precioAlquiler * 0.15;
+            if (vip) {  //TODO revisar descuentos en enunciados
+                descuentovip = precioAlquiler * 0.25;
                 descontado = true;
                 System.out.println("El cliente es VIP, por lo que se le aplica un descuento del 25%.");
                 System.out.println("El descuento es de " + descuentovip + "euros.");
@@ -235,7 +235,7 @@ public class GestorAlquiler {
             if (primera) {
                 descuentoprim = precioAlquiler * 0.25;
                 descontado = true;
-                System.out.println("Como es la primera vez que se alquila el vehiculo tiene un descuento del 75%.");
+                System.out.println("Como es la primera vez que se alquila el vehiculo tiene un descuento del 25%.");
                 System.out.println("El descuento es de " + descuentoprim + "euros.");
             }
             if (descontado) {
@@ -245,6 +245,7 @@ public class GestorAlquiler {
             alquileres.guardar();
             //Añade el alquiler y su precio al registro de alquileres
             historial.anyadirRegistro(alquiler, dias);
+            historial.guardar();
         } catch (FormatoIncorrectoException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
         } finally {

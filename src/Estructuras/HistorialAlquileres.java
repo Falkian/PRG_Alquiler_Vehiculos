@@ -65,6 +65,7 @@ public class HistorialAlquileres {
      */
     public double ingresos() {
         double total = 0;
+        ArrayList<Vehiculo> aparecidos = new ArrayList<>(); // TODO forma parte del calculo de la primera vez
         for (RegistroAlquiler registro : historial) {
             String matricula = registro.getAlquiler().getVehiculo().getMatricula();
             String dni = registro.getAlquiler().getCliente().getDni();
@@ -72,8 +73,13 @@ public class HistorialAlquileres {
             double precio = registro.getAlquiler().getVehiculo().alquilerTotal(dias);
 
             double descuento = 0;
+            
+            //TODO revisar calculo primera vez y valor descuentos
+            if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
+                aparecidos.add(registro.getAlquiler().getVehiculo());
+                descuento += precio * 0.25;
+            }            
             descuento += registro.getAlquiler().getCliente().isVip() ? precio * 0.25 : 0;
-            descuento += isPrimerAlquiler(matricula) ? precio * 0.75 : 0;
             precio -= descuento;
 
             total += precio;
