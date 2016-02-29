@@ -146,15 +146,11 @@ public class ColeccionVehiculos {
      */
     public void guardar() {
         File archivo = new File(PATH);
-        PrintWriter writer = null;
-        try {
-            archivo.createNewFile();
-            writer = new PrintWriter(new FileWriter(archivo, false));
-
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
             writer.println("Vehiculo\t\tMatricula\t\tNumPlazas / PMA");
 
             for (Vehiculo vehiculo : vehiculos) {
-                String tipo = vehiculo.getClass().getName().split("\\.", 2)[1];
+                String tipo = vehiculo.getClass().getSimpleName();
                 writer.printf("%s\t\t%s\t\t%n", tipo, vehiculo.getMatricula());
                 if (vehiculo instanceof V_Transporte) {
                     V_Transporte v = (V_Transporte) vehiculo;
@@ -166,10 +162,6 @@ public class ColeccionVehiculos {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 

@@ -128,11 +128,7 @@ public class ColeccionClientes {
      */
     public void guardar() {
         File archivo = new File(PATH);
-        PrintWriter writer = null;
-        try {
-            archivo.createNewFile();
-            writer = new PrintWriter(new FileWriter(archivo));
-
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))){
             writer.println("NumDNI\t\tNombre\t\tDireccion\t\tTelefono\t\tVIP");
 
             for (Cliente cliente : clientes) {
@@ -145,10 +141,6 @@ public class ColeccionClientes {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 

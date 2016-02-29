@@ -158,8 +158,8 @@ public class Cliente {
      * @return una cadena con la informacion del cliente.
      */
     public String obtenerInformacion() {
-        String info = "Nombre: " + nombre + ", DNI: " + dni + ", ";
-        info += "Direccion: " + direccion + ", Telefono: " + tlf + "\n";
+        String info = "Nombre: " + nombre + ", DNI: " + dni + ", " +
+        "Direccion: " + direccion + ", Telefono: " + tlf;
         info += vip ? "Es un cliente VIP" : "";
         return info;
     }

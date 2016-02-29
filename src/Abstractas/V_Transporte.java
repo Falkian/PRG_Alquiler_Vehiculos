@@ -47,7 +47,7 @@ public abstract class V_Transporte extends Vehiculo {
      */
     @Override
     public String obtenerInformacion() {
-        return super.obtenerInformacion() + "Plazas: " + plazas;
+        return super.obtenerInformacion() + ", Plazas: " + plazas;
     }
 
     /**

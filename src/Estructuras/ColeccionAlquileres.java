@@ -32,7 +32,8 @@ public class ColeccionAlquileres {
     }
 
     /**
-     * Añade un alquiler con un cliente y un vechiculo dados.
+     * Añade un alquiler con un cliente y un vechiculo dados, y los alquila
+     * automaticamente.
      *
      * @param v el vechiculo que se alquila.
      * @param c el cliente que alquila.
@@ -76,6 +77,7 @@ public class ColeccionAlquileres {
         for (Alquiler alquiler : alquileres) {
             if (alquiler.getCliente().getDni().equals(dni)) {
                 ac.add(alquiler.getVehiculo());
+                existe = true;
             }
         }
         if (!existe) {
@@ -184,11 +186,7 @@ public class ColeccionAlquileres {
      */
     public void guardar() {
         File archivo = new File(PATH);
-        PrintWriter writer = null;
-        try {
-            archivo.createNewFile();
-            writer = new PrintWriter(new FileWriter(archivo));
-
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))){
             writer.println("Matricula\t\tCliente");
 
             for (Alquiler alquiler : alquileres) {
@@ -197,10 +195,6 @@ public class ColeccionAlquileres {
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 }

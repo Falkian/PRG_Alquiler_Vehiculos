@@ -47,7 +47,7 @@ public abstract class V_Carga extends Vehiculo {
      */
     @Override
     public String obtenerInformacion() {
-        return super.obtenerInformacion() + "PMA: " + PMA;
+        return super.obtenerInformacion() + ", PMA: " + PMA;
     }
 
     /**

@@ -265,11 +265,8 @@ public class GestorAlquiler {
                 System.out.println("El vehiculo que quiere eliminar esta alquilado por el cliente " + dni);
                 boolean eliminar = scanner.leerSN("Seguro que quiere eliminarlo (S/N)? ", "Debe responder adirmativa o negativamente.");
                 if (eliminar) {
-                    alquileres.obtenerAlquilerPorMatricula(matricula).getVehiculo().devolver();
-                    alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().devolverVehiculo();
                     alquileres.eliminarAlquilerPorMatricula(matricula);
                     vehiculos.eliminarVehiculo(matricula);
-                    //TODO: actualizar historial?
                     System.out.println("Vehiculo eliminado.");
                 } else {
                     System.out.println("No se eliminara el vechiculo");
@@ -292,14 +289,13 @@ public class GestorAlquiler {
         System.out.println("- - - Eliminar Cliente - - -");
         try {
             String dni = leerDNI();
-            //Si el cliente tiene vechiculos lauqilados confirmar eliminacion.
+            //Si el cliente tiene vechiculos alquilados confirmar eliminacion.
             if (clientes.obtenerCliente(dni).isAlquilado()) {
                 System.out.println("El cliente tiene vehiculos alquilados.");
                 boolean eliminar = scanner.leerSN("Seguro que quiere eliminarlo (S/N))? ", "Debe responder afirmativa o negativamente.");
                 if (eliminar) {
                     alquileres.eliminarAlquilerPorDni(dni);
                     clientes.eliminarCliente(dni);
-                    //TODO: actualizar historial?
                     System.out.println("Cliente eliminado.");
                 } else {
                     System.out.println("No se eliminara el cliente.");
@@ -326,7 +322,7 @@ public class GestorAlquiler {
             String matricula = leerMatricula();
             Vehiculo v = vehiculos.obtenerVechiculo(matricula);
             //Mostrar información del vehiculo
-            System.out.printf(v.obtenerInformacion());
+            System.out.println(v.obtenerInformacion());
             //Si esta alquilado mostrar quien lo tiene alquilado
             if (v.isAlquilado()) {
                 String dni = alquileres.obtenerAlquilerPorMatricula(matricula).getCliente().getDni();
@@ -359,6 +355,7 @@ public class GestorAlquiler {
             System.out.println(c.obtenerInformacion());
             if (c.isAlquilado()) {
                 try {
+                    System.out.println("\nEl cliente tiene vehiculos alquilados: ");
                     ArrayList<Vehiculo> ac = alquileres.obtenerAlquileresCliente(dni);
                     for (Vehiculo vehiculo : ac) {
                         System.out.println(vehiculo.obtenerInformacion());
@@ -383,6 +380,7 @@ public class GestorAlquiler {
         System.out.println("- - - Mostrar ingresos - - -");
         double total = historial.ingresos();
         System.out.printf("Total: %.2f€%n",  total);
+        System.out.println("");
     }
 
     /**

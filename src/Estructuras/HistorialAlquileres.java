@@ -20,7 +20,7 @@ public class HistorialAlquileres {
 
     private static final String PATH = "ficheros/historialAlquileres.txt";
 
-    private final ArrayList<RegistroAlquiler> historial;
+    private final ArrayList<RegistroAlquiler> historial;        //Coleccion de registros
 
     /**
      * Constructor por defecto.
@@ -140,11 +140,7 @@ public class HistorialAlquileres {
      */
     public void guardar() {
         File archivo = new File(PATH);
-        PrintWriter writer = null;
-        try {
-            archivo.createNewFile();
-            writer = new PrintWriter(new FileWriter(archivo));
-
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))){
             writer.println("Matricula\t\tCliente\t\tNumDias");
 
             for (RegistroAlquiler registro : historial) {
@@ -155,10 +151,6 @@ public class HistorialAlquileres {
             }
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
         }
     }
 }
