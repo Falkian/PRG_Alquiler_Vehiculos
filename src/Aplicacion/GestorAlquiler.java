@@ -226,10 +226,10 @@ public class GestorAlquiler {
             vehiculo.mostrarInfoAlquiler(dias, precioAlquiler);
             double descuentovip = 0, descuentoprim = 0;
             boolean descontado = false;
-            if (vip) {  //TODO revisar descuentos en enunciados
-                descuentovip = precioAlquiler * 0.25;
+            if (vip) { 
+                descuentovip = precioAlquiler * 0.15;
                 descontado = true;
-                System.out.println("El cliente es VIP, por lo que se le aplica un descuento del 25%.");
+                System.out.println("El cliente es VIP, por lo que se le aplica un descuento del 15%.");
                 System.out.println("El descuento es de " + descuentovip + "euros.");
             }
             if (primera) {

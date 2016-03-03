@@ -87,8 +87,8 @@ public abstract class Vehiculo {
      * @return una cadena con informacion sobre el vehiculo.
      */
     public String obtenerInformacion() {
-        String info = "Matricula: " + matricula +
-        ", Tipo: " + this.getClass().getSimpleName();
+        String info = "Matricula: " + matricula
+                + ", Tipo: " + this.getClass().getSimpleName();
         return info;
     }
 
