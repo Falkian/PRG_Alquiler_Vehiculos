@@ -379,8 +379,7 @@ public class GestorAlquiler {
      */
     public static void mostrarIngresos() {
         System.out.println("- - - Mostrar ingresos - - -");
-        double total = historial.ingresos();
-        System.out.printf("Total: %.2f€%n",  total);
+        historial.ingresos();
         System.out.println("");
     }
 

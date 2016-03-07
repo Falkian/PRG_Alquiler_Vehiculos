@@ -60,33 +60,40 @@ public class HistorialAlquileres {
     /**
      * Muestra por pantalla un resumen de los ingresos obtenidos por los
      * alquileres y devuelve la suma de sus precios.
-     *
-     * @return total el total obtenido por todos los ingresos.
      */
-    public double ingresos() {
+    public void ingresos() {
+        //TODO dejar el método limpio
         double total = 0;
-        ArrayList<Vehiculo> aparecidos = new ArrayList<>(); // TODO forma parte del calculo de la primera vez
+        ArrayList<Vehiculo> aparecidos = new ArrayList<>();
         for (RegistroAlquiler registro : historial) {
             String matricula = registro.getAlquiler().getVehiculo().getMatricula();
             String dni = registro.getAlquiler().getCliente().getDni();
             int dias = registro.getDias();
             double precio = registro.getAlquiler().getVehiculo().alquilerTotal(dias);
-
-            double descuento = 0;
+            double descuentovip = 0, descuentoprimera = 0;
             
-            //TODO revisar calculo primera vez y valor descuentos
+            //Comprueba se es la primera vez que se alquiló un vechiculo
             if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
                 aparecidos.add(registro.getAlquiler().getVehiculo());
-                descuento += precio * 0.25;
+                descuentoprimera = precio * 0.25;
             }            
-            descuento += registro.getAlquiler().getCliente().isVip() ? precio * 0.25 : 0;
-            precio -= descuento;
-
+            //descuento += registro.getAlquiler().getCliente().isVip() ? precio * 0.15 : 0;
+            //precio -= descuento;
+            if (registro.getAlquiler().getCliente().isVip()) {
+                descuentovip = precio * 0.15;
+            }
+            total -= descuentoprimera + descuentovip;
             total += precio;
-            System.out.printf("Vehiculo: %s, Cliente: %s, Dias: %d, Precio: %f€\n",
+            System.out.printf("Vehiculo: %s, Cliente: %s, Dias: %d, Precio: %f€%n",
                     matricula, dni, dias, precio);
+            if (descuentovip > 0) {
+                System.out.println("Se le aplicó un 15% de descuento por ser el ciente VIP.");
+            }
+            if (descuentoprimera > 0) {
+                System.out.println("Se le aplicó un 25% de descuento por ser la primera vez que se alquilaba el vechiculo.");
+            }
         }
-        return total;
+        System.out.println("Total: " + total + "€");
     }
 
     /**
