@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 /**
  * Clase que representa el histórico de todos los alquileres relizados.
- * 
+ *
  * @author Kevin
  */
 public class HistorialAlquileres {
@@ -62,38 +62,36 @@ public class HistorialAlquileres {
      * alquileres y devuelve la suma de sus precios.
      */
     public void ingresos() {
-        //TODO dejar el método limpio
         double total = 0;
         ArrayList<Vehiculo> aparecidos = new ArrayList<>();
         for (RegistroAlquiler registro : historial) {
             String matricula = registro.getAlquiler().getVehiculo().getMatricula();
-            String dni = registro.getAlquiler().getCliente().getDni();
+            Cliente c = registro.getAlquiler().getCliente();
             int dias = registro.getDias();
             double precio = registro.getAlquiler().getVehiculo().alquilerTotal(dias);
             double descuentovip = 0, descuentoprimera = 0;
-            
+
             //Comprueba se es la primera vez que se alquiló un vechiculo
             if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
                 aparecidos.add(registro.getAlquiler().getVehiculo());
                 descuentoprimera = precio * 0.25;
-            }            
-            //descuento += registro.getAlquiler().getCliente().isVip() ? precio * 0.15 : 0;
-            //precio -= descuento;
-            if (registro.getAlquiler().getCliente().isVip()) {
+            }
+            //Comprueba si el cliente es VIP
+            if (c != null && registro.getAlquiler().getCliente().isVip()) {
                 descuentovip = precio * 0.15;
             }
-            total -= descuentoprimera + descuentovip;
+            precio -= descuentoprimera + descuentovip;
             total += precio;
             System.out.printf("Vehiculo: %s, Cliente: %s, Dias: %d, Precio: %f€%n",
-                    matricula, dni, dias, precio);
+                    matricula, c == null? "Ya no existe" : c.getDni(), dias, precio);
             if (descuentovip > 0) {
-                System.out.println("Se le aplicó un 15% de descuento por ser el ciente VIP.");
+                System.out.println("Se le aplicó un 15% de descuento (" + descuentovip + "€) por ser el ciente VIP.");
             }
             if (descuentoprimera > 0) {
-                System.out.println("Se le aplicó un 25% de descuento por ser la primera vez que se alquilaba el vechiculo.");
+                System.out.println("Se le aplicó un 25% de descuento (" + descuentoprimera + "€) por ser la primera vez que se alquilaba el vechiculo.");
             }
         }
-        System.out.println("Total: " + total + "€");
+        System.out.printf("Total: %.2f€", total);
     }
 
     /**
@@ -129,10 +127,16 @@ public class HistorialAlquileres {
                             int dias = Integer.parseInt(datos[2]);
                             try {
                                 Vehiculo v = vehiculos.obtenerVechiculo(matricula);
-                                Cliente c = clientes.obtenerCliente(dni);
+                                Cliente c;
+                                try {
+                                    c = clientes.obtenerCliente(dni);
+                                } catch (ObjetoNoExistenteException e) {
+                                    c = null;
+                                    System.out.println("La linea " + linea + " hace referencia a un cliente que ya no existe.");
+                                }
                                 historial.add(new RegistroAlquiler(new Alquiler(v, c), dias));
                             } catch (ObjetoNoExistenteException e) {
-                                System.out.println("Los datos de la linea " + linea + " hacen referencia a un elemento que ya no existe.");
+                                System.out.println("La linea " + linea + " hacen referencia a un vehiculo que ya no existe.");
                             }
                         }
                         str = reader.readLine();
@@ -153,7 +157,7 @@ public class HistorialAlquileres {
      */
     public void guardar() {
         File archivo = new File(PATH);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))){
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
             writer.println("Matricula\t\tCliente\t\tNumDias");
 
             for (RegistroAlquiler registro : historial) {
