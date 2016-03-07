@@ -85,13 +85,13 @@ public class HistorialAlquileres {
             System.out.printf("Vehiculo: %s, Cliente: %s, Dias: %d, Precio: %f€%n",
                     matricula, c == null? "Ya no existe" : c.getDni(), dias, precio);
             if (descuentovip > 0) {
-                System.out.println("Se le aplicó un 15% de descuento (" + descuentovip + "€) por ser el ciente VIP.");
+                System.out.printf("Se le aplicó un 15%% de descuento (%.2f€) por ser el ciente VIP.%n", descuentovip);
             }
             if (descuentoprimera > 0) {
-                System.out.println("Se le aplicó un 25% de descuento (" + descuentoprimera + "€) por ser la primera vez que se alquilaba el vechiculo.");
+                System.out.printf("Se le aplicó un 25%% de descuento (%.2f€) por ser la primera vez que se alquilaba el vechiculo.%n", descuentoprimera);
             }
         }
-        System.out.printf("Total: %.2f€", total);
+        System.out.printf("Total: %.2f€%n", total);
     }
 
     /**
