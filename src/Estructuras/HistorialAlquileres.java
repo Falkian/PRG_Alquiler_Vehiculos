@@ -90,6 +90,7 @@ public class HistorialAlquileres {
             if (descuentoprimera > 0) {
                 System.out.printf("Se le aplicó un 25%% de descuento (%.2f€) por ser la primera vez que se alquilaba el vechiculo.%n", descuentoprimera);
             }
+            System.out.println("");
         }
         System.out.printf("Total: %.2f€%n", total);
     }

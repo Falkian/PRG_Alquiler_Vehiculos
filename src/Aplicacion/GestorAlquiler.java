@@ -51,7 +51,7 @@ public class GestorAlquiler {
                     + "5.)Devolver vehiculo.\n"
                     + "6.)Eliminar vehiculo.\n"
                     + "7.)Eliminar cliente.\n"
-                    + "8.)Mostrar vechiulo.\n"
+                    + "8.)Mostrar vehiculo.\n"
                     + "9.)Mostrar cliente\n"
                     + "10.)Mostrar ingresos\n"
                     + "0.)Salir\n");
