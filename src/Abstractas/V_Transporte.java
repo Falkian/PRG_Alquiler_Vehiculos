@@ -60,4 +60,15 @@ public abstract class V_Transporte extends Vehiculo {
     public double alquilerTotal(int dias) {
         return super.alquilerTotal(dias) + 1.5 * plazas * dias;
     }
+    
+    /**
+     * Devuelve la informacion sobre el vehiculo en forma de array. Orden de la
+     * informacion: Matricula, Tipo, PMA
+     *
+     * @return un array con la informacion del vehiculo
+     */
+    @Override
+    public String[] dataToArray() {
+        return new String[]{getMatricula(), getClass().getSimpleName(), "" + plazas};
+    }
 }

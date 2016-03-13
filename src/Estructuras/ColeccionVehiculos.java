@@ -69,6 +69,23 @@ public class ColeccionVehiculos {
     }
 
     /**
+     * Modifica el vehiculo identificado por la matricula dada, asignandole el
+     * vehiculo dado.
+     *
+     * @param matricula la matricula del vehiculo a modificar.
+     * @param v el vehiculo a establecerle.
+     * @throws ObjetoNoExistenteException si el vehiculo a modificar no existe.
+     */
+    public void modificarVehiculo(String matricula, Vehiculo v) throws ObjetoNoExistenteException {
+        for (Vehiculo vehiculo : vehiculos) {
+            if (vehiculo.getMatricula().equals(matricula)) {
+                vehiculo = v;
+            }
+        }
+        throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
+    }
+
+    /**
      * Elimina el vehiculo identificado por la matricula dada.
      *
      * @param matricula la matricula del vehiculo.
@@ -83,6 +100,21 @@ public class ColeccionVehiculos {
         } else {
             throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
         }
+    }
+
+    /**
+     * Devuelve un array bidimensional con la informacion de la lista. Cada fila
+     * contiene un elemento, y las columnas contienen la matricula, tipo y
+     * caracteristica (plazas/PMA), respepctivamente.
+     *
+     * @return un array bidimensional con la informacion de la lista.
+     */
+    public String[][] obtenerDataArray() {
+        String[][] ret = new String[vehiculos.size()][3];
+        for (int i = 0; i < vehiculos.size(); i++) {
+            ret[i] = vehiculos.get(i).dataToArray();
+        }
+        return ret;
     }
 
     /**
@@ -151,7 +183,7 @@ public class ColeccionVehiculos {
 
             for (Vehiculo vehiculo : vehiculos) {
                 String tipo = vehiculo.getClass().getSimpleName();
-                writer.printf("%s\t\t%s\t\t%n", tipo, vehiculo.getMatricula());
+                writer.printf("%s\t\t%s\t\t", tipo, vehiculo.getMatricula());
                 if (vehiculo instanceof V_Transporte) {
                     V_Transporte v = (V_Transporte) vehiculo;
                     writer.println(v.getPlazas());

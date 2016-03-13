@@ -1,5 +1,6 @@
 package Estructuras;
 
+import Clases.RegistroAlquiler;
 import Abstractas.Vehiculo;
 import Clases.Cliente;
 import Excepciones.ObjetoNoExistenteException;
@@ -41,58 +42,74 @@ public class HistorialAlquileres {
     }
 
     /**
-     * Busca en el registro para devolver si es la primera vez que se alquila el
-     * vehiculo.
+     * Devuelve el total de todos los alquileres realizados.
      *
-     * @param matricula de vehiculo a buscar.
-     * @return cierto si es la primera vez que se alquila; false en caso
-     * contrario.
+     * @return el total de todos los alquileres realizados
      */
-    public boolean isPrimerAlquiler(String matricula) {
-        for (RegistroAlquiler registro : historial) {
-            if (registro.getAlquiler().getVehiculo().getMatricula().equals(matricula)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Muestra por pantalla un resumen de los ingresos obtenidos por los
-     * alquileres y devuelve la suma de sus precios.
-     */
-    public void ingresos() {
+    public double getTotal() {
         double total = 0;
         ArrayList<Vehiculo> aparecidos = new ArrayList<>();
         for (RegistroAlquiler registro : historial) {
-            String matricula = registro.getAlquiler().getVehiculo().getMatricula();
+            Vehiculo v = registro.getAlquiler().getVehiculo();
+            double precio = v.alquilerTotal(registro.getDias());
             Cliente c = registro.getAlquiler().getCliente();
-            int dias = registro.getDias();
-            double precio = registro.getAlquiler().getVehiculo().alquilerTotal(dias);
-            double descuentovip = 0, descuentoprimera = 0;
-
-            //Comprueba se es la primera vez que se alquiló un vechiculo
-            if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
+            
+            double descuentoprimera = 0;
+            //Comprueba si es la primera vez que se alquilo el vehiculo
+             if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
                 aparecidos.add(registro.getAlquiler().getVehiculo());
                 descuentoprimera = precio * 0.25;
             }
-            //Comprueba si el cliente es VIP
-            if (c != null && registro.getAlquiler().getCliente().isVip()) {
+             
+            double descuentovip = 0;
+            //Comprueba si el cliente era VIP
+            if (c != null && c.isVip()) {
                 descuentovip = precio * 0.15;
             }
-            precio -= descuentoprimera + descuentovip;
-            total += precio;
-            System.out.printf("Vehiculo: %s, Cliente: %s, Dias: %d, Precio: %f€%n",
-                    matricula, c == null? "Ya no existe" : c.getDni(), dias, precio);
-            if (descuentovip > 0) {
-                System.out.printf("Se le aplicó un 15%% de descuento (%.2f€) por ser el ciente VIP.%n", descuentovip);
-            }
-            if (descuentoprimera > 0) {
-                System.out.printf("Se le aplicó un 25%% de descuento (%.2f€) por ser la primera vez que se alquilaba el vechiculo.%n", descuentoprimera);
-            }
-            System.out.println("");
+            total += precio - descuentoprimera - descuentovip;
         }
-        System.out.printf("Total: %.2f€%n", total);
+        return total;
+    }
+
+    /**
+     * Devuelve un array bidimensional con la informacion de la lista. Cada fila
+     * contiene un elemento, y las columnas contienen la matricula, DNI,
+     * duracion, si era el primer alquiler, si era VIP y precio,
+     * respepctivamente.
+     *
+     * @return un array bidimensional con la informacion de la lista.
+     */
+    public String[][] obtenerDataArray() {
+        String[][] ret = new String[historial.size()][];
+        ArrayList<Vehiculo> aparecidos = new ArrayList<>();
+        for (int i = 0; i < historial.size(); i++) {
+            Vehiculo v = historial.get(i).getAlquiler().getVehiculo();
+            Cliente c = historial.get(i).getAlquiler().getCliente();
+            int dias = historial.get(i).getDias();
+            double precio = historial.get(i).getAlquiler().getVehiculo().alquilerTotal(dias);
+
+            String primerainfo = "\u2717";
+            //Comprueba si es la primera vez que se alquilo el vehiculo
+            double descuentoprimera = 0;
+             if (!aparecidos.contains(historial.get(i).getAlquiler().getVehiculo())) {
+                aparecidos.add(historial.get(i).getAlquiler().getVehiculo());
+                descuentoprimera = precio * 0.25;
+                
+                primerainfo = "\u2713 (" + descuentoprimera + "€)";
+            }
+
+            String vipinfo = "\u2717";
+            //Comprueba si el cliente era VIP
+            double descuentovip = 0;
+            if (c != null && c.isVip()) {
+                descuentovip = precio * 0.15;
+                vipinfo = "\u2713 (" + descuentovip + "€)";
+            }
+
+            precio -= descuentoprimera + descuentovip;
+            ret[i] = new String[]{v.getMatricula(), c == null ? "Ya no existe" : c.getDni(), "" + dias, primerainfo, vipinfo, "" + precio + "€"};
+        }
+        return ret;
     }
 
     /**

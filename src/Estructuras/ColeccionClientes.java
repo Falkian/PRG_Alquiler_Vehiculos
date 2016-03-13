@@ -62,6 +62,23 @@ public class ColeccionClientes {
     }
 
     /**
+     * Modifica el clientes identificado por el DNI dado, asignandole el cliente
+     * dado.
+     *
+     * @param DNI DNI del cliente a modificar.
+     * @param c el cliente a establecerle.
+     * @throws ObjetoNoExistenteException si el vehiculo a modificar no existe.
+     */
+    public void modificarCliente(String DNI, Cliente c) throws ObjetoNoExistenteException {
+        for (Cliente cliente : clientes) {
+            if (cliente.getDni().equals(DNI)) {
+                cliente = c;
+            }
+        }
+        throw new ObjetoNoExistenteException("El cliente con DNI " + DNI + " no eta registrado.");
+    }
+
+    /**
      * Elimina el cliente identificado por el DNI dado.
      *
      * @param dni el DNI del cliente.
@@ -76,6 +93,21 @@ public class ColeccionClientes {
         } else {
             throw new ObjetoNoExistenteException("El cliente con dni " + dni + " no existe.");
         }
+    }
+
+    /**
+     * Devuelve un array bidimensional con la informacion de la lista. Cada fila
+     * contiene un elemento, y las columnas contienen el dni, nombre, direccion
+     * telefono y vip, respepctivamente.
+     *
+     * @return un array bidimensional con la informacion de la lista.
+     */
+    public String[][] obtenerDataArray() {
+        String[][] ret = new String[clientes.size()][3];
+        for (int i = 0; i < clientes.size(); i++) {
+            ret[i] = clientes.get(i).dataToArray();
+        }
+        return ret;
     }
 
     /**
@@ -128,7 +160,7 @@ public class ColeccionClientes {
      */
     public void guardar() {
         File archivo = new File(PATH);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))){
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
             writer.println("NumDNI\t\tNombre\t\tDireccion\t\tTelefono\t\tVIP");
 
             for (Cliente cliente : clientes) {

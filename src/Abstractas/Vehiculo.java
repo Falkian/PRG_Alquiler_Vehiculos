@@ -100,4 +100,12 @@ public abstract class Vehiculo {
      * @param alquiler el precio del alquiler del vechiculo.
      */
     public abstract void mostrarInfoAlquiler(int dias, double alquiler);
+    
+    /**
+     * Devuelve la informacion sobre el vehiculo en forma de array. Orden de la
+     * informacion: Matricula, Tipo, PMA
+     *
+     * @return un array con la informacion del vehiculo
+     */
+    public abstract String[] dataToArray();
 }

@@ -163,4 +163,14 @@ public class Cliente {
         info += vip ? "Es un cliente VIP" : "";
         return info;
     }
+    
+    /**
+     * Devuelve la informacion sobre el cliente en forma de array. Orden de la
+     * informacion: DNI, nombre, direccion, telefono, vip
+     *
+     * @return un array con la informacion del cliente
+     */
+    public String[] dataToArray() {
+        return new String[]{dni, nombre, direccion, tlf, vip ? "\u2713" : "\u2717"};
+    }
 }
