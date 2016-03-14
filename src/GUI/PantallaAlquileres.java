@@ -11,7 +11,6 @@ import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,6 +39,9 @@ public class PantallaAlquileres extends JSplitPane {
      * Crea e inicializa el menu de alquileres.
      *
      * @param alquileres la colecion de alquileres
+     * @param vehiculos la coleccion de vehiculos
+     * @param clientes la coleccion de clientes
+     * @param historial el historial de alquileres
      */
     public PantallaAlquileres(ColeccionAlquileres alquileres, ColeccionVehiculos vehiculos, ColeccionClientes clientes, HistorialAlquileres historial) {
         super(JSplitPane.HORIZONTAL_SPLIT);
@@ -59,7 +61,7 @@ public class PantallaAlquileres extends JSplitPane {
         menuAlquileres.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        //- - - Botones de la parte izquierda del menu de gestion de alquileres
+        //Botones de la parte izquierda del menu de gestion de alquileres
         JButton botonConsulta = new JButton("Consulta");
         JButton botonAlquilar = new JButton("Alquilar");
         JButton botonDevolver = new JButton("Devolver");
@@ -249,6 +251,13 @@ public class PantallaAlquileres extends JSplitPane {
         ci.gridx = 1;
         contenido.add(introMatricula, ci);
 
+        textoDias = new JLabel("Dias");
+        introDias = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
+        ci.gridx = 0;
+        ci.gridy = 1;
+        contenido.add(textoDias, ci);
+        contenido.add(introDias, ci);
+        
         c.gridy = 1;
         c.fill = GridBagConstraints.VERTICAL;
         devolverVehiculo.add(contenido, c);
@@ -286,7 +295,7 @@ public class PantallaAlquileres extends JSplitPane {
         }
 
     }
-
+    
     /**
      * Manejador de eventos del boton de consulta de precios de alquiler.
      * Asegura que los datos sean validos al clicar, indicando los posibles
@@ -300,10 +309,12 @@ public class PantallaAlquileres extends JSplitPane {
                 String matricula = obtenerMatricula();
                 String DNI = obtenerDNI();
                 int dias = obtenerDias();
-                Vehiculo v = vehiculos.obtenerVechiculo(matricula);
-                Cliente c = clientes.obtenerCliente(DNI);
-                double precio = v.alquilerTotal(dias);
-                JOptionPane.showMessageDialog(rightComponent, "Alquilar el vehiculo " + matricula + " de tipo: " + v.getClass().getSimpleName()
+                double precio = alquileres.obtenerPrecioAlquiler(matricula, DNI, dias);
+                if (clientes.obtenerCliente(DNI).isVip()) {
+                    precio -= precio * 0.15;
+                }
+                JOptionPane.showMessageDialog(rightComponent, "Alquilar el vehiculo " + matricula + " de tipo: " 
+                        + vehiculos.obtenerVechiculo(matricula).getClass().getSimpleName()
                         + " durante " + dias + " dias por el cliente " + DNI + " costaria " + precio + "€.",
                         "Precio alquiler", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
@@ -327,10 +338,7 @@ public class PantallaAlquileres extends JSplitPane {
             try {
                 String matricula = obtenerMatricula();
                 String DNI = obtenerDNI();
-                int dias = obtenerDias();
-                Vehiculo v = vehiculos.obtenerVechiculo(matricula);
-                Cliente c = clientes.obtenerCliente(DNI);
-                alquileres.anyadirAlquiler(v, c);
+                alquileres.anyadirAlquiler(matricula, DNI);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {
@@ -352,8 +360,10 @@ public class PantallaAlquileres extends JSplitPane {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                //Añade el alquiler al regsitro y lo devuelve
                 String matricula = obtenerMatricula();
-                historial.anyadirRegistro(alquileres.obtenerAlquilerPorMatricula(matricula), WIDTH);
+                int dias = obtenerDias();
+                historial.anyadirRegistro(alquileres.obtenerAlquilerPorMatricula(matricula), dias);
                 alquileres.eliminarAlquilerPorMatricula(matricula);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);

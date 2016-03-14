@@ -7,6 +7,7 @@ import Clases.Camion;
 import Clases.Coche;
 import Clases.Furgoneta;
 import Clases.Microbus;
+import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
 import java.io.BufferedReader;
@@ -36,16 +37,48 @@ public class ColeccionVehiculos {
     }
 
     /**
-     * Anayade un vehiculo a la coleccion.
+     * Anyade un vehiculo a la colccion dando sus caracteristicas.
      *
-     * @param v el vechiulo a anyadir.
-     * @throws ObjetoYaExistenteException si el objeto ya existe en la
-     * coleccion.
+     * @param tipo el tipo de vehiculo
+     * @param matricula la matricula del vehiculo
+     * @param caract las plazas o PMA
+     * @throws ObjetoYaExistenteException si ya existe un vehiculo con la misma
+     * matricula
+     * @throws FormatoIncorrectoException si las plazas o PMA no tienen un valor
+     * valido
      */
-    public void anyadirVehiculo(Vehiculo v) throws ObjetoYaExistenteException {
-        if (posicionVehiculo(v.getMatricula()) < 0) {
-            vehiculos.add(v);
-            guardar();
+    public void anyadirVehiculo(String tipo, String matricula, double caract) throws ObjetoYaExistenteException, FormatoIncorrectoException {
+        if (posicionVehiculo(matricula) < 0) {
+            switch (tipo) {
+                case "Coche":
+                    if (caract < 2 || caract > Coche.PLAZAS_MAX) {
+                        throw new FormatoIncorrectoException("Las plazas de un coche deben estar entre 2 y " + Coche.PLAZAS_MAX);
+                    } else {
+                        vehiculos.add(new Coche(matricula, (int) caract));
+                    }
+                    break;
+                case "Microbus":
+                    if (caract < 2 || caract > Microbus.PLAZAS_MAX) {
+                        throw new FormatoIncorrectoException("Las plazas de un microbus deben estar entre 2 y " + Microbus.PLAZAS_MAX);
+                    } else {
+                        vehiculos.add(new Microbus(matricula, (int) caract));
+                    }
+                    break;
+                case "Furgoneta":
+                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
+                        throw new FormatoIncorrectoException("El PMA de una furgoneta debe estar entre 500 y " + Furgoneta.PMA_MAX);
+                    } else {
+                        vehiculos.add(new Furgoneta(matricula, caract));
+                    }
+                    break;
+                case "Camion":
+                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
+                        throw new FormatoIncorrectoException("El PMA de un camion debe estar entre 500 y " + Camion.PMA_MAX);
+                    } else {
+                        vehiculos.add(new Camion(matricula, caract));
+                    }
+                    break;
+            }
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -69,20 +102,52 @@ public class ColeccionVehiculos {
     }
 
     /**
-     * Modifica el vehiculo identificado por la matricula dada, asignandole el
-     * vehiculo dado.
+     * Modifica el vehiculo identificado por la matricula dada, asignandole las
+     * caracteristicas dadas.
      *
      * @param matricula la matricula del vehiculo a modificar.
-     * @param v el vehiculo a establecerle.
+     * @param tipo el tipo de vehiculo
+     * @param caract las plazas o PMA del vehiculo
      * @throws ObjetoNoExistenteException si el vehiculo a modificar no existe.
+     * @throws FormatoIncorrectoException si los datos no tienen el formato
+     * adecuado
      */
-    public void modificarVehiculo(String matricula, Vehiculo v) throws ObjetoNoExistenteException {
-        for (Vehiculo vehiculo : vehiculos) {
-            if (vehiculo.getMatricula().equals(matricula)) {
-                vehiculo = v;
+    public void modificarVehiculo(String matricula, String tipo, double caract) throws ObjetoNoExistenteException, FormatoIncorrectoException {
+        int posicionVehiculo = posicionVehiculo(matricula);
+        if (posicionVehiculo < 0) {
+            switch (tipo) {
+                case "Coche":
+                    if (caract < 2 || caract > Coche.PLAZAS_MAX) {
+                        throw new FormatoIncorrectoException("Las plazas de un coche deben estar entre 2 y " + Coche.PLAZAS_MAX);
+                    } else {
+                        vehiculos.set(posicionVehiculo, new Coche(matricula, (int) caract));
+                    }
+                    break;
+                case "Microbus":
+                    if (caract < 2 || caract > Microbus.PLAZAS_MAX) {
+                        throw new FormatoIncorrectoException("Las plazas de un microbus deben estar entre 2 y " + Microbus.PLAZAS_MAX);
+                    } else {
+                        vehiculos.set(posicionVehiculo, new Microbus(matricula, (int) caract));
+                    }
+                    break;
+                case "Furgoneta":
+                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
+                        throw new FormatoIncorrectoException("El PMA de una furgoneta debe estar entre 500 y " + Furgoneta.PMA_MAX);
+                    } else {
+                        vehiculos.set(posicionVehiculo, new Furgoneta(matricula, (int) caract));
+                    }
+                    break;
+                case "Camion":
+                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
+                        throw new FormatoIncorrectoException("El PMA de un camion debe estar entre 500 y " + Camion.PMA_MAX);
+                    } else {
+                        vehiculos.set(posicionVehiculo, new Camion(matricula, (int) caract));
+                    }
+                    break;
             }
+        } else {
+            throw new ObjetoNoExistenteException();
         }
-        throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
     }
 
     /**

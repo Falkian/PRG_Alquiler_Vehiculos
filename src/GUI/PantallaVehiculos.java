@@ -1,6 +1,5 @@
 package GUI;
 
-import Clases.*;
 import Estructuras.ColeccionAlquileres;
 import Estructuras.ColeccionVehiculos;
 import Excepciones.AlquilerVehiculoException;
@@ -23,7 +22,7 @@ public class PantallaVehiculos extends JSplitPane {
 
     private final ColeccionVehiculos vehiculos;     //Colecccion de vehiculos
     private final ColeccionAlquileres alquileres;   //Coleccion de alquileres (para saber si un vehiculo esta alquilado)
-    
+
     private JLabel textoMatricula;
     private JTextField introMatricula;
     private JLabel textoTipo;
@@ -34,7 +33,7 @@ public class PantallaVehiculos extends JSplitPane {
     /**
      * Crea e inicializa el menu de vehiculos.
      *
-     * @param vehiculos  la coleccion de vehiculos
+     * @param vehiculos la coleccion de vehiculos
      * @param alquileres la coleccion de alquileres
      */
     public PantallaVehiculos(ColeccionVehiculos vehiculos, ColeccionAlquileres alquileres) {
@@ -323,9 +322,9 @@ public class PantallaVehiculos extends JSplitPane {
     }
 
     /**
-     * Manejador de eventos del boton de alta de vehiculos. Asegura que los datos
-     * sean validos al clicar, indicando los posibles errores o exito de la
-     * accion.
+     * Manejador de eventos del boton de alta de vehiculos. Asegura que los
+     * datos sean validos al clicar, indicando los posibles errores o exito de
+     * la accion.
      */
     private class botonAltaListener implements ActionListener {
 
@@ -333,41 +332,13 @@ public class PantallaVehiculos extends JSplitPane {
         public void actionPerformed(ActionEvent e) {
             try {
                 //Obtiene la informacion del vehiculo
+                String tipo = (String) introTipo.getSelectedItem();
                 String matricula = obtenerMatricula();
-                switch (introTipo.getSelectedIndex()) {
-                    case GUI.COCHE:
-                        int plazas = obtenerPlazas(Coche.PLAZAS_MAX);
-                        Coche c = new Coche(matricula, plazas);
-                        vehiculos.anyadirVehiculo(c);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Coche con matricula " + matricula + " y " + plazas + "plazas introducido.", "Vehiculo introducido",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                    case GUI.MICROBUS:
-                        plazas = obtenerPlazas(Microbus.PLAZAS_MAX);
-                        Microbus b = new Microbus(matricula, plazas);
-                        vehiculos.anyadirVehiculo(b);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Microbus con matricula " + matricula + " y " + plazas + "plazas introducido.", "Vehiculo introducido",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                    case GUI.FURGONETA:
-                        double PMA = obtenerPMA(Furgoneta.PMA_MAX);
-                        Furgoneta f = new Furgoneta(matricula, PMA);
-                        vehiculos.anyadirVehiculo(f);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Furgoneta con matricula " + matricula + " y PMA " + PMA + " introducida.", "Vehiculo introducido",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                    case GUI.CAMION:
-                        PMA = obtenerPMA(Camion.PMA_MAX);
-                        Camion ca = new Camion(matricula, PMA);
-                        vehiculos.anyadirVehiculo(ca);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Camion con matricula " + matricula + " y PMA " + PMA + " introducido.", "Vehiculo introducido",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                }
+                double caract = obtenerCaracteristica();
+                vehiculos.anyadirVehiculo(tipo, matricula, caract);
+                String info = tipo.equals("Coche") || tipo.equals("Microbus") ? 
+                        " con " + (int)caract + "plazas" : "con PMA " + caract;
+                JOptionPane.showMessageDialog(rightComponent, tipo + info + " anyadido", "Vehiculo anyadido", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoYaExistenteException ex) {
@@ -386,51 +357,21 @@ public class PantallaVehiculos extends JSplitPane {
      * los datos sean validos al clicar, indicando los posibles errores o exito
      * de la accion.
      */
-
     private class botonModificarListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                //Obtiene la informacion del vehiculo
+                String tipo = (String) introTipo.getSelectedItem();
                 String matricula = obtenerMatricula();
-                switch (introTipo.getSelectedIndex()) {
-                    case GUI.COCHE:
-                        int plazas = obtenerPlazas(Coche.PLAZAS_MAX);
-                        Coche c = new Coche(matricula, plazas);
-                        vehiculos.modificarVehiculo(matricula, c);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Vehiculo con matricula " + matricula + " establecido como coche de " + plazas + "plazas.", "Vehiculo modificado",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                    case GUI.MICROBUS:
-                        plazas = obtenerPlazas(Microbus.PLAZAS_MAX);
-                        Microbus b = new Microbus(matricula, plazas);
-                        vehiculos.modificarVehiculo(matricula, b);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Vehiculo con matricula " + matricula + " establecido como microbus de " + plazas + "plazas.", "Vehiculo modificado",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                    case GUI.FURGONETA:
-                        double PMA = obtenerPMA(Furgoneta.PMA_MAX);
-                        Furgoneta f = new Furgoneta(matricula, PMA);
-                        vehiculos.modificarVehiculo(matricula, f);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Vehiculo con matricula " + matricula + " establecido como furgoneta con PMA " + PMA + ".", "Vehiculo modificado",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                    case GUI.CAMION:
-                        PMA = obtenerPMA(Camion.PMA_MAX);
-                        Camion ca = new Camion(matricula, PMA);
-                        vehiculos.modificarVehiculo(matricula, ca);
-                        JOptionPane.showMessageDialog(rightComponent,
-                                "Vehiculo con matricula " + matricula + " establecido como camion con PMA " + PMA + ".", "Vehiculo modificado",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        break;
-                }
+                double caract = obtenerCaracteristica();
+                vehiculos.modificarVehiculo(tipo, matricula, caract);
+                JOptionPane.showMessageDialog(rightComponent, "Vehiculo modificado correctamente", "Vehiculo modificado", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
             } finally {
                 introMatricula.setText("");
                 introTipo.setSelectedIndex(0);
@@ -441,11 +382,10 @@ public class PantallaVehiculos extends JSplitPane {
     }
 
     /**
-     * Manejador de eventos del boton de borrado de vehiculos. Asegura que
-     * los datos sean validos al clicar, indicando los posibles errores o exito
-     * de la accion.
+     * Manejador de eventos del boton de borrado de vehiculos. Asegura que los
+     * datos sean validos al clicar, indicando los posibles errores o exito de
+     * la accion.
      */
-
     private class botonBorrarListener implements ActionListener {
 
         @Override
@@ -466,7 +406,7 @@ public class PantallaVehiculos extends JSplitPane {
                                 "Vehiculo no eliminado", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
-                if (eliminar) {                    
+                if (eliminar) {
                     vehiculos.eliminarVehiculo(matricula);
                     JOptionPane.showMessageDialog(rightComponent, "Vehiculo con matricula " + matricula + " eliminado.",
                             "Vehiculo eliminado", JOptionPane.INFORMATION_MESSAGE);
@@ -508,8 +448,8 @@ public class PantallaVehiculos extends JSplitPane {
      * Lee la matricula de la zona de introduccion correspondiente.
      *
      * @return una matriculacon un formato valido
-     * @throws FormatoIncorrectoException si la matricula no tiene el formato adecuado
-     * o es vacio
+     * @throws FormatoIncorrectoException si la matricula no tiene el formato
+     * adecuado o es vacio
      */
     private String obtenerMatricula() throws FormatoIncorrectoException {
         String matricula = introMatricula.getText().toUpperCase();
@@ -523,52 +463,22 @@ public class PantallaVehiculos extends JSplitPane {
     }
 
     /**
-     * Lee las plazas de la zona de introduccion correspondiente.
+     * Lee las plazas o PMA de la zona de introduccion correspondiente.
      *
-     * @param max la cantidad maxima de plazas para el vehiculo
-     * @return un numero de plazas con un formato valido
-     * @throws FormatoIncorrectoException si las plazas no tiene el formato adecuado
-     * o es vacio
+     * @return un numero de plazas o PMA con un formato valido
+     * @throws FormatoIncorrectoException si las plazas o el PMA no tienen el
+     * formato adecuado o esta vacio
      */
-    private int obtenerPlazas(int max) throws FormatoIncorrectoException {
+    private double obtenerCaracteristica() throws FormatoIncorrectoException {
         try {
-            if (introCaract.getText().equals("")) {
-                throw new FormatoIncorrectoException("Debes introducir las plazas.");
-            } else {
-                int plazas = Integer.parseInt(introCaract.getText());
-                if (plazas < 2 || plazas > max) {
-                    throw new FormatoIncorrectoException("Las plazas deben estar entre 2 y " + max);
-                } else {
-                    return plazas;
-                }
-            }
+            double caract = Double.parseDouble(introCaract.getText());
+            return caract;
         } catch (NumberFormatException e) {
-            throw new FormatoIncorrectoException("Las plazas deben ser un numero entero.");
-        }
-    }
-
-    /**
-     * Lee el PMA de la zona de introduccion correspondiente.
-     *
-     * @param max el PMA maximo para el vehiculo
-     * @return el PMA con un formato valido
-     * @throws FormatoIncorrectoException si el PMA no tiene el formato adecuado
-     * o es vacio
-     */
-    private double obtenerPMA(double max) throws FormatoIncorrectoException {
-        try {
-            if (introCaract.getText().equals("")) {
-                throw new FormatoIncorrectoException("Debes introducir el PMA.");
+            if (introTipo.getSelectedItem().equals("Coche") || introTipo.getSelectedItem().equals("Microbus")) {
+                throw new FormatoIncorrectoException("Las plazas deben ser u numero entero.");
             } else {
-                double pma = Double.parseDouble(introCaract.getText());
-                if (pma < 500 || pma > max) {
-                    throw new FormatoIncorrectoException("El PMA debe estar entre 500 y " + max);
-                } else {
-                    return pma;
-                }
+                throw new FormatoIncorrectoException("El PMA debe ser un numero.");
             }
-        } catch (NumberFormatException e) {
-            throw new FormatoIncorrectoException("El PMA debe ser un numero.");
         }
     }
 }

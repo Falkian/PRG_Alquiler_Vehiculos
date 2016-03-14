@@ -18,7 +18,7 @@ public class GUI extends JFrame {
 
     private static final ColeccionVehiculos vehiculos = new ColeccionVehiculos();       //Coleccion de vehiculos.
     private static final ColeccionClientes clientes = new ColeccionClientes();          //Coleccion de clientes.
-    private static final ColeccionAlquileres alquileres = new ColeccionAlquileres();    //Coleccion de alquileres
+    private static final ColeccionAlquileres alquileres = new ColeccionAlquileres(vehiculos, clientes);    //Coleccion de alquileres
     private static final HistorialAlquileres historial = new HistorialAlquileres();     //Registro de alquileres realizados
 
     private JTabbedPane menuPestanas;           //Parte principal del menu

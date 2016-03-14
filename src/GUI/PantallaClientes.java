@@ -1,6 +1,5 @@
 package GUI;
 
-import Clases.Cliente;
 import Estructuras.ColeccionAlquileres;
 import Estructuras.ColeccionClientes;
 import Excepciones.AlquilerVehiculoException;
@@ -370,10 +369,12 @@ public class PantallaClientes extends JSplitPane {
                 String direccion = obtenerDireccion();
                 String telefono = obtenerTelefono();
                 boolean VIP = obtenerVIP();
-                Cliente c = new Cliente(dni, nombre, direccion, telefono);
-                c.setVip(VIP);
                 //Añade el cliente al listado
-                clientes.anyadirCliente(c);
+                clientes.anyadirCliente(dni, nombre, direccion, telefono, VIP);
+                JOptionPane.showMessageDialog(rightComponent, "Cliente anyadido con los siguientes datos:\n"
+                        + "DNI: " + dni + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
+                        + "Telefono: " + telefono + "VIP: " + (VIP? "\u2713" : "\u2717"), 
+                        "Cliente anyadido", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoYaExistenteException ex) {
@@ -404,10 +405,12 @@ public class PantallaClientes extends JSplitPane {
                 String direccion = obtenerDireccion();
                 String telefono = obtenerTelefono();
                 boolean VIP = obtenerVIP();
-                Cliente c = new Cliente(DNI, nombre, direccion, telefono);
-                c.setVip(VIP);
                 //Modifica el cliente
-                clientes.modificarCliente(DNI, c);
+                clientes.modificarCliente(DNI, nombre, direccion, telefono, VIP);
+                JOptionPane.showMessageDialog(rightComponent, "Modificado el cliente " + DNI + " con los siguientes datos:\n"
+                        + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
+                        + "Telefono: " + telefono + "VIP: " + (VIP? "\u2713" : "\u2717"), 
+                        "Cliente modificado", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {

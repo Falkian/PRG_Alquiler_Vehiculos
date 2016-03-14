@@ -24,11 +24,19 @@ public class ColeccionAlquileres {
 
     private final ArrayList<Alquiler> alquileres;       //Coleccion de alquielres
 
+    private final ColeccionVehiculos vehiculos;     //Coleccion de vehiculos
+    private final ColeccionClientes clientes;       //Coleccion de clientes
+
     /**
      * Constructor de la coleccion de alquileres.
+     *
+     * @param vehiculos la coleccion de vehiculos
+     * @param clientes la coleccion de clientes
      */
-    public ColeccionAlquileres() {
+    public ColeccionAlquileres(ColeccionVehiculos vehiculos, ColeccionClientes clientes) {
         alquileres = new ArrayList<>();
+        this.vehiculos = vehiculos;
+        this.clientes = clientes;
     }
 
     /**
@@ -41,6 +49,23 @@ public class ColeccionAlquileres {
      * alquilados.
      */
     public void anyadirAlquiler(Vehiculo v, Cliente c) throws AlquilerVehiculoException {
+        alquileres.add(new Alquiler(v, c));
+        v.alquilar();
+        c.alquilar();
+        guardar();
+    }
+
+    /**
+     * Dado un dni elimina todos los alquileres que tenga el cliente
+     * identidicado por dicho dni.
+     *
+     * @param dni que identifica al cliente.
+     * @throws AlquilerVehiculoException si el cliente no tiene vehiculos
+     * alquilados.
+     */
+    public void anyadirAlquiler(String matricula, String dni) throws ObjetoNoExistenteException, AlquilerVehiculoException {
+        Vehiculo v = vehiculos.obtenerVechiculo(matricula);
+        Cliente c = clientes.obtenerCliente(dni);
         alquileres.add(new Alquiler(v, c));
         v.alquilar();
         c.alquilar();
@@ -126,6 +151,24 @@ public class ColeccionAlquileres {
     }
 
     /**
+     * Devuelve el coste de alquilar un vehiculo durante una cantidad de dias
+     * por un cliente determinado.
+     *
+     * @param matricula identifica al vehiculo
+     * @param dni identifica al cliente
+     * @param dias que dura el alquiler
+     * @return catidad de alquilar el vehiculo durante los dias dados
+     * @throws ObjetoNoExistenteException
+     */
+    public double obtenerPrecioAlquiler(String matricula, String dni, int dias) throws ObjetoNoExistenteException {
+        double precio = vehiculos.obtenerVechiculo(matricula).alquilerTotal(dias);
+        if (clientes.obtenerCliente(dni).isVip()) {
+            precio *= 0.85;
+        }
+        return precio;
+    }
+
+    /**
      * Carga la informacion desde un fichero;
      *
      * @param vehiculos la coleccion en la que se almacenan los vehiculos
@@ -186,7 +229,7 @@ public class ColeccionAlquileres {
      */
     public void guardar() {
         File archivo = new File(PATH);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))){
+        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
             writer.println("Matricula\t\tCliente");
 
             for (Alquiler alquiler : alquileres) {

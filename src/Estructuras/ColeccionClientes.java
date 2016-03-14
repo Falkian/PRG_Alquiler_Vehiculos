@@ -32,11 +32,17 @@ public class ColeccionClientes {
     /**
      * Anayade un cliente a la coleccion.
      *
-     * @param c el cliente a anyadir.
+     * @param dni dni del cliente
+     * @param nombre nombre del cliente
+     * @param direccion direccion del cliente
+     * @param tlf telefono del cliente
+     * @param vip si del cliente es vip
      * @throws ObjetoYaExistenteException si el objeto a añadir ya existe.
-     */
-    public void anyadirCliente(Cliente c) throws ObjetoYaExistenteException {
-        if (posicionCliente(c.getDni()) < 0) {
+     */    
+    public void anyadirCliente(String dni, String nombre, String direccion, String tlf, boolean vip) throws ObjetoYaExistenteException {
+        if (posicionCliente(dni) < 0) {
+            Cliente c = new Cliente(dni, nombre, direccion, tlf);
+            c.setVip(vip);
             clientes.add(c);
             guardar();
         } else {
@@ -65,13 +71,18 @@ public class ColeccionClientes {
      * Modifica el clientes identificado por el DNI dado, asignandole el cliente
      * dado.
      *
-     * @param DNI DNI del cliente a modificar.
-     * @param c el cliente a establecerle.
+     * @param DNI dni del cliente
+     * @param nombre nombre del cliente
+     * @param direccion direccion del cliente
+     * @param tlf telefono del cliente
+     * @param vip si del cliente es vip
      * @throws ObjetoNoExistenteException si el vehiculo a modificar no existe.
      */
-    public void modificarCliente(String DNI, Cliente c) throws ObjetoNoExistenteException {
+    public void modificarCliente(String DNI, String nombre, String direccion, String tlf, boolean vip) throws ObjetoNoExistenteException {
         for (Cliente cliente : clientes) {
             if (cliente.getDni().equals(DNI)) {
+                Cliente c = new Cliente(DNI, nombre, direccion, tlf);
+                c.setVip(vip);
                 cliente = c;
             }
         }
