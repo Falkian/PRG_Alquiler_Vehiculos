@@ -5,16 +5,30 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.*;
 
+/**
+ * Clase que contiene el menu de finanzas
+ *
+ * @author Kevin
+ */
 public class PantallaFinanzas extends JPanel {
     
     private final HistorialAlquileres historial;
     
+    /**
+     * Crea e inicializa el menu de vehiculos.
+     *
+     * @param historial el hishtorial de alquileres realizados
+     */
     public PantallaFinanzas(HistorialAlquileres historial) {
         super();
         this.historial = historial;
         iniciar();
     }
     
+    /**
+     * Inicia la pantalla de finanzas, creando y colocando todos sus
+     * elementos. Empieza en el apartado de alta de vehiculos.
+     */
     private void iniciar() {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
@@ -29,7 +43,7 @@ public class PantallaFinanzas extends JPanel {
         c.gridheight = 8;
         c.weightx = 1;
         c.weighty = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
+        c.fill = GridBagConstraints.BOTH;
         add(listadoFinanzas, c);
         c.gridy = 9;
         c.gridheight = 1;

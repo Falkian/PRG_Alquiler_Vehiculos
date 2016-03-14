@@ -14,10 +14,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+/**
+ * Clase que contiene el menu de gestion de clientes
+ *
+ * @author Kevin
+ */
 public class PantallaClientes extends JSplitPane {
 
-    private final ColeccionClientes clientes;
-    private final ColeccionAlquileres alquileres;
+    private final ColeccionClientes clientes;       //Coleccion de clientes
+    private final ColeccionAlquileres alquileres;   //Coleccion de alquileres (para saber si un cliente tiene vehiculos alquilados)
 
     private JLabel textoDNI;
     private JTextField introDNI;
@@ -30,6 +35,12 @@ public class PantallaClientes extends JSplitPane {
     private JLabel textoVIP;
     private JCheckBox introVIP;
 
+    /**
+     * Crea e inicializa el menu de clientes.
+     *
+     * @param clientes la coleccion de clientes
+     * @param alquileres la coleccion de alquileres
+     */
     public PantallaClientes(ColeccionClientes clientes, ColeccionAlquileres alquileres) {
         super(JSplitPane.HORIZONTAL_SPLIT);
         this.clientes = clientes;
@@ -37,12 +48,16 @@ public class PantallaClientes extends JSplitPane {
         iniciar();
     }
 
+    /**
+     * Inicia el menu de gestion de clientes, creando y colocando todos sus
+     * elementos. Empieza en el apartado de alta de clientes.
+     */
     private void iniciar() {
         JPanel menuClientes = new JPanel();        //Menu izquierdo
         menuClientes.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        //- - - Botones de la parte izquierda del menu de gestion de vehiculos
+        //Botones de la parte izquierda del menu de gestion de vehiculos
         JButton botonAnadir = new JButton("Alta");
         JButton botonModificacion = new JButton("Modificacion");
         JButton botonBorrado = new JButton("Borrado");
@@ -87,10 +102,13 @@ public class PantallaClientes extends JSplitPane {
 
         setLeftComponent(menuClientes);
 
-        //- - - Inicia el menu de gestion de vehiculos en el apartado de alta
+        //Inicia el menu de gestion de vehiculos en el apartado de alta
         inicioPantallaClientesAlta();
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de alta de clientes.
+     */
     private void inicioPantallaClientesAlta() {
         JPanel altaClientes = new JPanel();
         altaClientes.setLayout(new GridBagLayout());
@@ -169,6 +187,9 @@ public class PantallaClientes extends JSplitPane {
         setRightComponent(altaClientes);
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de modificacion de clientes.
+     */
     private void inicioPantallaClientesModificacion() {
         JPanel modificacionClientes = new JPanel();
         modificacionClientes.setLayout(new GridBagLayout());
@@ -246,6 +267,9 @@ public class PantallaClientes extends JSplitPane {
         setRightComponent(modificacionClientes);
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de borrado de clientes.
+     */
     private void inicioPantallaClientesBorrado() {
         JPanel borradoClientes = new JPanel();
         borradoClientes.setLayout(new GridBagLayout());
@@ -275,7 +299,7 @@ public class PantallaClientes extends JSplitPane {
         contenido.add(textoDNI, ci);
         ci.gridx = 1;
         contenido.add(introDNI, ci);
-        
+
         c.gridy = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         borradoClientes.add(contenido, c);
@@ -292,6 +316,9 @@ public class PantallaClientes extends JSplitPane {
         setRightComponent(borradoClientes);
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de listado de clientes.
+     */
     private void inicioPantallaClientesListado() {
         JTable listado = new JTable(clientes.obtenerDataArray(), new String[]{"DNI", "Nombre", "Direccion", "Telefono", "VIP"});
 
@@ -301,6 +328,10 @@ public class PantallaClientes extends JSplitPane {
         setRightComponent(listadoVehiculos);
     }
 
+    /**
+     * Manejador de eventos de los botones de navegacion del menu de gestion de
+     * clientes.
+     */
     private class botonesMenuListener implements ActionListener {
 
         @Override
@@ -323,11 +354,17 @@ public class PantallaClientes extends JSplitPane {
 
     }
 
+    /**
+     * Manejador de eventos del boton de alta de clientes. Asegura que los datos
+     * sean validos al clicar, indicando los posibles errores o exito de la
+     * accion.
+     */
     private class botonAltaListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                //Obtiene la informacion del cliente
                 String dni = obtenerDNI();
                 String nombre = obtenerNombre();
                 String direccion = obtenerDireccion();
@@ -335,6 +372,7 @@ public class PantallaClientes extends JSplitPane {
                 boolean VIP = obtenerVIP();
                 Cliente c = new Cliente(dni, nombre, direccion, telefono);
                 c.setVip(VIP);
+                //Añade el cliente al listado
                 clientes.anyadirCliente(c);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
@@ -350,11 +388,17 @@ public class PantallaClientes extends JSplitPane {
         }
     }
 
+    /**
+     * Manejador de eventos del boton de modificacion de clientes. Asegura que
+     * los datos sean validos al clicar, indicando los posibles errores o exito
+     * de la accion.
+     */
     private class botonModificarListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                //Obtiene la informacion del cliente
                 String DNI = obtenerDNI();
                 String nombre = obtenerNombre();
                 String direccion = obtenerDireccion();
@@ -362,7 +406,8 @@ public class PantallaClientes extends JSplitPane {
                 boolean VIP = obtenerVIP();
                 Cliente c = new Cliente(DNI, nombre, direccion, telefono);
                 c.setVip(VIP);
-                clientes.modificarCliente(DNI, c);                
+                //Modifica el cliente
+                clientes.modificarCliente(DNI, c);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {
@@ -376,16 +421,22 @@ public class PantallaClientes extends JSplitPane {
             }
         }
     }
-    
+
+    /**
+     * Manejador de eventos del boton de borrado de clientes. Asegura que los
+     * datos sean validos al clicar, indicando los posibles errores o exito de
+     * la accion.
+     */
     private class botonBorrarListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                //Obtiene la informacion del cliente
                 String DNI = obtenerDNI();
                 boolean eliminar = true;
                 if (clientes.obtenerCliente(DNI).isAlquilado()) {
-                    //Informar de que tiene vehiculos alquilados y confirmar eliminacion
+                    //Informar si tiene vehiculos alquilados y confirmar eliminacion
                     int resp = JOptionPane.showConfirmDialog(rightComponent, "El cliente que quieres leiminar tiene vehiculos alquilados.\n"
                             + "¿Seguro que desea eliminarlo (se cancelara el alquiler sin agregarse al historial)?",
                             "Cliente alquilado", JOptionPane.YES_NO_OPTION);
@@ -398,6 +449,7 @@ public class PantallaClientes extends JSplitPane {
                     }
                 }
                 if (eliminar) {
+                    //Elimina el cliente
                     clientes.eliminarCliente(DNI);
                     JOptionPane.showMessageDialog(rightComponent, "Cliente con DNI " + DNI + "eliminado.",
                             "Cliente eliminado", JOptionPane.INFORMATION_MESSAGE);
@@ -414,6 +466,13 @@ public class PantallaClientes extends JSplitPane {
         }
     }
 
+    /**
+     * Lee el DNI de la zona de introduccion correspondiente.
+     *
+     * @return un DNI con un formato valido
+     * @throws FormatoIncorrectoException si el DNI no tiene el formato adecuado
+     * o es vacio
+     */
     private String obtenerDNI() throws FormatoIncorrectoException {
         String DNI = introDNI.getText().toUpperCase();
         if (DNI.matches("\\d{8}[a-zA-Z]")) {
@@ -425,6 +484,12 @@ public class PantallaClientes extends JSplitPane {
         }
     }
 
+    /**
+     * Lee el nombre de la zona de introduccion correspondiente.
+     *
+     * @return un nombre con un formato valido
+     * @throws FormatoIncorrectoException si el nombre no es correcto o es vacio
+     */
     private String obtenerNombre() throws FormatoIncorrectoException {
         String nombre = introNombre.getText();
         if (nombre.equals("")) {
@@ -436,6 +501,12 @@ public class PantallaClientes extends JSplitPane {
         }
     }
 
+    /**
+     * Lee la direccion de la zona de introduccion correspondiente.
+     *
+     * @return una direccion no vacia
+     * @throws FormatoIncorrectoException si la direccion esta vacia
+     */
     private String obtenerDireccion() throws FormatoIncorrectoException {
         String direccion = introDireccion.getText();
         if (direccion.equals("")) {
@@ -445,6 +516,13 @@ public class PantallaClientes extends JSplitPane {
         }
     }
 
+    /**
+     * Lee el telefono de la zona de introduccion correspondiente,
+     *
+     * @return un telefono valido
+     * @throws FormatoIncorrectoException si el telefono no tiene un formato
+     * valido o es vacio
+     */
     private String obtenerTelefono() throws FormatoIncorrectoException {
         String tlf = introTelefono.getText();
         if (tlf.equals("")) {
@@ -456,11 +534,12 @@ public class PantallaClientes extends JSplitPane {
         }
     }
 
+    /**
+     * Lee si el cliente es VIP de la zona de introduccion correspondiente
+     *
+     * @return true si el cliente es VIP; false en caso contrario
+     */
     private boolean obtenerVIP() {
-        if (introVIP.isSelected()) {
-            return true;
-        } else {
-            return false;
-        }
+        return introVIP.isSelected();
     }
 }

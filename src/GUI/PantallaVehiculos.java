@@ -14,10 +14,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+/**
+ * Clase que contiene el menu de gestion de vehiculos
+ *
+ * @author Kevin
+ */
 public class PantallaVehiculos extends JSplitPane {
 
-    private final ColeccionVehiculos vehiculos;
-    private final ColeccionAlquileres alquileres;
+    private final ColeccionVehiculos vehiculos;     //Colecccion de vehiculos
+    private final ColeccionAlquileres alquileres;   //Coleccion de alquileres (para saber si un vehiculo esta alquilado)
     
     private JLabel textoMatricula;
     private JTextField introMatricula;
@@ -26,6 +31,12 @@ public class PantallaVehiculos extends JSplitPane {
     private JLabel textoCaract;
     private JTextField introCaract;
 
+    /**
+     * Crea e inicializa el menu de vehiculos.
+     *
+     * @param vehiculos  la coleccion de vehiculos
+     * @param alquileres la coleccion de alquileres
+     */
     public PantallaVehiculos(ColeccionVehiculos vehiculos, ColeccionAlquileres alquileres) {
         super(JSplitPane.HORIZONTAL_SPLIT);
         this.vehiculos = vehiculos;
@@ -33,6 +44,10 @@ public class PantallaVehiculos extends JSplitPane {
         iniciar();
     }
 
+    /**
+     * Inicia el menu de gestion de vehiculos, creando y colocando todos sus
+     * elementos. Empieza en el apartado de alta de vehiculos.
+     */
     private void iniciar() {
         JPanel menuVehiculos = new JPanel();        //Menu izquierdo
         menuVehiculos.setLayout(new GridBagLayout());
@@ -87,6 +102,9 @@ public class PantallaVehiculos extends JSplitPane {
         inicioPantallaVehiculosAlta();
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de alta de vehiculos.
+     */
     private void inicioPantallaVehiculosAlta() {
         JPanel altaVehiculos = new JPanel();
         altaVehiculos.setLayout(new GridBagLayout());
@@ -151,6 +169,9 @@ public class PantallaVehiculos extends JSplitPane {
         setRightComponent(altaVehiculos);
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de modificacion de vehiculos.
+     */
     private void inicioPantallaVehiculosModificacion() {
         JPanel modificacionVehiculos = new JPanel();
         modificacionVehiculos.setLayout(new GridBagLayout());
@@ -214,6 +235,9 @@ public class PantallaVehiculos extends JSplitPane {
         setRightComponent(modificacionVehiculos);
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de borrado de vehiculos.
+     */
     private void inicioPantallaVehiculosBorrado() {
         JPanel borradoVehiculos = new JPanel();
         borradoVehiculos.setLayout(new GridBagLayout());
@@ -260,6 +284,9 @@ public class PantallaVehiculos extends JSplitPane {
         setRightComponent(borradoVehiculos);
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de listado de vehiculos.
+     */
     private void inicioPantallaVehiculosListado() {
         JTable listado = new JTable(vehiculos.obtenerDataArray(), new String[]{"Matricula", "Tipo", "Plazas\\PMA"});
 
@@ -269,6 +296,10 @@ public class PantallaVehiculos extends JSplitPane {
         setRightComponent(listadoVehiculos);
     }
 
+    /**
+     * Manejador de eventos de los botones de navegacion del menu de gestion de
+     * vehiculos.
+     */
     private class botonesMenuListener implements ActionListener {
 
         @Override
@@ -291,11 +322,17 @@ public class PantallaVehiculos extends JSplitPane {
 
     }
 
+    /**
+     * Manejador de eventos del boton de alta de vehiculos. Asegura que los datos
+     * sean validos al clicar, indicando los posibles errores o exito de la
+     * accion.
+     */
     private class botonAltaListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                //Obtiene la informacion del vehiculo
                 String matricula = obtenerMatricula();
                 switch (introTipo.getSelectedIndex()) {
                     case GUI.COCHE:
@@ -343,6 +380,12 @@ public class PantallaVehiculos extends JSplitPane {
         }
 
     }
+
+    /**
+     * Manejador de eventos del boton de modificacion de vehiculos. Asegura que
+     * los datos sean validos al clicar, indicando los posibles errores o exito
+     * de la accion.
+     */
 
     private class botonModificarListener implements ActionListener {
 
@@ -397,6 +440,12 @@ public class PantallaVehiculos extends JSplitPane {
 
     }
 
+    /**
+     * Manejador de eventos del boton de borrado de vehiculos. Asegura que
+     * los datos sean validos al clicar, indicando los posibles errores o exito
+     * de la accion.
+     */
+
     private class botonBorrarListener implements ActionListener {
 
         @Override
@@ -434,6 +483,9 @@ public class PantallaVehiculos extends JSplitPane {
         }
     }
 
+    /**
+     * Manejador de eventos del selector del tipo de vehiculo.
+     */
     private class selectorTipoListener implements ActionListener {
 
         @Override
@@ -452,6 +504,13 @@ public class PantallaVehiculos extends JSplitPane {
 
     }
 
+    /**
+     * Lee la matricula de la zona de introduccion correspondiente.
+     *
+     * @return una matriculacon un formato valido
+     * @throws FormatoIncorrectoException si la matricula no tiene el formato adecuado
+     * o es vacio
+     */
     private String obtenerMatricula() throws FormatoIncorrectoException {
         String matricula = introMatricula.getText().toUpperCase();
         if (matricula.matches("[\\d]{4}[a-zA-Z]{3}")) {
@@ -463,6 +522,14 @@ public class PantallaVehiculos extends JSplitPane {
         }
     }
 
+    /**
+     * Lee las plazas de la zona de introduccion correspondiente.
+     *
+     * @param max la cantidad maxima de plazas para el vehiculo
+     * @return un numero de plazas con un formato valido
+     * @throws FormatoIncorrectoException si las plazas no tiene el formato adecuado
+     * o es vacio
+     */
     private int obtenerPlazas(int max) throws FormatoIncorrectoException {
         try {
             if (introCaract.getText().equals("")) {
@@ -480,6 +547,14 @@ public class PantallaVehiculos extends JSplitPane {
         }
     }
 
+    /**
+     * Lee el PMA de la zona de introduccion correspondiente.
+     *
+     * @param max el PMA maximo para el vehiculo
+     * @return el PMA con un formato valido
+     * @throws FormatoIncorrectoException si el PMA no tiene el formato adecuado
+     * o es vacio
+     */
     private double obtenerPMA(double max) throws FormatoIncorrectoException {
         try {
             if (introCaract.getText().equals("")) {
