@@ -366,7 +366,7 @@ public class PantallaVehiculos extends JSplitPane {
                 String tipo = (String) introTipo.getSelectedItem();
                 String matricula = obtenerMatricula();
                 double caract = obtenerCaracteristica();
-                vehiculos.modificarVehiculo(tipo, matricula, caract);
+                vehiculos.modificarVehiculo(matricula, tipo, caract);
                 JOptionPane.showMessageDialog(rightComponent, "Vehiculo modificado correctamente", "Vehiculo modificado", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);

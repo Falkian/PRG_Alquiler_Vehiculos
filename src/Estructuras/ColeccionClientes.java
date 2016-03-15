@@ -83,7 +83,9 @@ public class ColeccionClientes {
             if (cliente.getDni().equals(DNI)) {
                 Cliente c = new Cliente(DNI, nombre, direccion, tlf);
                 c.setVip(vip);
-                cliente = c;
+                clientes.set(posicionCliente(DNI), c);
+                guardar();
+                return;
             }
         }
         throw new ObjetoNoExistenteException("El cliente con DNI " + DNI + " no eta registrado.");

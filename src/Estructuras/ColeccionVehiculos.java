@@ -79,6 +79,7 @@ public class ColeccionVehiculos {
                     }
                     break;
             }
+            guardar();
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -114,7 +115,7 @@ public class ColeccionVehiculos {
      */
     public void modificarVehiculo(String matricula, String tipo, double caract) throws ObjetoNoExistenteException, FormatoIncorrectoException {
         int posicionVehiculo = posicionVehiculo(matricula);
-        if (posicionVehiculo < 0) {
+        if (posicionVehiculo >= 0) {
             switch (tipo) {
                 case "Coche":
                     if (caract < 2 || caract > Coche.PLAZAS_MAX) {
@@ -145,6 +146,7 @@ public class ColeccionVehiculos {
                     }
                     break;
             }
+            guardar();
         } else {
             throw new ObjetoNoExistenteException();
         }

@@ -373,7 +373,7 @@ public class PantallaClientes extends JSplitPane {
                 clientes.anyadirCliente(dni, nombre, direccion, telefono, VIP);
                 JOptionPane.showMessageDialog(rightComponent, "Cliente anyadido con los siguientes datos:\n"
                         + "DNI: " + dni + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
-                        + "Telefono: " + telefono + "VIP: " + (VIP? "\u2713" : "\u2717"), 
+                        + "Telefono: " + telefono + "\nVIP: " + (VIP? "\u2713" : "\u2717"), 
                         "Cliente anyadido", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
@@ -409,7 +409,7 @@ public class PantallaClientes extends JSplitPane {
                 clientes.modificarCliente(DNI, nombre, direccion, telefono, VIP);
                 JOptionPane.showMessageDialog(rightComponent, "Modificado el cliente " + DNI + " con los siguientes datos:\n"
                         + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
-                        + "Telefono: " + telefono + "VIP: " + (VIP? "\u2713" : "\u2717"), 
+                        + "Telefono: " + telefono + "\nVIP: " + (VIP? "\u2713" : "\u2717"), 
                         "Cliente modificado", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
@@ -497,7 +497,7 @@ public class PantallaClientes extends JSplitPane {
         String nombre = introNombre.getText();
         if (nombre.equals("")) {
             throw new FormatoIncorrectoException("Debes introducir el nombre.");
-        } else if (!nombre.matches("\\D")) {
+        } else if (!nombre.matches("\\D+")) {
             throw new FormatoIncorrectoException(nombre + " no es un nombre valido.");
         } else {
             return nombre;
