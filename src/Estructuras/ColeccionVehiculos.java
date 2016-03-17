@@ -196,20 +196,21 @@ public class ColeccionVehiculos {
             //Lee el encabezado del archivo e informa si esta vacio.
             String str = reader.readLine();
             if (str == null) {
-                System.out.println("Archivo de vehiclos en blanco.");
+                //TODO? - Sustituir salida de consola por log
+                //System.out.println("Archivo de vehiclos en blanco.");
                 return;
             } else {
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 str = reader.readLine();
                 if (str == null || str.equals("")) {
-                    System.out.println("El archivo de vechiculos no contiene informacion.");
+                    //System.out.println("El archivo de vechiculos no contiene informacion.");
                     return;
                 }
                 int linea = 1;
                 while (str != null && !str.equals("")) {
                     String[] datos = str.split("\\t\\t");
                     if (datos.length != 3) {
-                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                        //System.out.println("Datos en la linea " + linea + " incorrectos.");
                     } else {
                         String tipo = datos[0].trim();
                         String matricula = datos[1].trim();
@@ -236,7 +237,7 @@ public class ColeccionVehiculos {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } finally {
-            System.out.println("Fin de la carga de vehiculos.\n");
+            //System.out.println("Fin de la carga de vehiculos.\n");
         }
     }
 

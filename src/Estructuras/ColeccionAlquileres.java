@@ -59,7 +59,10 @@ public class ColeccionAlquileres {
      * Dado un dni elimina todos los alquileres que tenga el cliente
      * identidicado por dicho dni.
      *
+     * @param matricula que identifica al vehiculo.
      * @param dni que identifica al cliente.
+     * @throws ObjetoNoExistenteException si el cliente o el vehiculo no
+     * existen.
      * @throws AlquilerVehiculoException si el cliente no tiene vehiculos
      * alquilados.
      */
@@ -185,19 +188,20 @@ public class ColeccionAlquileres {
             //Lee el encabezado del archivo e informa si esta vacio
             String str = reader.readLine();
             if (str == null) {
-                System.out.println("El archivo de alquileres esta vacio.");
+                //TODO? - Sustituir salida de consola por log
+                //System.out.println("El archivo de alquileres esta vacio.");
                 return;
             } else {
                 //Lee la primera linea e informa si esta vacia
                 if ((str = reader.readLine()) == null || str.equals("")) {
-                    System.out.println("El archivo de alquileres no contiene informacion.");
+                    //System.out.println("El archivo de alquileres no contiene informacion.");
                     return;
                 }
                 int linea = 1;
                 while (str != null && !str.equals("")) {
                     String[] datos = str.split("\\t\\t");
                     if (datos.length != 2) {
-                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                        //System.out.println("Datos en la linea " + linea + " incorrectos.");
                     } else {
                         try {
                             String matricula = datos[0].trim();
@@ -206,7 +210,7 @@ public class ColeccionAlquileres {
                             Cliente c = clientes.obtenerCliente(dni);
                             anyadirAlquiler(v, c);
                         } catch (ObjetoNoExistenteException e) {
-                            System.out.println("Datos en la linea " + linea + " incorrectos: ");
+                            //System.out.println("Datos en la linea " + linea + " incorrectos: ");
                             System.out.println(e.getMessage());
                         } catch (AlquilerVehiculoException e) {
                             System.out.println(e.getMessage());
@@ -220,7 +224,7 @@ public class ColeccionAlquileres {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } finally {
-            System.out.println("Fin de la carga de alquileres.\n");
+            //System.out.println("Fin de la carga de alquileres.\n");
         }
     }
 

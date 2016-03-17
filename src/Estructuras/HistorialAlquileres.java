@@ -127,18 +127,19 @@ public class HistorialAlquileres {
             //Lee el encabezado e informa si esta vacio
             String str = reader.readLine();
             if (str == null) {
-                System.out.println("Historial de alquileres en blanco.");
+                //TODO? - Sustituir salida de consola por log
+                //System.out.println("Historial de alquileres en blanco.");
             } else {
                 str = reader.readLine();
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 if (str == null || str.equals("")) {
-                    System.out.println("El historial de registros no contiene informacion.");
+                    //System.out.println("El historial de registros no contiene informacion.");
                 } else {
                     int linea = 1;
                     while (str != null && !str.equals("")) {
                         String[] datos = str.split("\\t\\t");
                         if (datos.length != 3) {
-                            System.out.println("Datos en la linea " + linea + " incorrectos.");
+                            //System.out.println("Datos en la linea " + linea + " incorrectos.");
                         } else {
                             String matricula = datos[0];
                             String dni = datos[1];
@@ -150,11 +151,11 @@ public class HistorialAlquileres {
                                     c = clientes.obtenerCliente(dni);
                                 } catch (ObjetoNoExistenteException e) {
                                     c = null;
-                                    System.out.println("La linea " + linea + " hace referencia a un cliente que ya no existe.");
+                                    //System.out.println("La linea " + linea + " hace referencia a un cliente que ya no existe.");
                                 }
                                 historial.add(new RegistroAlquiler(new Alquiler(v, c), dias));
                             } catch (ObjetoNoExistenteException e) {
-                                System.out.println("La linea " + linea + " hacen referencia a un vehiculo que ya no existe.");
+                                //System.out.println("La linea " + linea + " hacen referencia a un vehiculo que ya no existe.");
                             }
                         }
                         str = reader.readLine();
@@ -166,7 +167,7 @@ public class HistorialAlquileres {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } finally {
-            System.out.println("Fin de la carga del historial.\n");
+            //System.out.println("Fin de la carga del historial.\n");
         }
     }
 

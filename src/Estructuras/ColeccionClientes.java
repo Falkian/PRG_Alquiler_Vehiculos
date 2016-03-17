@@ -135,20 +135,21 @@ public class ColeccionClientes {
             //Lee el encabezado del archivo e informa si esta vacio.
             String str = reader.readLine();
             if (str == null) {
-                System.out.println("Archivo de clientes en blanco.");
+                //TODO? - Sustituir salida de consola por log
+                //System.out.println("Archivo de clientes en blanco.");
                 return;
             } else {
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 str = reader.readLine();
                 if (str == null || str.equals("")) {
-                    System.out.println("El archivo de clientes no contiene informacion.");
+                    //System.out.println("El archivo de clientes no contiene informacion.");
                     return;
                 }
                 int linea = 1;
                 while (str != null && !str.equals("")) {
                     String[] datos = str.split("\\t\\t");
                     if (datos.length != 5) {
-                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                        //System.out.println("Datos en la linea " + linea + " incorrectos.");
                     } else {
                         Cliente c = new Cliente(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
                         if (datos[4].equals("S")) {
@@ -164,7 +165,7 @@ public class ColeccionClientes {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         } finally {
-            System.out.println("Fin de la carga de clientes.\n");
+            //System.out.println("Fin de la carga de clientes.\n");
         }
     }
 

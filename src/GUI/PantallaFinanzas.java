@@ -34,6 +34,7 @@ public class PantallaFinanzas extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         
         JTable listado = new JTable(historial.obtenerDataArray(), new String[]{"Matricula", "DNI", "Dias", "Primer", "VIP", "Precio"});
+        listado.setEnabled(false);
 
         JScrollPane listadoFinanzas = new JScrollPane(listado);
         listado.setFillsViewportHeight(true);
