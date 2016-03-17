@@ -320,7 +320,9 @@ public class PantallaClientes extends JSplitPane {
      */
     private void inicioPantallaClientesListado() {
         JTable listado = new JTable(clientes.obtenerDataArray(), new String[]{"DNI", "Nombre", "Direccion", "Telefono", "VIP"});
-
+        listado.setEnabled(false);
+        listado.getTableHeader().setReorderingAllowed(false);
+        
         JScrollPane listadoVehiculos = new JScrollPane(listado);
         listado.setFillsViewportHeight(true);
 

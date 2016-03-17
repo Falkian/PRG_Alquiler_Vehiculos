@@ -288,6 +288,8 @@ public class PantallaVehiculos extends JSplitPane {
      */
     private void inicioPantallaVehiculosListado() {
         JTable listado = new JTable(vehiculos.obtenerDataArray(), new String[]{"Matricula", "Tipo", "Plazas\\PMA"});
+        listado.setEnabled(false);
+        listado.getTableHeader().setReorderingAllowed(false);
 
         JScrollPane listadoVehiculos = new JScrollPane(listado);
         listado.setFillsViewportHeight(true);
