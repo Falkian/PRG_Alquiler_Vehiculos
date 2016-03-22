@@ -83,7 +83,7 @@ public class HistorialAlquileres {
             precio -= descuentoprimera + descuentovip;
             total += precio;
             System.out.printf("Vehiculo: %s, Cliente: %s, Dias: %d, Precio: %f€%n",
-                    matricula, c == null? "Ya no existe" : c.getDni(), dias, precio);
+                    matricula, c == null ? "Ya no existe" : c.getDni(), dias, precio);
             if (descuentovip > 0) {
                 System.out.printf("Se le aplicó un 15%% de descuento (%.2f€) por ser el ciente VIP.%n", descuentovip);
             }
@@ -163,7 +163,14 @@ public class HistorialAlquileres {
 
             for (RegistroAlquiler registro : historial) {
                 String matricula = registro.getAlquiler().getVehiculo().getMatricula();
-                String dni = registro.getAlquiler().getCliente().getDni();
+                //TODO  - AQUI
+                Cliente c = registro.getAlquiler().getCliente();
+                String dni;
+                if (c != null) {
+                    dni = registro.getAlquiler().getCliente().getDni();
+                } else {
+                    dni = "Ya no existe.";
+                }
                 int dias = registro.getDias();
                 writer.println(matricula + "\t\t" + dni + "\t\t" + dias);
             }

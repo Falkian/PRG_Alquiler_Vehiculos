@@ -245,7 +245,6 @@ public class GestorAlquiler {
             alquileres.guardar();
             //Añade el alquiler y su precio al registro de alquileres
             historial.anyadirRegistro(alquiler, dias);
-            historial.guardar();
         } catch (FormatoIncorrectoException | AlquilerVehiculoException e) {
             System.out.println(e.getMessage());
         } finally {
