@@ -163,7 +163,6 @@ public class HistorialAlquileres {
 
             for (RegistroAlquiler registro : historial) {
                 String matricula = registro.getAlquiler().getVehiculo().getMatricula();
-                //TODO  - AQUI
                 Cliente c = registro.getAlquiler().getCliente();
                 String dni;
                 if (c != null) {
