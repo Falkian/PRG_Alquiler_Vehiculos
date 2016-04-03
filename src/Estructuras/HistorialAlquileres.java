@@ -180,7 +180,13 @@ public class HistorialAlquileres {
 
             for (RegistroAlquiler registro : historial) {
                 String matricula = registro.getAlquiler().getVehiculo().getMatricula();
-                String dni = registro.getAlquiler().getCliente().getDni();
+                Cliente c = registro.getAlquiler().getCliente();
+                String dni;
+                if (c != null) {
+                    dni = c.getDni();
+                } else {
+                    dni = "Ya no existe.";
+                }
                 int dias = registro.getDias();
                 writer.println(matricula + "\t\t" + dni + "\t\t" + dias);
             }
