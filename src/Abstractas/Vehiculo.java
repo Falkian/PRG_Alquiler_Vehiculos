@@ -20,7 +20,6 @@ public abstract class Vehiculo {
      */
     public Vehiculo(String matricula) {
         alquilado = false;
-        //primer = true;
         this.matricula = matricula;
     }
 
@@ -32,6 +31,14 @@ public abstract class Vehiculo {
     public String getMatricula() {
         return matricula;
     }
+
+    /**
+     * Devuelve la cacracteristica propia del vehiculo, bien sea un numero de
+     * plazas o PMA
+     *
+     * @return las plazas o PMA del vehiculo
+     */
+    public abstract double getCaracteristica();
 
     /**
      * Devuelve si el vechiculo esta alquilado o no.
@@ -65,7 +72,6 @@ public abstract class Vehiculo {
     public void devolver() throws AlquilerVehiculoException {
         if (alquilado) {
             alquilado = false;
-            //primer = false;
         } else {
             throw new AlquilerVehiculoException("El vechiculo no esta alquilado.");
         }
@@ -100,7 +106,7 @@ public abstract class Vehiculo {
      * @param alquiler el precio del alquiler del vechiculo.
      */
     public abstract void mostrarInfoAlquiler(int dias, double alquiler);
-    
+
     /**
      * Devuelve la informacion sobre el vehiculo en forma de array. Orden de la
      * informacion: Matricula, Tipo, PMA

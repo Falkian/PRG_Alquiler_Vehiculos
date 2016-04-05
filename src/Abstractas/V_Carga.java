@@ -21,13 +21,23 @@ public abstract class V_Carga extends Vehiculo {
         super(matricula);
         this.PMA = PMA;
     }
-
+    
     /**
      * Devuleve el peso maximo autorizado.
      *
      * @return el peso maximo autorizado.
      */
     public double getPMA() {
+        return PMA;
+    }
+    
+    /**
+     * Devuleve el peso maximo autorizado.
+     *
+     * @return el peso maximo autorizado.
+     */
+    @Override
+    public double getCaracteristica() {
         return PMA;
     }
 

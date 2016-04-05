@@ -79,6 +79,7 @@ public class ColeccionVehiculos {
                     }
                     break;
             }
+            guardar();
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -145,6 +146,7 @@ public class ColeccionVehiculos {
                     }
                     break;
             }
+            guardar();
         } else {
             throw new ObjetoNoExistenteException();
         }
@@ -165,6 +167,51 @@ public class ColeccionVehiculos {
         } else {
             throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
         }
+    }
+
+    /**
+     * Devuelve las plazas maximas de un coche.
+     *
+     * @return las plazas maximas de un coche.
+     */
+    public int getPlazasMaxCoche() {
+        return Coche.PLAZAS_MAX;
+    }
+
+    /**
+     * Devuelve las plazas maximas de un microbus.
+     *
+     * @return las plazas maximas de un microbus.
+     */
+    public int getPlazasMaxMicrobus() {
+        return Microbus.PLAZAS_MAX;
+    }
+
+    /**
+     * Devuelve el PMA maximo de una furgoneta.
+     *
+     * @return el PMA maximo de una furgoneta.
+     */
+    public int getPMAMaxFurgoneta() {
+        return Furgoneta.PMA_MAX;
+    }
+
+    /**
+     * Devuelve el PMA maximo de un camion.
+     *
+     * @return el PMA maximo de un camion.
+     */
+    public int getPMAMaxCamion() {
+        return Camion.PMA_MAX;
+    }
+
+    /**
+     * Devuelve un iterador para la coleccion de vehiculos.
+     *
+     * @return un iterador para la coleccion de vehiculos.
+     */
+    public IteradorVehiculos getIterador() {
+        return new IteradorVehiculos(vehiculos);
     }
 
     /**

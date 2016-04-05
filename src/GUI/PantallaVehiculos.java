@@ -2,33 +2,67 @@ package GUI;
 
 import Estructuras.ColeccionAlquileres;
 import Estructuras.ColeccionVehiculos;
+import Estructuras.IteradorVehiculos;
 import Excepciones.AlquilerVehiculoException;
 import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 
+//TODO - Trabajamdo en aspecto
 /**
  * Clase que contiene el menu de gestion de vehiculos
  *
  * @author Kevin
  */
-public class PantallaVehiculos extends JSplitPane {
+public class PantallaVehiculos extends JPanel {
 
     private final ColeccionVehiculos vehiculos;     //Colecccion de vehiculos
     private final ColeccionAlquileres alquileres;   //Coleccion de alquileres (para saber si un vehiculo esta alquilado)
+
+    private final IteradorVehiculos iterador;
+
+    private JPanel parteIzq;            //Contendra la zona de datos y el menu de navegacion
+
+    private JPanel zonaDatos;           //Contendra los campos de introduccion y visualizacion de datos
 
     private JLabel textoMatricula;
     private JTextField introMatricula;
     private JLabel textoTipo;
     private JComboBox introTipo;
     private JLabel textoCaract;
-    private JTextField introCaract;
+    private JSpinner introCaract;
+
+    private JPanel zonaNav;             //Contendra los botones de navegacion
+
+    private JButton botonPrimero;
+    private JButton botonAnterior;
+    private JButton botonSiguiente;
+    private JButton botonUltimo;
+
+    private JPanel parteDer;            //Contentra los botones de las opciones disponibles
+
+    private JButton botonAnadir;
+    private JButton botonEditar;
+    private JButton botonBorrar;
+    private JButton botonListar;
+
+    private JButton botonAceptarAlta;
+    private JButton botonDescartarAlta;
+
+    private JButton botonAceptarModificacion;
+    private JButton botonDescartarModificacion;
 
     /**
      * Crea e inicializa el menu de vehiculos.
@@ -37,10 +71,31 @@ public class PantallaVehiculos extends JSplitPane {
      * @param alquileres la coleccion de alquileres
      */
     public PantallaVehiculos(ColeccionVehiculos vehiculos, ColeccionAlquileres alquileres) {
-        super(JSplitPane.HORIZONTAL_SPLIT);
+        super();
         this.vehiculos = vehiculos;
         this.alquileres = alquileres;
+        iterador = vehiculos.getIterador();
+        creaElementos();
         iniciar();
+    }
+
+    /**
+     * Inicializa todos los elementos necesarios para poder operar.
+     */
+    private void creaElementos() {
+        textoMatricula = new JLabel("Matricula");
+        introMatricula = new JTextField(10);
+        introMatricula.setEnabled(false);
+
+        textoTipo = new JLabel("Tipo");
+        introTipo = new JComboBox(new String[]{"Coche", "Microbus", "Furgoneta", "Camion"});
+        introTipo.setSelectedIndex(GUI.COCHE);
+        introTipo.setEnabled(false);
+
+        textoCaract = new JLabel("Plazas");
+        introCaract = new JSpinner();
+        introCaract.setModel(new SpinnerNumberModel(2, 2, vehiculos.getPlazasMaxCoche(), 1));
+        introCaract.setEnabled(false);
     }
 
     /**
@@ -48,379 +103,162 @@ public class PantallaVehiculos extends JSplitPane {
      * elementos. Empieza en el apartado de alta de vehiculos.
      */
     private void iniciar() {
-        JPanel menuVehiculos = new JPanel();        //Menu izquierdo
-        menuVehiculos.setLayout(new GridBagLayout());
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
+        //Parte izquierda de la pantalla
+        parteIzq = new JPanel();
+        //parteIzq.setLayout(new BoxLayout(parteIzq, BoxLayout.Y_AXIS));
+        parteIzq.setLayout(new GridBagLayout());
+        GridBagConstraints ci = new GridBagConstraints();
+
+        ci.weightx = 0.2;
+        ci.weighty = 0.2;
+        ci.gridx = 0;
+        ci.gridy = 0;
+        parteIzq.add(new JLabel("<HTML><H3>GESTION DE VEHICULOS</H3></HTML>"), ci);
+
+        //Parte de la ventana en la que se mostraran y modificaran los datos
+        zonaDatos = new JPanel();
+        zonaDatos.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        //- - - Botones de la parte izquierda del menu de gestion de vehiculos
-        JButton botonAnadir = new JButton("Alta");
-        JButton botonModificacion = new JButton("Modificacion");
-        JButton botonBorrado = new JButton("Borrado");
-        JButton botonListado = new JButton("Listado");
+        //Inicia los datos con los valores del primer elemento de la coleccion
+        try {
+            introMatricula.setEnabled(false);
+            introTipo.setEnabled(false);
+            introTipo.addActionListener(new selectorTipoListener());
+            introCaract.setEnabled(false);
 
-        c.gridy = 0;
+            seleccionActual();
+        } catch (NullPointerException e) {
+            seleccionVacia();
+        }
+
         c.weightx = 0.5;
         c.weighty = 0.5;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        int yin = menuVehiculos.getHeight() / 5 - botonAnadir.getHeight() / 2;
-        int xin = menuVehiculos.getWidth() / 2 - botonAnadir.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuVehiculos.add(botonAnadir, c);
-
+        c.gridx = 0;
+        c.gridy = 0;
+        zonaDatos.add(textoMatricula, c);
+        c.gridx = 1;
+        zonaDatos.add(introMatricula, c);
+        c.gridx = 0;
         c.gridy = 1;
-        yin = menuVehiculos.getHeight() / 5 - botonModificacion.getHeight() / 2;
-        xin = menuVehiculos.getWidth() / 2 - botonModificacion.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuVehiculos.add(botonModificacion, c);
-
+        zonaDatos.add(textoTipo, c);
+        c.gridx = 1;
+        zonaDatos.add(introTipo, c);
+        c.gridx = 0;
         c.gridy = 2;
-        yin = menuVehiculos.getHeight() / 5 - botonBorrado.getHeight() / 2;
-        xin = menuVehiculos.getWidth() / 2 - botonBorrado.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuVehiculos.add(botonBorrado, c);
+        zonaDatos.add(textoCaract, c);
+        c.gridx = 1;
+        zonaDatos.add(introCaract, c);
 
+        ci.weightx = 0.8;
+        ci.weighty = 0.8;
+        ci.gridy = 1;
+        ci.gridheight = 3;
+        ci.fill = GridBagConstraints.BOTH;
+        parteIzq.add(zonaDatos, ci);
+
+        //Parte de la ventana con los botones de navegacion
+        zonaNav = new JPanel();
+        zonaNav.setLayout(new GridBagLayout());
+
+        botonPrimero = new JButton("|<");
+        botonAnterior = new JButton("<");
+        botonSiguiente = new JButton(">");
+        botonUltimo = new JButton(">|");
+
+        botonPrimero.setEnabled(false);
+        botonAnterior.setEnabled(false);
+        if (iterador.getActual() == null || !iterador.tieneSiguiente()) {
+            botonSiguiente.setEnabled(false);
+            botonUltimo.setEnabled(false);
+        }
+
+        botonPrimero.setActionCommand("Primero");
+        botonAnterior.setActionCommand("Anterior");
+        botonSiguiente.setActionCommand("Siguiente");
+        botonUltimo.setActionCommand("Ultimo");
+
+        botonPrimero.addActionListener(new BotonNavegacionListener());
+        botonAnterior.addActionListener(new BotonNavegacionListener());
+        botonSiguiente.addActionListener(new BotonNavegacionListener());
+        botonUltimo.addActionListener(new BotonNavegacionListener());
+
+        c.gridx = 0;
+        c.gridy = 0;
+        zonaNav.add(botonPrimero, c);
+        c.gridx = 1;
+        zonaNav.add(botonAnterior, c);
+        c.gridx = 2;
+        zonaNav.add(botonSiguiente, c);
+        c.gridx = 3;
+        zonaNav.add(botonUltimo, c);
+
+        ci.weightx = 0.5;
+        ci.weighty = 0.5;
+        ci.gridy = 4;
+        ci.fill = GridBagConstraints.HORIZONTAL;
+        parteIzq.add(zonaNav, ci);
+
+        add(parteIzq);
+
+        //Parte de la pantalla con los botones de edicion
+        parteDer = new JPanel();
+        parteDer.setLayout(new GridBagLayout());
+
+        botonAnadir = new JButton("+");
+        botonEditar = new JButton("E");
+        botonBorrar = new JButton("-");
+        botonListar = new JButton("Lista");
+
+        botonAnadir.addActionListener(new BotonAnadirListerner());
+        botonEditar.addActionListener(new BotonEditarListener());
+        botonBorrar.addActionListener(new BotonBorrarListener());
+        botonListar.addActionListener(new BotonListarListener());
+
+        botonAceptarAlta = new JButton("\u2713");
+        botonDescartarAlta = new JButton("\u2717");
+        botonAceptarAlta.setEnabled(false);
+        botonDescartarAlta.setEnabled(false);
+
+        botonAceptarAlta.addActionListener(new BotonAceptarAltaListerner());
+        botonDescartarAlta.addActionListener(new BotonDescartarAltaListener());
+
+        botonAceptarModificacion = new JButton("\u2713");
+        botonDescartarModificacion = new JButton("\u2717");
+        botonAceptarModificacion.setEnabled(false);
+        botonDescartarModificacion.setEnabled(false);
+
+        botonAceptarModificacion.addActionListener(new BotonAceptarModificacionListener());
+        botonDescartarModificacion.addActionListener(new BotonDescartarModificacionListener());
+
+        c.gridx = 0;
+        c.gridy = 0;
+        parteDer.add(botonAnadir, c);
+        c.gridy = 1;
+        parteDer.add(botonEditar, c);
+        c.gridy = 2;
+        parteDer.add(botonBorrar, c);
+        c.gridx = 1;
+        c.gridy = 0;
+        parteDer.add(botonAceptarAlta, c);
+        c.gridy = 1;
+        parteDer.add(botonDescartarAlta, c);
+        c.gridx = 1;
+        c.gridy = 0;
+        parteDer.add(botonAceptarModificacion, c);
+        c.gridy = 1;
+        parteDer.add(botonDescartarModificacion, c);
+        c.gridx = 1;
         c.gridy = 3;
-        yin = menuVehiculos.getHeight() / 5 - botonListado.getHeight() / 2;
-        xin = menuVehiculos.getWidth() / 2 - botonListado.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuVehiculos.add(botonListado, c);
+        c.insets = new Insets(10, 10, 10, 10);
+        c.anchor = GridBagConstraints.LAST_LINE_END;
+        parteDer.add(botonListar, c);
 
-        botonAnadir.addActionListener(new botonesMenuListener());
-        botonModificacion.addActionListener(new botonesMenuListener());
-        botonBorrado.addActionListener(new botonesMenuListener());
-        botonListado.addActionListener(new botonesMenuListener());
+        add(parteDer);
 
-        botonAnadir.setActionCommand("Anadir");
-        botonModificacion.setActionCommand("Modificar");
-        botonBorrado.setActionCommand("Borrar");
-        botonListado.setActionCommand("Lista");
-
-        setLeftComponent(menuVehiculos);
-
-        //- - - Inicia el menu de gestion de vehiculos en el apartado de alta
-        inicioPantallaVehiculosAlta();
-    }
-
-    /**
-     * Crea y coloca los elementos del apartado de alta de vehiculos.
-     */
-    private void inicioPantallaVehiculosAlta() {
-        JPanel altaVehiculos = new JPanel();
-        altaVehiculos.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        //Titulo del submenu
-        JPanel titulo = new JPanel();
-        titulo.add(new JLabel("<HTML><U><B>ALTA DE VEHICULOS</B></U></HTML>"));
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        altaVehiculos.add(titulo, c);
-
-        //Zona de introduccion de datos
-        JPanel contenido = new JPanel();
-        contenido.setLayout(new GridBagLayout());
-        GridBagConstraints ci = new GridBagConstraints();
-
-        textoMatricula = new JLabel("Matricula");
-        introMatricula = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 0;
-        ci.ipadx = 20;
-        ci.weightx = 0.5;
-        ci.weighty = 0.5;
-        contenido.add(textoMatricula, ci);
-        ci.gridx = 1;
-        contenido.add(introMatricula, ci);
-
-        textoTipo = new JLabel("Tipo");
-        introTipo = new JComboBox(new String[]{"Coche", "Microbus", "Furgoneta", "Camion"});
-        ci.gridx = 0;
-        ci.gridy = 1;
-        contenido.add(textoTipo, ci);
-        ci.gridx = 1;
-        contenido.add(introTipo, ci);
-
-        introTipo.addActionListener(new selectorTipoListener());
-
-        textoCaract = new JLabel("Plazas");
-        introCaract = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 2;
-        contenido.add(textoCaract, ci);
-        ci.gridx = 1;
-        contenido.add(introCaract, ci);
-
-        c.gridy = 1;
-        c.fill = GridBagConstraints.VERTICAL;
-        altaVehiculos.add(contenido, c);
-
-        //Boton de alta
-        JButton botonAlta = new JButton("Alta");
-        botonAlta.addActionListener(new botonAltaListener());
-
-        c.gridx = 0;
-        c.gridy = 2;
-        c.fill = GridBagConstraints.NONE;
-        altaVehiculos.add(botonAlta, c);
-
-        setRightComponent(altaVehiculos);
-    }
-
-    /**
-     * Crea y coloca los elementos del apartado de modificacion de vehiculos.
-     */
-    private void inicioPantallaVehiculosModificacion() {
-        JPanel modificacionVehiculos = new JPanel();
-        modificacionVehiculos.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        //Titulo del submenu
-        JPanel titulo = new JPanel();
-        titulo.add(new JLabel("<HTML><U></B>MODIFICACION DE VEHICULOS</B></U></HTML>"));
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        modificacionVehiculos.add(titulo, c);
-
-        //Zona de introduccion de datos
-        JPanel contenido = new JPanel();
-        contenido.setLayout(new GridBagLayout());
-        GridBagConstraints ci = new GridBagConstraints();
-
-        textoMatricula = new JLabel("Matricula");
-        introMatricula = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 0;
-        ci.ipadx = 20;
-        ci.weightx = 0.5;
-        ci.weighty = 0.5;
-        contenido.add(textoMatricula, ci);
-        ci.gridx = 1;
-        contenido.add(introMatricula, ci);
-
-        textoTipo = new JLabel("Tipo");
-        introTipo = new JComboBox(new String[]{"Coche", "Microbus", "Furgoneta", "Camion"});
-        ci.gridx = 0;
-        ci.gridy = 1;
-        contenido.add(textoTipo, ci);
-        ci.gridx = 1;
-        contenido.add(introTipo, ci);
-
-        introTipo.addActionListener(new selectorTipoListener());
-
-        textoCaract = new JLabel("Plazas");
-        introCaract = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 2;
-        contenido.add(textoCaract, ci);
-        ci.gridx = 1;
-        contenido.add(introCaract, ci);
-
-        c.gridy = 1;
-        c.fill = GridBagConstraints.VERTICAL;
-        modificacionVehiculos.add(contenido, c);
-
-        //Boton de borrado
-        JButton botonModificacion = new JButton("Modificar");
-        botonModificacion.addActionListener(new botonModificarListener());
-
-        c.gridy = 2;
-        c.fill = GridBagConstraints.NONE;
-        modificacionVehiculos.add(botonModificacion, c);
-
-        setRightComponent(modificacionVehiculos);
-    }
-
-    /**
-     * Crea y coloca los elementos del apartado de borrado de vehiculos.
-     */
-    private void inicioPantallaVehiculosBorrado() {
-        JPanel borradoVehiculos = new JPanel();
-        borradoVehiculos.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        //Titulo del submenu
-        JPanel titulo = new JPanel();
-        titulo.add(new JLabel("<HTML><U><B>BORRADO DE VEHICULOS</B></U></HTML>"));
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        borradoVehiculos.add(titulo, c);
-
-        //Zona de introduccion de datos
-        JPanel contenido = new JPanel();
-        contenido.setLayout(new GridBagLayout());
-        GridBagConstraints ci = new GridBagConstraints();
-
-        textoMatricula = new JLabel("Matricula");
-        introMatricula = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 0;
-        ci.ipadx = 20;
-        ci.weightx = 0.5;
-        ci.weighty = 0.5;
-        contenido.add(textoMatricula, ci);
-        ci.gridx = 1;
-        contenido.add(introMatricula, ci);
-
-        c.gridy = 1;
-        c.fill = GridBagConstraints.VERTICAL;
-        borradoVehiculos.add(contenido, c);
-
-        //Boton de borrado
-        JButton botonBorrado = new JButton("Eliminar");
-        botonBorrado.addActionListener(new botonBorrarListener());
-
-        c.gridx = 0;
-        c.gridy = 2;
-        c.fill = GridBagConstraints.NONE;
-        borradoVehiculos.add(botonBorrado, c);
-
-        setRightComponent(borradoVehiculos);
-    }
-
-    /**
-     * Crea y coloca los elementos del apartado de listado de vehiculos.
-     */
-    private void inicioPantallaVehiculosListado() {
-        JTable listado = new JTable(vehiculos.obtenerDataArray(), new String[]{"Matricula", "Tipo", "Plazas\\PMA"});
-
-        JScrollPane listadoVehiculos = new JScrollPane(listado);
-        listado.setFillsViewportHeight(true);
-
-        setRightComponent(listadoVehiculos);
-    }
-
-    /**
-     * Manejador de eventos de los botones de navegacion del menu de gestion de
-     * vehiculos.
-     */
-    private class botonesMenuListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            switch (e.getActionCommand()) {
-                case "Anadir":
-                    inicioPantallaVehiculosAlta();
-                    break;
-                case "Modificar":
-                    inicioPantallaVehiculosModificacion();
-                    break;
-                case "Borrar":
-                    inicioPantallaVehiculosBorrado();
-                    break;
-                case "Lista":
-                    inicioPantallaVehiculosListado();
-                    break;
-            }
-        }
-
-    }
-
-    /**
-     * Manejador de eventos del boton de alta de vehiculos. Asegura que los
-     * datos sean validos al clicar, indicando los posibles errores o exito de
-     * la accion.
-     */
-    private class botonAltaListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                //Obtiene la informacion del vehiculo
-                String tipo = (String) introTipo.getSelectedItem();
-                String matricula = obtenerMatricula();
-                double caract = obtenerCaracteristica();
-                vehiculos.anyadirVehiculo(tipo, matricula, caract);
-                String info = tipo.equals("Coche") || tipo.equals("Microbus") ? 
-                        " con " + (int)caract + "plazas" : "con PMA " + caract;
-                JOptionPane.showMessageDialog(rightComponent, tipo + info + " anyadido", "Vehiculo anyadido", JOptionPane.INFORMATION_MESSAGE);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
-            } catch (ObjetoYaExistenteException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                introMatricula.setText("");
-                introTipo.setSelectedIndex(0);
-                introCaract.setText("");
-            }
-        }
-
-    }
-
-    /**
-     * Manejador de eventos del boton de modificacion de vehiculos. Asegura que
-     * los datos sean validos al clicar, indicando los posibles errores o exito
-     * de la accion.
-     */
-    private class botonModificarListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                //Obtiene la informacion del vehiculo
-                String tipo = (String) introTipo.getSelectedItem();
-                String matricula = obtenerMatricula();
-                double caract = obtenerCaracteristica();
-                vehiculos.modificarVehiculo(tipo, matricula, caract);
-                JOptionPane.showMessageDialog(rightComponent, "Vehiculo modificado correctamente", "Vehiculo modificado", JOptionPane.INFORMATION_MESSAGE);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
-            } catch (ObjetoNoExistenteException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                introMatricula.setText("");
-                introTipo.setSelectedIndex(0);
-                introCaract.setText("");
-            }
-        }
-
-    }
-
-    /**
-     * Manejador de eventos del boton de borrado de vehiculos. Asegura que los
-     * datos sean validos al clicar, indicando los posibles errores o exito de
-     * la accion.
-     */
-    private class botonBorrarListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                String matricula = obtenerMatricula();
-                boolean eliminar = true;
-                if (vehiculos.obtenerVechiculo(matricula).isAlquilado()) {
-                    //Informar de que esta alquilado y confirmar eliminacion
-                    int resp = JOptionPane.showConfirmDialog(rightComponent, "El vehiculo que quiere eliminar esta alquilado.\n"
-                            + "¿Seguro que desea eliminarlo (se cancelará el alquiler sin agregarse al historial)?",
-                            "Vehiculo alquilado", JOptionPane.YES_NO_OPTION);
-                    if (resp == JOptionPane.YES_OPTION) {
-                        alquileres.eliminarAlquilerPorMatricula(matricula);
-                    } else {
-                        eliminar = false;
-                        JOptionPane.showMessageDialog(rightComponent, "No se eliminara el vehiculo.",
-                                "Vehiculo no eliminado", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
-                if (eliminar) {
-                    vehiculos.eliminarVehiculo(matricula);
-                    JOptionPane.showMessageDialog(rightComponent, "Vehiculo con matricula " + matricula + " eliminado.",
-                            "Vehiculo eliminado", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
-            } catch (ObjetoNoExistenteException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
-            } catch (AlquilerVehiculoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo al eliminar el alquiler", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                introMatricula.setText("");
-            }
-        }
+        setVisible(true);
     }
 
     /**
@@ -432,14 +270,368 @@ public class PantallaVehiculos extends JSplitPane {
         public void actionPerformed(ActionEvent e) {
             switch (introTipo.getSelectedIndex()) {
                 case GUI.COCHE:
+                    textoCaract.setText("Plazas");
+                    introCaract.setModel(new SpinnerNumberModel(2, 2, vehiculos.getPlazasMaxCoche(), 1));
+                    break;
                 case GUI.MICROBUS:
                     textoCaract.setText("Plazas");
+                    introCaract.setModel(new SpinnerNumberModel(5, 5, vehiculos.getPlazasMaxMicrobus(), 1));
                     break;
                 case GUI.FURGONETA:
+                    textoCaract.setText("PMA");
+                    introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxFurgoneta(), 10));
+                    break;
                 case GUI.CAMION:
                     textoCaract.setText("PMA");
+                    introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxCamion(), 10));
                     break;
             }
+        }
+    }
+
+    /**
+     * Manejador de eventos de los botones de navegacion del menu de gestion de
+     * vehiculos.
+     */
+    private class BotonNavegacionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            switch (e.getActionCommand()) {
+                case "Primero":
+                    iterador.primero();
+                    botonPrimero.setEnabled(false);
+                    botonAnterior.setEnabled(false);
+                    if (!botonSiguiente.isEnabled()) {
+                        botonSiguiente.setEnabled(true);
+                        botonUltimo.setEnabled(true);
+                    }
+                    break;
+                case "Anterior":
+                    iterador.anterior();
+                    if (!iterador.tieneAnterior()) {
+                        botonPrimero.setEnabled(false);
+                        botonAnterior.setEnabled(false);
+                    }
+                    if (iterador.tieneSiguiente() && !botonSiguiente.isEnabled()) {
+                        botonSiguiente.setEnabled(true);
+                        botonUltimo.setEnabled(true);
+                    }
+                    break;
+                case "Siguiente":
+                    iterador.siguiente();
+                    if (!iterador.tieneSiguiente()) {
+                        botonSiguiente.setEnabled(false);
+                        botonUltimo.setEnabled(false);
+                    }
+                    if (iterador.tieneAnterior() && !botonAnterior.isEnabled()) {
+                        botonAnterior.setEnabled(true);
+                        botonPrimero.setEnabled(true);
+                    }
+                    break;
+                case "Ultimo":
+                    iterador.ultimo();
+                    botonUltimo.setEnabled(false);
+                    botonSiguiente.setEnabled(false);
+                    if (!botonAnterior.isEnabled()) {
+                        botonAnterior.setEnabled(true);
+                        botonPrimero.setEnabled(true);
+                    }
+                    break;
+            }
+            try {
+                seleccionActual();
+            } catch (NullPointerException ex) {
+                botonPrimero.setEnabled(false);
+                botonAnterior.setEnabled(false);
+                botonSiguiente.setEnabled(false);
+                botonUltimo.setEnabled(false);
+            }
+        }
+
+    }
+
+    /**
+     * Manejador de eventos del boton de alta de vehiculos. Asegura que los
+     * datos sean validos al clicar, indicando los posibles errores o exito de
+     * la accion.
+     */
+    private class BotonAnadirListerner implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            iterador.ultimo();
+
+            introMatricula.setText("");
+            introMatricula.requestFocus();
+            introTipo.setSelectedIndex(GUI.COCHE);
+            introCaract.setValue(((SpinnerNumberModel) introCaract.getModel()).getMinimum());
+
+            introMatricula.setEnabled(true);
+            introTipo.setEnabled(true);
+            introCaract.setEnabled(true);
+            botonAceptarAlta.setEnabled(true);
+            botonAceptarAlta.setVisible(true);
+            botonDescartarAlta.setEnabled(true);
+            botonDescartarAlta.setVisible(true);
+
+            botonAnadir.setEnabled(false);
+            botonEditar.setEnabled(false);
+            botonBorrar.setEnabled(false);
+        }
+    }
+
+    /**
+     * Manejador de eventos del boton de modificacion de vehiculos. Asegura que
+     * los datos sean validos al clicar, indicando los posibles errores o exito
+     * de la accion.
+     */
+    private class BotonEditarListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            introMatricula.requestFocus();
+
+            introMatricula.setEnabled(true);
+            introTipo.setEnabled(true);
+            introCaract.setEnabled(true);
+            botonAceptarModificacion.setEnabled(true);
+            botonAceptarModificacion.setVisible(true);
+            botonDescartarModificacion.setEnabled(true);
+            botonDescartarModificacion.setVisible(true);
+
+            botonAnadir.setEnabled(false);
+            botonEditar.setEnabled(false);
+            botonBorrar.setEnabled(false);
+        }
+    }
+
+    /**
+     * Manejador de eventos del boton de borrado de vehiculos. Asegura que los
+     * datos sean validos al clicar, indicando los posibles errores o exito de
+     * la accion.
+     */
+    private class BotonBorrarListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                String matricula = obtenerMatricula();
+                boolean eliminar = true;
+                if (vehiculos.obtenerVechiculo(matricula).isAlquilado()) {
+                    //Informar de que esta alquilado y confirmar eliminacion
+                    int resp = JOptionPane.showConfirmDialog(PantallaVehiculos.this, "El vehiculo que quiere eliminar esta alquilado.\n"
+                            + "¿Seguro que desea eliminarlo (se cancelará el alquiler sin agregarse al historial)?",
+                            "Vehiculo alquilado", JOptionPane.YES_NO_OPTION);
+                    if (resp == JOptionPane.YES_OPTION) {
+                        alquileres.eliminarAlquilerPorMatricula(matricula);
+                    } else {
+                        eliminar = false;
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, "No se eliminara el vehiculo.",
+                                "Vehiculo no eliminado", JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+                if (eliminar) {
+                    vehiculos.eliminarVehiculo(matricula);
+                    JOptionPane.showMessageDialog(PantallaVehiculos.this, "Vehiculo con matricula " + matricula + " eliminado.",
+                            "Vehiculo eliminado", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } catch (FormatoIncorrectoException ex) {
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+            } catch (ObjetoNoExistenteException ex) {
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+            } catch (AlquilerVehiculoException ex) {
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo al eliminar el alquiler", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                iterador.anterior();
+                botonPrimero.setEnabled(iterador.tieneAnterior());
+                botonAnterior.setEnabled(iterador.tieneAnterior());
+                botonUltimo.setEnabled(iterador.tieneSiguiente());
+                botonSiguiente.setEnabled(iterador.tieneSiguiente());
+                if (iterador.getActual() == null) {
+                    seleccionVacia();
+                } else {
+                    seleccionActual();
+                }
+            }
+        }
+    }
+
+    /**
+     * Manejador de deventos del boton de listado de vehiculos. Muestra una
+     * ventana con un listado de todos los vehiculos existentetes.
+     */
+    private class BotonListarListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JDialog ventanaLista = new JDialog((JFrame) PantallaVehiculos.this.getParent().getParent().getParent().getParent().getParent(), "Listado de vehiculos", true);
+            ventanaLista.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+            JTable listado = new JTable(vehiculos.obtenerDataArray(), new String[]{"Matricula", "Tipo", "Plazas\\PMA"});
+            TableColumn columnaTipo = listado.getColumnModel().getColumn(1);
+            columnaTipo.setCellEditor(new DefaultCellEditor(introTipo));
+
+            listado.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent me) {
+                    JTable tabla = (JTable) me.getSource();
+                    Point p = me.getPoint();
+                    int row = tabla.rowAtPoint(p);
+                    if (me.getClickCount() == 2) {
+                        //TODO - Ir al elemento como modificacion
+                        iterador.seleccionar((String) tabla.getValueAt(row, 0));
+                        //TODO - alt - modificar datos desde tabla
+                        //http://stackoverflow.com/questions/11684903/how-to-add-a-drop-down-menu-to-a-jtable-cell
+                        //http://stackoverflow.com/questions/15555183/jtable-update-selected-row
+                    }
+                }
+            });
+            JScrollPane listadoVehiculos = new JScrollPane(listado);
+            listado.setFillsViewportHeight(true);
+            listado.setEnabled(false);
+
+            ventanaLista.add(listadoVehiculos);
+
+            ventanaLista.pack();
+            ventanaLista.setVisible(true);
+        }
+
+    }
+
+    /**
+     * Manejador de eventos del boton de aceptar un alta. Asegura que los datos
+     * sean validos al clicar, indicando los posibles errores o exito de la
+     * accion.
+     */
+    private class BotonAceptarAltaListerner implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                //Obtiene la informacion del vehiculo
+                String tipo = (String) introTipo.getSelectedItem();
+                String matricula = obtenerMatricula();
+                double caract = obtenerCaracteristica();
+                vehiculos.anyadirVehiculo(tipo, matricula, caract);
+                String info = tipo.equals("Coche") || tipo.equals("Microbus")
+                        ? " con " + (int) caract + " plazas" : " con PMA " + caract;
+                JOptionPane.showMessageDialog(zonaDatos, tipo + info + " anyadido", "Vehiculo anyadido", JOptionPane.INFORMATION_MESSAGE);
+            } catch (FormatoIncorrectoException ex) {
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+            } catch (ObjetoYaExistenteException ex) {
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                iterador.ultimo();
+                seleccionActual();
+                introMatricula.setEnabled(false);
+                introTipo.setEnabled(false);
+                introCaract.setEnabled(false);
+                botonUltimo.setEnabled(false);
+                botonSiguiente.setEnabled(false);
+                botonPrimero.setEnabled(iterador.tieneAnterior());
+                botonAnterior.setEnabled(iterador.tieneAnterior());
+                botonAceptarAlta.setEnabled(false);
+                botonDescartarAlta.setEnabled(false);
+                botonAceptarAlta.setVisible(false);
+                botonDescartarAlta.setVisible(false);
+
+                botonAnadir.setEnabled(true);
+                botonEditar.setEnabled(true);
+                botonBorrar.setEnabled(true);
+            }
+        }
+    }
+
+    /**
+     * Manejador de eventos del boton de descartar un alta. Inhabilita la
+     * introduccion de datos y selecciona el ultimo vehiculo.
+     */
+    private class BotonDescartarAltaListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            seleccionActual();
+            introMatricula.setEnabled(false);
+            introTipo.setEnabled(false);
+            introCaract.setEnabled(false);
+            botonUltimo.setEnabled(iterador.tieneSiguiente());
+            botonSiguiente.setEnabled(iterador.tieneSiguiente());
+            botonPrimero.setEnabled(iterador.tieneAnterior());
+            botonAnterior.setEnabled(iterador.tieneAnterior());
+            botonAceptarAlta.setEnabled(false);
+            botonDescartarAlta.setEnabled(false);
+            botonAceptarAlta.setVisible(false);
+            botonDescartarAlta.setVisible(false);
+
+            botonAnadir.setEnabled(true);
+            botonEditar.setEnabled(true);
+            botonBorrar.setEnabled(true);
+        }
+    }
+
+    /**
+     * Manejador de eventos del boton de aceptar una modificaion. Asegura que
+     * los datos sean validos al clicar, indicando los posibles errores o exito
+     * de la accion.
+     */
+    private class BotonAceptarModificacionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                //Obtiene la informacion del vehiculo
+                String tipo = (String) introTipo.getSelectedItem();
+                String matricula = obtenerMatricula();
+                double caract = obtenerCaracteristica();
+                vehiculos.modificarVehiculo(tipo, matricula, caract);
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, "Vehiculo modificado correctamente", "Vehiculo modificado", JOptionPane.INFORMATION_MESSAGE);
+            } catch (FormatoIncorrectoException ex) {
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+            } catch (ObjetoNoExistenteException ex) {
+                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+            } finally {
+                seleccionActual();
+                introMatricula.setEnabled(false);
+                introTipo.setEnabled(false);
+                introCaract.setEnabled(false);
+                botonUltimo.setEnabled(iterador.tieneSiguiente());
+                botonSiguiente.setEnabled(iterador.tieneSiguiente());
+                botonPrimero.setEnabled(iterador.tieneAnterior());
+                botonAnterior.setEnabled(iterador.tieneAnterior());
+                botonAceptarModificacion.setEnabled(false);
+                botonDescartarModificacion.setEnabled(false);
+                botonAceptarModificacion.setVisible(false);
+                botonDescartarModificacion.setVisible(false);
+
+                botonAnadir.setEnabled(true);
+                botonEditar.setEnabled(true);
+                botonBorrar.setEnabled(true);
+            }
+        }
+
+    }
+
+    /**
+     * Manejador de eventos del boton de descartar una modificaion. Deja la
+     * informacion tal y como estaba.
+     */
+    private class BotonDescartarModificacionListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            seleccionActual();
+            introMatricula.setEnabled(false);
+            introTipo.setEnabled(false);
+            introCaract.setEnabled(false);
+            botonAceptarModificacion.setEnabled(false);
+            botonDescartarModificacion.setEnabled(false);
+            botonAceptarModificacion.setVisible(false);
+            botonDescartarModificacion.setVisible(false);
+
+            botonAnadir.setEnabled(true);
+            botonEditar.setEnabled(true);
+            botonBorrar.setEnabled(true);
         }
 
     }
@@ -471,14 +663,74 @@ public class PantallaVehiculos extends JSplitPane {
      */
     private double obtenerCaracteristica() throws FormatoIncorrectoException {
         try {
-            double caract = Double.parseDouble(introCaract.getText());
+            double caract;
+            if (introTipo.getSelectedIndex() == 0 || introTipo.getSelectedIndex() == 1) {
+                caract = (Integer) introCaract.getValue();
+            } else {
+                caract = (Double) introCaract.getValue();
+            }
             return caract;
         } catch (NumberFormatException e) {
             if (introTipo.getSelectedItem().equals("Coche") || introTipo.getSelectedItem().equals("Microbus")) {
-                throw new FormatoIncorrectoException("Las plazas deben ser u numero entero.");
+                throw new FormatoIncorrectoException("Las plazas deben ser un numero entero.");
             } else {
                 throw new FormatoIncorrectoException("El PMA debe ser un numero.");
             }
         }
+    }
+
+    /**
+     * Deja los campos en un estado predeterminado.
+     */
+    private void seleccionVacia() {
+        introMatricula.setText("");
+        introTipo.setSelectedIndex(GUI.COCHE);
+        introCaract.setValue(((SpinnerNumberModel) introCaract.getModel()).getMinimum());
+    }
+
+    /**
+     * Llena los campos de datos con la informacion del vehiculo actual.
+     */
+    private void seleccionActual() {
+        String matricula = iterador.getActual().getMatricula();
+        introMatricula.setText(matricula);
+        String tipo = iterador.getActual().getClass().getSimpleName();
+        switch (tipo) {
+            case "Coche":
+                introTipo.setSelectedIndex(GUI.COCHE);
+                break;
+            case "Microbus":
+                introTipo.setSelectedIndex(GUI.MICROBUS);
+                break;
+            case "Furgoneta":
+                introTipo.setSelectedIndex(GUI.FURGONETA);
+                break;
+            case "Camion":
+                introTipo.setSelectedIndex(GUI.CAMION);
+                break;
+        }
+        switch (iterador.getActual().getClass().getSimpleName()) {
+            case "Coche":
+                textoCaract.setText("Plazas");
+                introCaract.setModel(new SpinnerNumberModel(2, 2, vehiculos.getPlazasMaxCoche(), 1));
+                introCaract.setValue(iterador.getActual().getCaracteristica());
+                break;
+            case "Microbus":
+                textoCaract.setText("Plazas");
+                introCaract.setModel(new SpinnerNumberModel(5, 5, vehiculos.getPlazasMaxMicrobus(), 1));
+                introCaract.setValue(iterador.getActual().getCaracteristica());
+                break;
+            case "Furgoneta":
+                textoCaract.setText("PMA");
+                introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxFurgoneta(), 10));
+                introCaract.setValue(iterador.getActual().getCaracteristica());
+                break;
+            case "Camion":
+                textoCaract.setText("PMA");
+                introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxCamion(), 10));
+                introCaract.setValue(iterador.getActual().getCaracteristica());
+                break;
+        }
+        introCaract.setValue(iterador.getActual().getCaracteristica());
     }
 }

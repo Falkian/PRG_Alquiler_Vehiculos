@@ -32,6 +32,16 @@ public abstract class V_Transporte extends Vehiculo {
     }
 
     /**
+     * Devuelve el numero de plazas del vehiculo.
+     *
+     * @return el numero de plazas del vehiculo.
+     */
+    @Override
+    public double getCaracteristica() {
+        return plazas;
+    }
+
+    /**
      * Establece el numero de plazas.
      *
      * @param plazas el numero de plazas del vehiculo.
@@ -60,7 +70,7 @@ public abstract class V_Transporte extends Vehiculo {
     public double alquilerTotal(int dias) {
         return super.alquilerTotal(dias) + 1.5 * plazas * dias;
     }
-    
+
     /**
      * Devuelve la informacion sobre el vehiculo en forma de array. Orden de la
      * informacion: Matricula, Tipo, PMA

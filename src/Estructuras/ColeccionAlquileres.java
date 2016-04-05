@@ -119,14 +119,16 @@ public class ColeccionAlquileres {
      * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
      */
     public void eliminarAlquilerPorMatricula(String matricula) throws AlquilerVehiculoException {
-        for (Alquiler alquiler : alquileres) {
+        Iterator<Alquiler> iter = alquileres.listIterator();
+        while (iter.hasNext()) {
+            Alquiler alquiler = iter.next();
             if (alquiler.getVehiculo().getMatricula().equals(matricula)) {
                 alquiler.getCliente().devolverVehiculo();
                 alquiler.getVehiculo().devolver();
                 alquileres.remove(alquiler);
-                guardar();
             }
         }
+        guardar();
     }
 
     /**
