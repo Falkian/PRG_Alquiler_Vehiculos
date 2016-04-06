@@ -7,10 +7,8 @@ import Excepciones.AlquilerVehiculoException;
 import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -58,11 +56,8 @@ public class PantallaVehiculos extends JPanel {
     private JButton botonBorrar;
     private JButton botonListar;
 
-    private JButton botonAceptarAlta;
-    private JButton botonDescartarAlta;
-
-    private JButton botonAceptarModificacion;
-    private JButton botonDescartarModificacion;
+    private JButton botonAceptar;
+    private JButton botonDescartar;
 
     /**
      * Crea e inicializa el menu de vehiculos.
@@ -89,12 +84,10 @@ public class PantallaVehiculos extends JPanel {
 
         textoTipo = new JLabel("Tipo");
         introTipo = new JComboBox(new String[]{"Coche", "Microbus", "Furgoneta", "Camion"});
-        introTipo.setSelectedIndex(GUI.COCHE);
         introTipo.setEnabled(false);
 
         textoCaract = new JLabel("Plazas");
         introCaract = new JSpinner();
-        introCaract.setModel(new SpinnerNumberModel(2, 2, vehiculos.getPlazasMaxCoche(), 1));
         introCaract.setEnabled(false);
     }
 
@@ -217,21 +210,13 @@ public class PantallaVehiculos extends JPanel {
         botonBorrar.addActionListener(new BotonBorrarListener());
         botonListar.addActionListener(new BotonListarListener());
 
-        botonAceptarAlta = new JButton("\u2713");
-        botonDescartarAlta = new JButton("\u2717");
-        botonAceptarAlta.setEnabled(false);
-        botonDescartarAlta.setEnabled(false);
+        botonAceptar = new JButton("\u2713");
+        botonDescartar = new JButton("\u2717");
+        botonAceptar.setEnabled(false);
+        botonDescartar.setEnabled(false);
 
-        botonAceptarAlta.addActionListener(new BotonAceptarAltaListerner());
-        botonDescartarAlta.addActionListener(new BotonDescartarAltaListener());
-
-        botonAceptarModificacion = new JButton("\u2713");
-        botonDescartarModificacion = new JButton("\u2717");
-        botonAceptarModificacion.setEnabled(false);
-        botonDescartarModificacion.setEnabled(false);
-
-        botonAceptarModificacion.addActionListener(new BotonAceptarModificacionListener());
-        botonDescartarModificacion.addActionListener(new BotonDescartarModificacionListener());
+        botonAceptar.addActionListener(new BotonAceptarListener());
+        botonDescartar.addActionListener(new BotonDescartarListener());
 
         c.gridx = 0;
         c.gridy = 0;
@@ -242,14 +227,10 @@ public class PantallaVehiculos extends JPanel {
         parteDer.add(botonBorrar, c);
         c.gridx = 1;
         c.gridy = 0;
-        parteDer.add(botonAceptarAlta, c);
+        parteDer.add(botonAceptar, c);
         c.gridy = 1;
-        parteDer.add(botonDescartarAlta, c);
-        c.gridx = 1;
-        c.gridy = 0;
-        parteDer.add(botonAceptarModificacion, c);
-        c.gridy = 1;
-        parteDer.add(botonDescartarModificacion, c);
+        parteDer.add(botonDescartar, c);
+
         c.gridx = 1;
         c.gridy = 3;
         c.insets = new Insets(10, 10, 10, 10);
@@ -370,10 +351,10 @@ public class PantallaVehiculos extends JPanel {
             introMatricula.setEnabled(true);
             introTipo.setEnabled(true);
             introCaract.setEnabled(true);
-            botonAceptarAlta.setEnabled(true);
-            botonAceptarAlta.setVisible(true);
-            botonDescartarAlta.setEnabled(true);
-            botonDescartarAlta.setVisible(true);
+            botonAceptar.setEnabled(true);
+            botonDescartar.setEnabled(true);
+            botonAceptar.setActionCommand("Alta");
+            botonDescartar.setActionCommand("Alta");
 
             botonAnadir.setEnabled(false);
             botonEditar.setEnabled(false);
@@ -395,10 +376,10 @@ public class PantallaVehiculos extends JPanel {
             introMatricula.setEnabled(true);
             introTipo.setEnabled(true);
             introCaract.setEnabled(true);
-            botonAceptarModificacion.setEnabled(true);
-            botonAceptarModificacion.setVisible(true);
-            botonDescartarModificacion.setEnabled(true);
-            botonDescartarModificacion.setVisible(true);
+            botonAceptar.setEnabled(true);
+            botonDescartar.setEnabled(true);
+            botonAceptar.setActionCommand("Modificacion");
+            botonDescartar.setActionCommand("Modificacion");
 
             botonAnadir.setEnabled(false);
             botonEditar.setEnabled(false);
@@ -481,6 +462,7 @@ public class PantallaVehiculos extends JPanel {
                     if (me.getClickCount() == 2) {
                         //TODO - Ir al elemento como modificacion
                         iterador.seleccionar((String) tabla.getValueAt(row, 0));
+                        seleccionActual();
                         //TODO - alt - modificar datos desde tabla
                         //http://stackoverflow.com/questions/11684903/how-to-add-a-drop-down-menu-to-a-jtable-cell
                         //http://stackoverflow.com/questions/15555183/jtable-update-selected-row
@@ -500,138 +482,117 @@ public class PantallaVehiculos extends JPanel {
     }
 
     /**
-     * Manejador de eventos del boton de aceptar un alta. Asegura que los datos
-     * sean validos al clicar, indicando los posibles errores o exito de la
-     * accion.
+     * Manejador de eventos del boton de aceptar. Añadra un vehiculo a la
+     * coleccion o modificara uno existente.
      */
-    private class BotonAceptarAltaListerner implements ActionListener {
+    private class BotonAceptarListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                //Obtiene la informacion del vehiculo
-                String tipo = (String) introTipo.getSelectedItem();
-                String matricula = obtenerMatricula();
-                double caract = obtenerCaracteristica();
-                vehiculos.anyadirVehiculo(tipo, matricula, caract);
-                String info = tipo.equals("Coche") || tipo.equals("Microbus")
-                        ? " con " + (int) caract + " plazas" : " con PMA " + caract;
-                JOptionPane.showMessageDialog(zonaDatos, tipo + info + " anyadido", "Vehiculo anyadido", JOptionPane.INFORMATION_MESSAGE);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
-            } catch (ObjetoYaExistenteException ex) {
-                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                iterador.ultimo();
-                seleccionActual();
-                introMatricula.setEnabled(false);
-                introTipo.setEnabled(false);
-                introCaract.setEnabled(false);
-                botonUltimo.setEnabled(false);
-                botonSiguiente.setEnabled(false);
-                botonPrimero.setEnabled(iterador.tieneAnterior());
-                botonAnterior.setEnabled(iterador.tieneAnterior());
-                botonAceptarAlta.setEnabled(false);
-                botonDescartarAlta.setEnabled(false);
-                botonAceptarAlta.setVisible(false);
-                botonDescartarAlta.setVisible(false);
+            switch (e.getActionCommand()) {
+                case "Alta":
+                    try {
+                        //Obtiene la informacion del vehiculo
+                        String tipo = (String) introTipo.getSelectedItem();
+                        String matricula = obtenerMatricula();
+                        double caract = obtenerCaracteristica();
+                        vehiculos.anyadirVehiculo(tipo, matricula, caract);
+                        String info = tipo.equals("Coche") || tipo.equals("Microbus")
+                                ? " con " + (int) caract + " plazas" : " con PMA " + caract;
+                        JOptionPane.showMessageDialog(zonaDatos, tipo + info + " anyadido", "Vehiculo anyadido", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (FormatoIncorrectoException ex) {
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+                    } catch (ObjetoYaExistenteException ex) {
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        iterador.ultimo();
+                        seleccionActual();
+                        introMatricula.setEnabled(false);
+                        introTipo.setEnabled(false);
+                        introCaract.setEnabled(false);
+                        botonUltimo.setEnabled(false);
+                        botonSiguiente.setEnabled(false);
+                        botonPrimero.setEnabled(iterador.tieneAnterior());
+                        botonAnterior.setEnabled(iterador.tieneAnterior());
+                        botonAceptar.setEnabled(false);
+                        botonDescartar.setEnabled(false);
 
-                botonAnadir.setEnabled(true);
-                botonEditar.setEnabled(true);
-                botonBorrar.setEnabled(true);
-            }
-        }
-    }
+                        botonAnadir.setEnabled(true);
+                        botonEditar.setEnabled(true);
+                        botonBorrar.setEnabled(true);
+                    }
+                    break;
+                case "Modificacion":
+                    try {
+                        //Obtiene la informacion del vehiculo
+                        String tipo = (String) introTipo.getSelectedItem();
+                        String matricula = obtenerMatricula();
+                        double caract = obtenerCaracteristica();
+                        vehiculos.modificarVehiculo(tipo, matricula, caract);
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, "Vehiculo modificado correctamente", "Vehiculo modificado", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (FormatoIncorrectoException ex) {
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+                    } catch (ObjetoNoExistenteException ex) {
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        seleccionActual();
+                        introMatricula.setEnabled(false);
+                        introTipo.setEnabled(false);
+                        introCaract.setEnabled(false);
+                        botonUltimo.setEnabled(iterador.tieneSiguiente());
+                        botonSiguiente.setEnabled(iterador.tieneSiguiente());
+                        botonPrimero.setEnabled(iterador.tieneAnterior());
+                        botonAnterior.setEnabled(iterador.tieneAnterior());
+                        botonAceptar.setEnabled(false);
+                        botonDescartar.setEnabled(false);
 
-    /**
-     * Manejador de eventos del boton de descartar un alta. Inhabilita la
-     * introduccion de datos y selecciona el ultimo vehiculo.
-     */
-    private class BotonDescartarAltaListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            seleccionActual();
-            introMatricula.setEnabled(false);
-            introTipo.setEnabled(false);
-            introCaract.setEnabled(false);
-            botonUltimo.setEnabled(iterador.tieneSiguiente());
-            botonSiguiente.setEnabled(iterador.tieneSiguiente());
-            botonPrimero.setEnabled(iterador.tieneAnterior());
-            botonAnterior.setEnabled(iterador.tieneAnterior());
-            botonAceptarAlta.setEnabled(false);
-            botonDescartarAlta.setEnabled(false);
-            botonAceptarAlta.setVisible(false);
-            botonDescartarAlta.setVisible(false);
-
-            botonAnadir.setEnabled(true);
-            botonEditar.setEnabled(true);
-            botonBorrar.setEnabled(true);
-        }
-    }
-
-    /**
-     * Manejador de eventos del boton de aceptar una modificaion. Asegura que
-     * los datos sean validos al clicar, indicando los posibles errores o exito
-     * de la accion.
-     */
-    private class BotonAceptarModificacionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                //Obtiene la informacion del vehiculo
-                String tipo = (String) introTipo.getSelectedItem();
-                String matricula = obtenerMatricula();
-                double caract = obtenerCaracteristica();
-                vehiculos.modificarVehiculo(tipo, matricula, caract);
-                JOptionPane.showMessageDialog(PantallaVehiculos.this, "Vehiculo modificado correctamente", "Vehiculo modificado", JOptionPane.INFORMATION_MESSAGE);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
-            } catch (ObjetoNoExistenteException ex) {
-                JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                seleccionActual();
-                introMatricula.setEnabled(false);
-                introTipo.setEnabled(false);
-                introCaract.setEnabled(false);
-                botonUltimo.setEnabled(iterador.tieneSiguiente());
-                botonSiguiente.setEnabled(iterador.tieneSiguiente());
-                botonPrimero.setEnabled(iterador.tieneAnterior());
-                botonAnterior.setEnabled(iterador.tieneAnterior());
-                botonAceptarModificacion.setEnabled(false);
-                botonDescartarModificacion.setEnabled(false);
-                botonAceptarModificacion.setVisible(false);
-                botonDescartarModificacion.setVisible(false);
-
-                botonAnadir.setEnabled(true);
-                botonEditar.setEnabled(true);
-                botonBorrar.setEnabled(true);
+                        botonAnadir.setEnabled(true);
+                        botonEditar.setEnabled(true);
+                        botonBorrar.setEnabled(true);
+                    }
+                    break;
             }
         }
 
     }
 
     /**
-     * Manejador de eventos del boton de descartar una modificaion. Deja la
-     * informacion tal y como estaba.
+     * Manejador de eventos del boton de descartar cambios.
      */
-    private class BotonDescartarModificacionListener implements ActionListener {
+    private class BotonDescartarListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            seleccionActual();
-            introMatricula.setEnabled(false);
-            introTipo.setEnabled(false);
-            introCaract.setEnabled(false);
-            botonAceptarModificacion.setEnabled(false);
-            botonDescartarModificacion.setEnabled(false);
-            botonAceptarModificacion.setVisible(false);
-            botonDescartarModificacion.setVisible(false);
+            switch (e.getActionCommand()) {
+                case "Alta":
+                    seleccionActual();
+                    introMatricula.setEnabled(false);
+                    introTipo.setEnabled(false);
+                    introCaract.setEnabled(false);
+                    botonUltimo.setEnabled(iterador.tieneSiguiente());
+                    botonSiguiente.setEnabled(iterador.tieneSiguiente());
+                    botonPrimero.setEnabled(iterador.tieneAnterior());
+                    botonAnterior.setEnabled(iterador.tieneAnterior());
+                    botonAceptar.setEnabled(false);
+                    botonDescartar.setEnabled(false);
 
-            botonAnadir.setEnabled(true);
-            botonEditar.setEnabled(true);
-            botonBorrar.setEnabled(true);
+                    botonAnadir.setEnabled(true);
+                    botonEditar.setEnabled(true);
+                    botonBorrar.setEnabled(true);
+                    break;
+                case "Modificacion":
+                    seleccionActual();
+                    introMatricula.setEnabled(false);
+                    introTipo.setEnabled(false);
+                    introCaract.setEnabled(false);
+                    botonAceptar.setEnabled(false);
+                    botonDescartar.setEnabled(false);
+
+                    botonAnadir.setEnabled(true);
+                    botonEditar.setEnabled(true);
+                    botonBorrar.setEnabled(true);
+                    break;
+            }
         }
 
     }
@@ -713,12 +674,12 @@ public class PantallaVehiculos extends JPanel {
             case "Coche":
                 textoCaract.setText("Plazas");
                 introCaract.setModel(new SpinnerNumberModel(2, 2, vehiculos.getPlazasMaxCoche(), 1));
-                introCaract.setValue(iterador.getActual().getCaracteristica());
+                introCaract.setValue((int) iterador.getActual().getCaracteristica());
                 break;
             case "Microbus":
                 textoCaract.setText("Plazas");
                 introCaract.setModel(new SpinnerNumberModel(5, 5, vehiculos.getPlazasMaxMicrobus(), 1));
-                introCaract.setValue(iterador.getActual().getCaracteristica());
+                introCaract.setValue((int) iterador.getActual().getCaracteristica());
                 break;
             case "Furgoneta":
                 textoCaract.setText("PMA");
@@ -731,6 +692,5 @@ public class PantallaVehiculos extends JPanel {
                 introCaract.setValue(iterador.getActual().getCaracteristica());
                 break;
         }
-        introCaract.setValue(iterador.getActual().getCaracteristica());
     }
 }
