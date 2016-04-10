@@ -3,3 +3,4 @@ NumDNI		Nombre		Direccion		Telefono		VIP
 22222222B		Roberto		Calle Dos		999999992		N
 44444444D		Diego		Calle Tres		999999993		N
 66666666E		Manuela		Calle Cuatro		999999994		S
+
