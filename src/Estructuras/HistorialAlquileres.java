@@ -53,14 +53,14 @@ public class HistorialAlquileres {
             Vehiculo v = registro.getAlquiler().getVehiculo();
             double precio = v.alquilerTotal(registro.getDias());
             Cliente c = registro.getAlquiler().getCliente();
-            
+
             double descuentoprimera = 0;
             //Comprueba si es la primera vez que se alquilo el vehiculo
-             if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
+            if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
                 aparecidos.add(registro.getAlquiler().getVehiculo());
                 descuentoprimera = precio * 0.25;
             }
-             
+
             double descuentovip = 0;
             //Comprueba si el cliente era VIP
             if (c != null && c.isVip()) {
@@ -69,6 +69,22 @@ public class HistorialAlquileres {
             total += precio - descuentoprimera - descuentovip;
         }
         return total;
+    }
+
+    /**
+     * Devuelve si es la primera vez que se alquila un vehiculo.
+     *
+     * @param matricula matricula del vehiculo.
+     * @return true si el vehiculo ha sido alquilado con anterioridad; false en
+     * caso contrario.
+     */
+    public boolean isPrimeraVez(String matricula) {
+        for (RegistroAlquiler registro : historial) {
+            if (registro.getAlquiler().getVehiculo().getMatricula().equals(matricula)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -91,10 +107,10 @@ public class HistorialAlquileres {
             String primerainfo = "\u2717";
             //Comprueba si es la primera vez que se alquilo el vehiculo
             double descuentoprimera = 0;
-             if (!aparecidos.contains(historial.get(i).getAlquiler().getVehiculo())) {
+            if (!aparecidos.contains(historial.get(i).getAlquiler().getVehiculo())) {
                 aparecidos.add(historial.get(i).getAlquiler().getVehiculo());
                 descuentoprimera = precio * 0.25;
-                
+
                 primerainfo = "\u2713 (" + descuentoprimera + "€)";
             }
 
@@ -127,18 +143,18 @@ public class HistorialAlquileres {
             //Lee el encabezado e informa si esta vacio
             String str = reader.readLine();
             if (str == null) {
-                System.out.println("Historial de alquileres en blanco.");
+                //Archivo en blanco
             } else {
                 str = reader.readLine();
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 if (str == null || str.equals("")) {
-                    System.out.println("El historial de registros no contiene informacion.");
+                    //Archivo sin informacion
                 } else {
                     int linea = 1;
                     while (str != null && !str.equals("")) {
                         String[] datos = str.split("\\t\\t");
                         if (datos.length != 3) {
-                            System.out.println("Datos en la linea " + linea + " incorrectos.");
+                            //Datos de la linea incorrectos
                         } else {
                             String matricula = datos[0];
                             String dni = datos[1];
@@ -150,11 +166,11 @@ public class HistorialAlquileres {
                                     c = clientes.obtenerCliente(dni);
                                 } catch (ObjetoNoExistenteException e) {
                                     c = null;
-                                    System.out.println("La linea " + linea + " hace referencia a un cliente que ya no existe.");
+                                    //Referencia a objeto no existente
                                 }
                                 historial.add(new RegistroAlquiler(new Alquiler(v, c), dias));
                             } catch (ObjetoNoExistenteException e) {
-                                System.out.println("La linea " + linea + " hacen referencia a un vehiculo que ya no existe.");
+                                //Referencia a vehiculo no existente
                             }
                         }
                         str = reader.readLine();
@@ -164,9 +180,7 @@ public class HistorialAlquileres {
             }
             reader.close();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            System.out.println("Fin de la carga del historial.\n");
+            //Error de lectura
         }
     }
 
@@ -191,7 +205,7 @@ public class HistorialAlquileres {
                 writer.println(matricula + "\t\t" + dni + "\t\t" + dias);
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            //Error de escritura
         }
     }
 }

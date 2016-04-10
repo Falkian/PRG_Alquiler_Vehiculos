@@ -1,7 +1,5 @@
 package GUI;
 
-import Abstractas.Vehiculo;
-import Clases.Cliente;
 import Estructuras.ColeccionAlquileres;
 import Estructuras.ColeccionClientes;
 import Estructuras.ColeccionVehiculos;
@@ -29,9 +27,9 @@ public class PantallaAlquileres extends JSplitPane {
     private final HistorialAlquileres historial;    //Historial de alquileres (para actualizarlo al devolver un vehiculo)
 
     JLabel textoMatricula;
-    JTextField introMatricula;
+    JComboBox introMatricula;
     JLabel textoDNI;
-    JTextField introDNI;
+    JComboBox introDNI;
     JLabel textoDias;
     JSpinner introDias;
 
@@ -124,7 +122,7 @@ public class PantallaAlquileres extends JSplitPane {
         GridBagConstraints ci = new GridBagConstraints();
 
         textoMatricula = new JLabel("Matricula");
-        introMatricula = new JTextField(5);
+        introMatricula = new JComboBox(vehiculos.obtenerArrayMatriculas());
         ci.gridx = 0;
         ci.gridy = 0;
         ci.ipadx = 20;
@@ -135,13 +133,14 @@ public class PantallaAlquileres extends JSplitPane {
         contenido.add(introMatricula, ci);
 
         textoDNI = new JLabel("DNI");
-        introDNI = new JTextField(5);
+        introDNI = new JComboBox(clientes.obtenerArrayDnis());
+        ((DefaultComboBoxModel) introDNI.getModel()).insertElementAt("- Ninguno -", 0);
+        introDNI.setSelectedIndex(0);
         ci.gridx = 0;
         ci.gridy = 1;
         contenido.add(textoDNI, ci);
         ci.gridx = 1;
         contenido.add(introDNI, ci);
-
         textoDias = new JLabel("Dias");
         introDias = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
         ci.gridx = 0;
@@ -155,12 +154,12 @@ public class PantallaAlquileres extends JSplitPane {
         consultaAlquileres.add(contenido, c);
 
         //Boton de Consulta
-        JButton botonModificacion = new JButton("Consultar precio");
-        botonModificacion.addActionListener(new botonConsultaListener());
+        JButton botonConsulta = new JButton("Consultar precio");
+        botonConsulta.addActionListener(new botonConsultaListener());
 
         c.gridy = 2;
         c.fill = GridBagConstraints.NONE;
-        consultaAlquileres.add(botonModificacion, c);
+        consultaAlquileres.add(botonConsulta, c);
 
         setRightComponent(consultaAlquileres);
     }
@@ -188,7 +187,7 @@ public class PantallaAlquileres extends JSplitPane {
         GridBagConstraints ci = new GridBagConstraints();
 
         textoMatricula = new JLabel("Matricula");
-        introMatricula = new JTextField(5);
+        introMatricula = new JComboBox(vehiculos.obtenerArrayMatriculasLibres());
         ci.gridx = 0;
         ci.gridy = 0;
         ci.ipadx = 20;
@@ -199,7 +198,7 @@ public class PantallaAlquileres extends JSplitPane {
         contenido.add(introMatricula, ci);
 
         textoDNI = new JLabel("DNI");
-        introDNI = new JTextField(5);
+        introDNI = new JComboBox(clientes.obtenerArrayDnis());
         ci.gridx = 0;
         ci.gridy = 1;
         contenido.add(textoDNI, ci);
@@ -221,6 +220,9 @@ public class PantallaAlquileres extends JSplitPane {
         setRightComponent(realizarAlquileres);
     }
 
+    /**
+     * Crea y coloca los elementos del apartado de devolucion de vehiculos.
+     */
     private void inicioPantallaAlquileresDevolver() {
         JPanel devolverVehiculo = new JPanel();
         devolverVehiculo.setLayout(new GridBagLayout());
@@ -241,7 +243,7 @@ public class PantallaAlquileres extends JSplitPane {
         GridBagConstraints ci = new GridBagConstraints();
 
         textoMatricula = new JLabel("Matricula");
-        introMatricula = new JTextField(5);
+        introMatricula = new JComboBox(alquileres.obtenerMatriculasAlquilados());
         ci.gridx = 0;
         ci.gridy = 0;
         ci.ipadx = 20;
@@ -256,8 +258,9 @@ public class PantallaAlquileres extends JSplitPane {
         ci.gridx = 0;
         ci.gridy = 1;
         contenido.add(textoDias, ci);
+        ci.gridx = 1;
         contenido.add(introDias, ci);
-        
+
         c.gridy = 1;
         c.fill = GridBagConstraints.VERTICAL;
         devolverVehiculo.add(contenido, c);
@@ -295,7 +298,7 @@ public class PantallaAlquileres extends JSplitPane {
         }
 
     }
-    
+
     /**
      * Manejador de eventos del boton de consulta de precios de alquiler.
      * Asegura que los datos sean validos al clicar, indicando los posibles
@@ -306,23 +309,34 @@ public class PantallaAlquileres extends JSplitPane {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String matricula = obtenerMatricula();
-                String DNI = obtenerDNI();
-                int dias = obtenerDias();
-                double precio = alquileres.obtenerPrecioAlquiler(matricula, DNI, dias);
-                if (clientes.obtenerCliente(DNI).isVip()) {
-                    precio -= precio * 0.15;
+                String matricula = (String) introMatricula.getSelectedItem();
+                if (introDNI.getSelectedIndex() == 0) {
+                    int dias = (Integer) introDias.getValue();
+                    double precio = vehiculos.obtenerVechiculo(matricula).alquilerTotal(dias);
+                    double pdia = vehiculos.obtenerVechiculo(matricula).alquilerTotal(1);
+                    JOptionPane.showMessageDialog(rightComponent, "Alquilar el vehiculo " + matricula + " de tipo: "
+                            + vehiculos.obtenerVechiculo(matricula).getClass().getSimpleName()
+                            + " durante " + dias + " dias costaria " + precio + "€ (" + pdia + "€/dia).",
+                            "Precio alquiler", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    String DNI = (String) introDNI.getSelectedItem();
+                    int dias = (Integer) introDias.getValue();
+                    double preciob = alquileres.obtenerPrecioAlquiler(matricula, DNI, dias);
+                    double precio = preciob;
+                    if (clientes.obtenerCliente(DNI).isVip()) {
+                        precio -= preciob * 0.15;
+                    }
+                    if (historial.isPrimeraVez(matricula)) {
+                        precio -= preciob * 0.25;
+                    }
+                    JOptionPane.showMessageDialog(rightComponent, "Alquilar el vehiculo " + matricula + " de tipo: "
+                            + vehiculos.obtenerVechiculo(matricula).getClass().getSimpleName()
+                            + " durante " + dias + " dias por el cliente " + DNI + " costaria " + precio + "€.",
+                            "Precio alquiler", JOptionPane.INFORMATION_MESSAGE);
                 }
-                JOptionPane.showMessageDialog(rightComponent, "Alquilar el vehiculo " + matricula + " de tipo: " 
-                        + vehiculos.obtenerVechiculo(matricula).getClass().getSimpleName()
-                        + " durante " + dias + " dias por el cliente " + DNI + " costaria " + precio + "€.",
-                        "Precio alquiler", JOptionPane.INFORMATION_MESSAGE);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Obejto no existente", JOptionPane.ERROR_MESSAGE);
             }
-
         }
     }
 
@@ -336,20 +350,19 @@ public class PantallaAlquileres extends JSplitPane {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String matricula = obtenerMatricula();
-                String DNI = obtenerDNI();
+                String matricula = (String) introMatricula.getSelectedItem();
+                String DNI = (String) introDNI.getSelectedItem();
                 alquileres.anyadirAlquiler(matricula, DNI);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(rightComponent, "Vehiculo con matricula " + matricula + " alquilado al cliente "
+                        + DNI + ".", "Vehiculo alquilado", JOptionPane.INFORMATION_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Obejto no existente", JOptionPane.ERROR_MESSAGE);
             } catch (AlquilerVehiculoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo al alquilar el vehiculo", JOptionPane.ERROR_MESSAGE);
             }
-
         }
     }
-    
+
     /**
      * Manejador de eventos del boton de devolver vehiculos. Asegura que los
      * datos sean validos al clicar, indicando los posibles errores o exito de
@@ -361,7 +374,7 @@ public class PantallaAlquileres extends JSplitPane {
         public void actionPerformed(ActionEvent e) {
             try {
                 //Añade el alquiler al regsitro y lo devuelve
-                String matricula = obtenerMatricula();
+                String matricula = (String) introMatricula.getSelectedItem();
                 int dias = obtenerDias();
                 historial.anyadirRegistro(alquileres.obtenerAlquilerPorMatricula(matricula), dias);
                 alquileres.eliminarAlquilerPorMatricula(matricula);
@@ -371,42 +384,6 @@ public class PantallaAlquileres extends JSplitPane {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo al alquilar el vehiculo", JOptionPane.ERROR_MESSAGE);
             }
 
-        }
-    }
-
-    /**
-     * Lee la matricula de la zona de introduccion correspondiente.
-     *
-     * @return una matriculacon un formato valido
-     * @throws FormatoIncorrectoException si la matricula no tiene el formato
-     * adecuado o es vacio
-     */
-    private String obtenerMatricula() throws FormatoIncorrectoException {
-        String matricula = introMatricula.getText().toUpperCase();
-        if (matricula.matches("[\\d]{4}[a-zA-Z]{3}")) {
-            return matricula;
-        } else if (matricula.equals("")) {
-            throw new FormatoIncorrectoException("Debes introducir la matricula.");
-        } else {
-            throw new FormatoIncorrectoException("La matricula debe tener 4 numeros seguidos de 3 letras.");
-        }
-    }
-
-    /**
-     * Lee el DNI de la zona de introduccion correspondiente.
-     *
-     * @return un DNI con un formato valido
-     * @throws FormatoIncorrectoException si el DNI no tiene el formato adecuado
-     * o es vacio
-     */
-    private String obtenerDNI() throws FormatoIncorrectoException {
-        String DNI = introDNI.getText().toUpperCase();
-        if (DNI.matches("\\d{8}[a-zA-Z]")) {
-            return DNI;
-        } else if (DNI.equals("")) {
-            throw new FormatoIncorrectoException("Debes introducir el DNI.");
-        } else {
-            throw new FormatoIncorrectoException("El DNI debe tener 8 numeros seguidos de una letra.");
         }
     }
 

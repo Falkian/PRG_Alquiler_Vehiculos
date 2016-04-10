@@ -18,7 +18,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
-//TODO - Trabajamdo en aspecto
 /**
  * Clase que contiene el menu de gestion de vehiculos
  *
@@ -41,6 +40,8 @@ public class PantallaVehiculos extends JPanel {
     private JComboBox introTipo;
     private JLabel textoCaract;
     private JSpinner introCaract;
+
+    private JDialog ventanaLista;
 
     private JPanel zonaNav;             //Contendra los botones de navegacion
 
@@ -89,6 +90,11 @@ public class PantallaVehiculos extends JPanel {
         textoCaract = new JLabel("Plazas");
         introCaract = new JSpinner();
         introCaract.setEnabled(false);
+
+        botonPrimero = new JButton("|<");
+        botonAnterior = new JButton("<");
+        botonSiguiente = new JButton(">");
+        botonUltimo = new JButton(">|");
     }
 
     /**
@@ -155,11 +161,6 @@ public class PantallaVehiculos extends JPanel {
         //Parte de la ventana con los botones de navegacion
         zonaNav = new JPanel();
         zonaNav.setLayout(new GridBagLayout());
-
-        botonPrimero = new JButton("|<");
-        botonAnterior = new JButton("<");
-        botonSiguiente = new JButton(">");
-        botonUltimo = new JButton(">|");
 
         botonPrimero.setEnabled(false);
         botonAnterior.setEnabled(false);
@@ -354,11 +355,15 @@ public class PantallaVehiculos extends JPanel {
             botonAceptar.setEnabled(true);
             botonDescartar.setEnabled(true);
             botonAceptar.setActionCommand("Alta");
-            botonDescartar.setActionCommand("Alta");
 
             botonAnadir.setEnabled(false);
             botonEditar.setEnabled(false);
             botonBorrar.setEnabled(false);
+
+            botonPrimero.setEnabled(false);
+            botonAnterior.setEnabled(false);
+            botonSiguiente.setEnabled(false);
+            botonUltimo.setEnabled(false);
         }
     }
 
@@ -373,17 +378,20 @@ public class PantallaVehiculos extends JPanel {
         public void actionPerformed(ActionEvent e) {
             introMatricula.requestFocus();
 
-            introMatricula.setEnabled(true);
             introTipo.setEnabled(true);
             introCaract.setEnabled(true);
             botonAceptar.setEnabled(true);
             botonDescartar.setEnabled(true);
             botonAceptar.setActionCommand("Modificacion");
-            botonDescartar.setActionCommand("Modificacion");
 
             botonAnadir.setEnabled(false);
             botonEditar.setEnabled(false);
             botonBorrar.setEnabled(false);
+
+            botonPrimero.setEnabled(false);
+            botonAnterior.setEnabled(false);
+            botonSiguiente.setEnabled(false);
+            botonUltimo.setEnabled(false);
         }
     }
 
@@ -425,10 +433,6 @@ public class PantallaVehiculos extends JPanel {
                 JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo al eliminar el alquiler", JOptionPane.ERROR_MESSAGE);
             } finally {
                 iterador.anterior();
-                botonPrimero.setEnabled(iterador.tieneAnterior());
-                botonAnterior.setEnabled(iterador.tieneAnterior());
-                botonUltimo.setEnabled(iterador.tieneSiguiente());
-                botonSiguiente.setEnabled(iterador.tieneSiguiente());
                 if (iterador.getActual() == null) {
                     seleccionVacia();
                 } else {
@@ -446,7 +450,7 @@ public class PantallaVehiculos extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JDialog ventanaLista = new JDialog((JFrame) PantallaVehiculos.this.getParent().getParent().getParent().getParent().getParent(), "Listado de vehiculos", true);
+            ventanaLista = new JDialog((JFrame) PantallaVehiculos.this.getParent().getParent().getParent().getParent().getParent(), "Listado de vehiculos", true);
             ventanaLista.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
             JTable listado = new JTable(vehiculos.obtenerDataArray(), new String[]{"Matricula", "Tipo", "Plazas\\PMA"});
@@ -459,13 +463,15 @@ public class PantallaVehiculos extends JPanel {
                     JTable tabla = (JTable) me.getSource();
                     Point p = me.getPoint();
                     int row = tabla.rowAtPoint(p);
-                    if (me.getClickCount() == 2) {
-                        //TODO - Ir al elemento como modificacion
+                    //Si se clica una vez ir al elemento
+                    if (me.getClickCount() == 1) {
                         iterador.seleccionar((String) tabla.getValueAt(row, 0));
                         seleccionActual();
-                        //TODO - alt - modificar datos desde tabla
-                        //http://stackoverflow.com/questions/11684903/how-to-add-a-drop-down-menu-to-a-jtable-cell
-                        //http://stackoverflow.com/questions/15555183/jtable-update-selected-row
+                    } //Si se clica dos veces editar el elemento
+                    else if (me.getClickCount() == 2) {
+                        iterador.seleccionar((String) tabla.getValueAt(row, 0));
+                        botonEditar.doClick();
+                        ventanaLista.dispose();
                     }
                 }
             });
@@ -510,10 +516,6 @@ public class PantallaVehiculos extends JPanel {
                         introMatricula.setEnabled(false);
                         introTipo.setEnabled(false);
                         introCaract.setEnabled(false);
-                        botonUltimo.setEnabled(false);
-                        botonSiguiente.setEnabled(false);
-                        botonPrimero.setEnabled(iterador.tieneAnterior());
-                        botonAnterior.setEnabled(iterador.tieneAnterior());
                         botonAceptar.setEnabled(false);
                         botonDescartar.setEnabled(false);
 
@@ -526,7 +528,7 @@ public class PantallaVehiculos extends JPanel {
                     try {
                         //Obtiene la informacion del vehiculo
                         String tipo = (String) introTipo.getSelectedItem();
-                        String matricula = obtenerMatricula();
+                        String matricula = iterador.getActual().getMatricula();
                         double caract = obtenerCaracteristica();
                         vehiculos.modificarVehiculo(tipo, matricula, caract);
                         JOptionPane.showMessageDialog(PantallaVehiculos.this, "Vehiculo modificado correctamente", "Vehiculo modificado", JOptionPane.INFORMATION_MESSAGE);
@@ -539,10 +541,6 @@ public class PantallaVehiculos extends JPanel {
                         introMatricula.setEnabled(false);
                         introTipo.setEnabled(false);
                         introCaract.setEnabled(false);
-                        botonUltimo.setEnabled(iterador.tieneSiguiente());
-                        botonSiguiente.setEnabled(iterador.tieneSiguiente());
-                        botonPrimero.setEnabled(iterador.tieneAnterior());
-                        botonAnterior.setEnabled(iterador.tieneAnterior());
                         botonAceptar.setEnabled(false);
                         botonDescartar.setEnabled(false);
 
@@ -563,36 +561,21 @@ public class PantallaVehiculos extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            switch (e.getActionCommand()) {
-                case "Alta":
-                    seleccionActual();
-                    introMatricula.setEnabled(false);
-                    introTipo.setEnabled(false);
-                    introCaract.setEnabled(false);
-                    botonUltimo.setEnabled(iterador.tieneSiguiente());
-                    botonSiguiente.setEnabled(iterador.tieneSiguiente());
-                    botonPrimero.setEnabled(iterador.tieneAnterior());
-                    botonAnterior.setEnabled(iterador.tieneAnterior());
-                    botonAceptar.setEnabled(false);
-                    botonDescartar.setEnabled(false);
+            seleccionActual();
+            introMatricula.setEnabled(false);
+            introTipo.setEnabled(false);
+            introCaract.setEnabled(false);
+            botonAceptar.setEnabled(false);
+            botonDescartar.setEnabled(false);
 
-                    botonAnadir.setEnabled(true);
-                    botonEditar.setEnabled(true);
-                    botonBorrar.setEnabled(true);
-                    break;
-                case "Modificacion":
-                    seleccionActual();
-                    introMatricula.setEnabled(false);
-                    introTipo.setEnabled(false);
-                    introCaract.setEnabled(false);
-                    botonAceptar.setEnabled(false);
-                    botonDescartar.setEnabled(false);
+            botonAnadir.setEnabled(true);
+            botonEditar.setEnabled(true);
+            botonBorrar.setEnabled(true);
 
-                    botonAnadir.setEnabled(true);
-                    botonEditar.setEnabled(true);
-                    botonBorrar.setEnabled(true);
-                    break;
-            }
+            botonPrimero.setEnabled(true);
+            botonAnterior.setEnabled(true);
+            botonSiguiente.setEnabled(true);
+            botonUltimo.setEnabled(true);
         }
 
     }
@@ -692,5 +675,13 @@ public class PantallaVehiculos extends JPanel {
                 introCaract.setValue(iterador.getActual().getCaracteristica());
                 break;
         }
+
+        //Deja los botones en un estado correcto
+        boolean en = iterador.tieneSiguiente();
+        botonUltimo.setEnabled(en);
+        botonSiguiente.setEnabled(en);
+        en = iterador.tieneAnterior();
+        botonPrimero.setEnabled(en);
+        botonAnterior.setEnabled(en);
     }
 }

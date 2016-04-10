@@ -230,6 +230,35 @@ public class ColeccionVehiculos {
     }
 
     /**
+     * Devuelve un array con las matriculas de los vehiculos de la coleccion.
+     *
+     * @return un array con las matriculas de los vehiculos de la coleccion.
+     */
+    public String[] obtenerArrayMatriculas() {
+        String[] matriculas = new String[vehiculos.size()];
+        for (int i = 0; i < vehiculos.size(); i++) {
+            matriculas[i] = vehiculos.get(i).getMatricula();
+        }
+        return matriculas;
+    }
+
+    /**
+     * Devuelve un array con las matriculas de los vehiculos que no estan
+     * alquilados.
+     *
+     * @return un array con las matriculas de los vehiculos no alquilados.
+     */
+    public String[] obtenerArrayMatriculasLibres() {
+        ArrayList<String> matriculas = new ArrayList<>();
+        for (Vehiculo vehiculo : vehiculos) {
+            if (!vehiculo.isAlquilado()) {
+                matriculas.add(vehiculo.getMatricula());
+            }
+        }
+        return matriculas.toArray(new String[matriculas.size()]);
+    }
+
+    /**
      * Carga la informacion del fichero en el programa
      */
     public void cargar() {
@@ -241,20 +270,20 @@ public class ColeccionVehiculos {
             //Lee el encabezado del archivo e informa si esta vacio.
             String str = reader.readLine();
             if (str == null) {
-                System.out.println("Archivo de vehiclos en blanco.");
+                //Archivo en blanco
                 return;
             } else {
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 str = reader.readLine();
                 if (str == null || str.equals("")) {
-                    System.out.println("El archivo de vechiculos no contiene informacion.");
+                    //Archivo sin informacion
                     return;
                 }
                 int linea = 1;
                 while (str != null && !str.equals("")) {
                     String[] datos = str.split("\\t\\t");
                     if (datos.length != 3) {
-                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                        //Datos de la linea incorrectos
                     } else {
                         String tipo = datos[0].trim();
                         String matricula = datos[1].trim();
@@ -279,9 +308,7 @@ public class ColeccionVehiculos {
             }
             reader.close();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            System.out.println("Fin de la carga de vehiculos.\n");
+            //Fallo de lectura
         }
     }
 
@@ -305,7 +332,7 @@ public class ColeccionVehiculos {
                 }
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            //Fallo de escritura
         }
     }
 

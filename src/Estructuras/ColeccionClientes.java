@@ -84,9 +84,11 @@ public class ColeccionClientes {
                 Cliente c = new Cliente(DNI, nombre, direccion, tlf);
                 c.setVip(vip);
                 cliente = c;
+                guardar();
+                return;
             }
         }
-        throw new ObjetoNoExistenteException("El cliente con DNI " + DNI + " no eta registrado.");
+        throw new ObjetoNoExistenteException("El cliente con DNI " + DNI + " no esta registrado.");
     }
 
     /**
@@ -105,6 +107,15 @@ public class ColeccionClientes {
             throw new ObjetoNoExistenteException("El cliente con dni " + dni + " no existe.");
         }
     }
+    
+    /**
+     * Devuelve un iterador para la coleccion de clientes.
+     *
+     * @return un iterador para la coleccion de clientes.
+     */
+    public IteradorClientes getIterador() {
+        return new IteradorClientes(clientes);
+    }
 
     /**
      * Devuelve un array bidimensional con la informacion de la lista. Cada fila
@@ -120,6 +131,19 @@ public class ColeccionClientes {
         }
         return ret;
     }
+    
+    /**
+     * Devuelve un array con los DNIs de los clientes de la coleccion.
+     *
+     * @return un array con los DNIs de los clientes de la coleccion.
+     */
+    public String[] obtenerArrayDnis() {
+        String[] dnis = new String[clientes.size()];
+        for (int i = 0; i < clientes.size(); i++) {
+            dnis[i] = clientes.get(i).getDni();
+        }
+        return dnis;
+    }
 
     /**
      * Carga la informacion del fichero en el programa
@@ -133,20 +157,20 @@ public class ColeccionClientes {
             //Lee el encabezado del archivo e informa si esta vacio.
             String str = reader.readLine();
             if (str == null) {
-                System.out.println("Archivo de clientes en blanco.");
+                //Archivo en blanco
                 return;
             } else {
                 //Lee la primera linea del archivo e informa si no contiene datos.
                 str = reader.readLine();
                 if (str == null || str.equals("")) {
-                    System.out.println("El archivo de clientes no contiene informacion.");
+                    //Archivo sin informacion
                     return;
                 }
                 int linea = 1;
                 while (str != null && !str.equals("")) {
                     String[] datos = str.split("\\t\\t");
                     if (datos.length != 5) {
-                        System.out.println("Datos en la linea " + linea + " incorrectos.");
+                        //Datos de la linea incorrectos
                     } else {
                         Cliente c = new Cliente(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
                         if (datos[4].equals("S")) {
@@ -160,9 +184,7 @@ public class ColeccionClientes {
             }
             reader.close();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } finally {
-            System.out.println("Fin de la carga de clientes.\n");
+            //Fallo de lectura
         }
     }
 
@@ -183,7 +205,7 @@ public class ColeccionClientes {
                 writer.printf("%s\t\t%s\t\t%s\t\t%s\t\t%s%n", dni, nombre, dir, tlf, vip);
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            //Fallo de escritura
         }
     }
 

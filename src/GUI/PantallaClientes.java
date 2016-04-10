@@ -2,6 +2,7 @@ package GUI;
 
 import Estructuras.ColeccionAlquileres;
 import Estructuras.ColeccionClientes;
+import Estructuras.IteradorClientes;
 import Excepciones.AlquilerVehiculoException;
 import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
@@ -9,19 +10,29 @@ import Excepciones.ObjetoYaExistenteException;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 
 /**
- * Clase que contiene el menu de gestion de clientes
+ * Clase que contiene el menu de gestion de vehiculos
  *
  * @author Kevin
  */
-public class PantallaClientes extends JSplitPane {
+public class PantallaClientes extends JPanel {
 
-    private final ColeccionClientes clientes;       //Coleccion de clientes
-    private final ColeccionAlquileres alquileres;   //Coleccion de alquileres (para saber si un cliente tiene vehiculos alquilados)
+    private final ColeccionClientes clientes;     //Colecccion de vehiculos
+    private final ColeccionAlquileres alquileres;   //Coleccion de alquileres (para saber si un vehiculo esta alquilado)
+
+    private final IteradorClientes iterador;
+
+    private JPanel parteIzq;            //Contendra la zona de datos y el menu de navegacion
+
+    private JPanel zonaDatos;           //Contendra los campos de introduccion y visualizacion de datos
 
     private JLabel textoDNI;
     private JTextField introDNI;
@@ -34,403 +45,365 @@ public class PantallaClientes extends JSplitPane {
     private JLabel textoVIP;
     private JCheckBox introVIP;
 
+    private JDialog ventanaLista;
+
+    private JPanel zonaNav;             //Contendra los botones de navegacion
+
+    private JButton botonPrimero;
+    private JButton botonAnterior;
+    private JButton botonSiguiente;
+    private JButton botonUltimo;
+
+    private JPanel parteDer;            //Contentra los botones de las opciones disponibles
+
+    private JButton botonAnadir;
+    private JButton botonEditar;
+    private JButton botonBorrar;
+    private JButton botonListar;
+
+    private JButton botonAceptar;
+    private JButton botonDescartar;
+
     /**
      * Crea e inicializa el menu de clientes.
      *
-     * @param clientes la coleccion de clientes
+     * @param clientes coleccion de clientes
      * @param alquileres la coleccion de alquileres
      */
     public PantallaClientes(ColeccionClientes clientes, ColeccionAlquileres alquileres) {
-        super(JSplitPane.HORIZONTAL_SPLIT);
+        super();
         this.clientes = clientes;
         this.alquileres = alquileres;
+        iterador = clientes.getIterador();
+        creaElementos();
         iniciar();
     }
 
     /**
-     * Inicia el menu de gestion de clientes, creando y colocando todos sus
-     * elementos. Empieza en el apartado de alta de clientes.
+     * Inicializa todos los elementos necesarios para poder operar.
+     */
+    private void creaElementos() {
+        textoDNI = new JLabel("DNI");
+        introDNI = new JTextField(10);
+        introDNI.setEnabled(false);
+
+        textoNombre = new JLabel("Nombre");
+        introNombre = new JTextField(10);
+        introNombre.setEnabled(false);
+
+        textoDireccion = new JLabel("Direccion");
+        introDireccion = new JTextField(10);
+        introDireccion.setEnabled(false);
+
+        textoTelefono = new JLabel("Telefono");
+        introTelefono = new JTextField(9);
+
+        textoVIP = new JLabel("VIP");
+        introVIP = new JCheckBox();
+
+        botonPrimero = new JButton("|<");
+        botonAnterior = new JButton("<");
+        botonSiguiente = new JButton(">");
+        botonUltimo = new JButton(">|");
+    }
+
+    /**
+     * Inicia el menu de gestion de vehiculos, creando y colocando todos sus
+     * elementos. Empieza en el apartado de alta de vehiculos.
      */
     private void iniciar() {
-        JPanel menuClientes = new JPanel();        //Menu izquierdo
-        menuClientes.setLayout(new GridBagLayout());
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
+        //Parte izquierda de la pantalla
+        parteIzq = new JPanel();
+        //parteIzq.setLayout(new BoxLayout(parteIzq, BoxLayout.Y_AXIS));
+        parteIzq.setLayout(new GridBagLayout());
+        GridBagConstraints ci = new GridBagConstraints();
+
+        ci.weightx = 0.2;
+        ci.weighty = 0.2;
+        ci.gridx = 0;
+        ci.gridy = 0;
+        parteIzq.add(new JLabel("<HTML><H3>GESTION DE CLIENTES</H3></HTML>"), ci);
+
+        //Parte de la ventana en la que se mostraran y modificaran los datos
+        zonaDatos = new JPanel();
+        zonaDatos.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
 
-        //Botones de la parte izquierda del menu de gestion de vehiculos
-        JButton botonAnadir = new JButton("Alta");
-        JButton botonModificacion = new JButton("Modificacion");
-        JButton botonBorrado = new JButton("Borrado");
-        JButton botonListado = new JButton("Listado");
+        //Inicia los datos con los valores del primer elemento de la coleccion
+        try {
+            introDNI.setEnabled(false);
+            introNombre.setEnabled(false);
+            introDireccion.setEnabled(false);
+            introTelefono.setEnabled(false);
+            introVIP.setEnabled(false);
 
-        c.gridy = 0;
+            seleccionActual();
+        } catch (NullPointerException e) {
+            seleccionVacia();
+        }
+
         c.weightx = 0.5;
         c.weighty = 0.5;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        int yin = menuClientes.getHeight() / 5 - botonAnadir.getHeight() / 2;
-        int xin = menuClientes.getWidth() / 2 - botonAnadir.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuClientes.add(botonAnadir, c);
-
+        c.gridx = 0;
+        c.gridy = 0;
+        zonaDatos.add(textoDNI, c);
+        c.gridx = 1;
+        zonaDatos.add(introDNI, c);
+        c.gridx = 0;
         c.gridy = 1;
-        yin = menuClientes.getHeight() / 5 - botonModificacion.getHeight() / 2;
-        xin = menuClientes.getWidth() / 2 - botonModificacion.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuClientes.add(botonModificacion, c);
-
+        zonaDatos.add(textoNombre, c);
+        c.gridx = 1;
+        zonaDatos.add(introNombre, c);
+        c.gridx = 0;
         c.gridy = 2;
-        yin = menuClientes.getHeight() / 5 - botonBorrado.getHeight() / 2;
-        xin = menuClientes.getWidth() / 2 - botonBorrado.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuClientes.add(botonBorrado, c);
-
+        zonaDatos.add(textoDireccion, c);
+        c.gridx = 1;
+        zonaDatos.add(introDireccion, c);
+        c.gridx = 0;
         c.gridy = 3;
-        yin = menuClientes.getHeight() / 5 - botonListado.getHeight() / 2;
-        xin = menuClientes.getWidth() / 2 - botonListado.getWidth() / 2;
-        c.insets = new Insets(yin, xin, yin, xin);
-        menuClientes.add(botonListado, c);
-
-        botonAnadir.addActionListener(new botonesMenuListener());
-        botonModificacion.addActionListener(new botonesMenuListener());
-        botonBorrado.addActionListener(new botonesMenuListener());
-        botonListado.addActionListener(new botonesMenuListener());
-
-        botonAnadir.setActionCommand("Anadir");
-        botonModificacion.setActionCommand("Modificar");
-        botonBorrado.setActionCommand("Borrar");
-        botonListado.setActionCommand("Lista");
-
-        setLeftComponent(menuClientes);
-
-        //Inicia el menu de gestion de vehiculos en el apartado de alta
-        inicioPantallaClientesAlta();
-    }
-
-    /**
-     * Crea y coloca los elementos del apartado de alta de clientes.
-     */
-    private void inicioPantallaClientesAlta() {
-        JPanel altaClientes = new JPanel();
-        altaClientes.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        //Titulo del submenu
-        JPanel titulo = new JPanel();
-        titulo.add(new JLabel("<HTML><U><B>ALTA DE CLIENTES</B></U></HTML>"));
+        zonaDatos.add(textoTelefono, c);
+        c.gridx = 1;
+        zonaDatos.add(introTelefono, c);
         c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        altaClientes.add(titulo, c);
+        c.gridy = 4;
+        zonaDatos.add(textoVIP, c);
+        c.gridx = 1;
+        zonaDatos.add(introVIP, c);
 
-        //Zona de introduccion de datos
-        JPanel contenido = new JPanel();
-        contenido.setLayout(new GridBagLayout());
-        GridBagConstraints ci = new GridBagConstraints();
-
-        textoDNI = new JLabel("DNI");
-        introDNI = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 0;
-        ci.ipadx = 20;
-        ci.weightx = 0.5;
-        ci.weighty = 0.5;
-        contenido.add(textoDNI, ci);
-        ci.gridx = 1;
-        contenido.add(introDNI, ci);
-
-        textoNombre = new JLabel("Nombre");
-        introNombre = new JTextField(5);
-        ci.gridx = 0;
+        ci.weightx = 0.8;
+        ci.weighty = 0.8;
         ci.gridy = 1;
-        contenido.add(textoNombre, ci);
-        ci.gridx = 1;
-        contenido.add(introNombre, ci);
+        ci.gridheight = 3;
+        ci.fill = GridBagConstraints.BOTH;
+        parteIzq.add(zonaDatos, ci);
 
-        textoDireccion = new JLabel("Direccion");
-        introDireccion = new JTextField(10);
-        ci.gridx = 0;
-        ci.gridy = 2;
-        contenido.add(textoDireccion, ci);
-        ci.gridx = 1;
-        contenido.add(introDireccion, ci);
+        //Parte de la ventana con los botones de navegacion
+        zonaNav = new JPanel();
+        zonaNav.setLayout(new GridBagLayout());
 
-        textoTelefono = new JLabel("Telefono");
-        introTelefono = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 3;
-        contenido.add(textoTelefono, ci);
-        ci.gridx = 1;
-        contenido.add(introTelefono, ci);
+        botonPrimero.setEnabled(false);
+        botonAnterior.setEnabled(false);
+        if (iterador.getActual() == null || !iterador.tieneSiguiente()) {
+            botonSiguiente.setEnabled(false);
+            botonUltimo.setEnabled(false);
+        }
 
-        textoVIP = new JLabel("VIP");
-        introVIP = new JCheckBox();
-        ci.gridx = 0;
-        ci.gridy = 4;
-        contenido.add(textoVIP, ci);
-        ci.gridx = 1;
-        contenido.add(introVIP, ci);
+        botonPrimero.setActionCommand("Primero");
+        botonAnterior.setActionCommand("Anterior");
+        botonSiguiente.setActionCommand("Siguiente");
+        botonUltimo.setActionCommand("Ultimo");
 
-        c.gridy = 1;
-        c.fill = GridBagConstraints.VERTICAL;
-        altaClientes.add(contenido, c);
+        botonPrimero.addActionListener(new BotonNavegacionListener());
+        botonAnterior.addActionListener(new BotonNavegacionListener());
+        botonSiguiente.addActionListener(new BotonNavegacionListener());
+        botonUltimo.addActionListener(new BotonNavegacionListener());
 
-        //Boton de alta
-        JButton botonAlta = new JButton("Alta");
-        botonAlta.addActionListener(new botonAltaListener());
-
-        c.gridx = 0;
-        c.gridy = 2;
-        c.fill = GridBagConstraints.NONE;
-        altaClientes.add(botonAlta, c);
-
-        setRightComponent(altaClientes);
-    }
-
-    /**
-     * Crea y coloca los elementos del apartado de modificacion de clientes.
-     */
-    private void inicioPantallaClientesModificacion() {
-        JPanel modificacionClientes = new JPanel();
-        modificacionClientes.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-
-        //Titulo del submenu
-        JPanel titulo = new JPanel();
-        titulo.add(new JLabel("<HTML><U></B>MODIFICACION DE CLIENTES</B></U></HTML>"));
         c.gridx = 0;
         c.gridy = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        modificacionClientes.add(titulo, c);
+        zonaNav.add(botonPrimero, c);
+        c.gridx = 1;
+        zonaNav.add(botonAnterior, c);
+        c.gridx = 2;
+        zonaNav.add(botonSiguiente, c);
+        c.gridx = 3;
+        zonaNav.add(botonUltimo, c);
 
-        //Zona de introduccion de datos
-        JPanel contenido = new JPanel();
-        contenido.setLayout(new GridBagLayout());
-        GridBagConstraints ci = new GridBagConstraints();
-
-        textoDNI = new JLabel("DNI");
-        introDNI = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 0;
-        ci.ipadx = 20;
         ci.weightx = 0.5;
         ci.weighty = 0.5;
-        contenido.add(textoDNI, ci);
-        ci.gridx = 1;
-        contenido.add(introDNI, ci);
-
-        textoNombre = new JLabel("Nombre");
-        introNombre = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 1;
-        contenido.add(textoNombre, ci);
-        ci.gridx = 1;
-        contenido.add(introNombre, ci);
-
-        textoDireccion = new JLabel("Direccion");
-        introDireccion = new JTextField(10);
-        ci.gridx = 0;
-        ci.gridy = 2;
-        contenido.add(textoDireccion, ci);
-        ci.gridx = 1;
-        contenido.add(introDireccion, ci);
-
-        textoTelefono = new JLabel("Telefono");
-        introTelefono = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 3;
-        contenido.add(textoTelefono, ci);
-        ci.gridx = 1;
-        contenido.add(introTelefono, ci);
-
-        textoVIP = new JLabel("VIP");
-        introVIP = new JCheckBox();
-        ci.gridx = 0;
         ci.gridy = 4;
-        contenido.add(textoVIP, ci);
-        ci.gridx = 1;
-        contenido.add(introVIP, ci);
+        ci.fill = GridBagConstraints.HORIZONTAL;
+        parteIzq.add(zonaNav, ci);
 
-        c.gridy = 1;
-        c.fill = GridBagConstraints.VERTICAL;
-        modificacionClientes.add(contenido, c);
+        add(parteIzq);
 
-        //Boton de modificacion
-        JButton botonModificacion = new JButton("Modificar");
-        botonModificacion.addActionListener(new botonModificarListener());
+        //Parte de la pantalla con los botones de edicion
+        parteDer = new JPanel();
+        parteDer.setLayout(new GridBagLayout());
 
-        c.gridy = 2;
-        c.fill = GridBagConstraints.NONE;
-        modificacionClientes.add(botonModificacion, c);
+        botonAnadir = new JButton("+");
+        botonEditar = new JButton("E");
+        botonBorrar = new JButton("-");
+        botonListar = new JButton("Lista");
 
-        setRightComponent(modificacionClientes);
-    }
+        botonAnadir.addActionListener(new BotonAnadirListerner());
+        botonEditar.addActionListener(new BotonEditarListener());
+        botonBorrar.addActionListener(new BotonBorrarListener());
+        botonListar.addActionListener(new BotonListarListener());
 
-    /**
-     * Crea y coloca los elementos del apartado de borrado de clientes.
-     */
-    private void inicioPantallaClientesBorrado() {
-        JPanel borradoClientes = new JPanel();
-        borradoClientes.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        botonAceptar = new JButton("\u2713");
+        botonDescartar = new JButton("\u2717");
+        botonAceptar.setEnabled(false);
+        botonDescartar.setEnabled(false);
 
-        //Titulo del submenu
-        JPanel titulo = new JPanel();
-        titulo.add(new JLabel("<HTML><U><B>BORRADO DE VEHICULOS</B></U></HTML>"));
+        botonAceptar.addActionListener(new BotonAceptarListener());
+        botonDescartar.addActionListener(new BotonDescartarListener());
+
         c.gridx = 0;
         c.gridy = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        borradoClientes.add(titulo, c);
-
-        //Zona de introduccion de datos
-        JPanel contenido = new JPanel();
-        contenido.setLayout(new GridBagLayout());
-        GridBagConstraints ci = new GridBagConstraints();
-
-        textoDNI = new JLabel("DNI");
-        introDNI = new JTextField(5);
-        ci.gridx = 0;
-        ci.gridy = 0;
-        ci.ipadx = 20;
-        ci.weightx = 0.5;
-        ci.weighty = 0.5;
-        contenido.add(textoDNI, ci);
-        ci.gridx = 1;
-        contenido.add(introDNI, ci);
-
+        parteDer.add(botonAnadir, c);
         c.gridy = 1;
-        c.fill = GridBagConstraints.HORIZONTAL;
-        borradoClientes.add(contenido, c);
-
-        //Boton de borrado
-        JButton botonBorrado = new JButton("Eliminar");
-        botonBorrado.addActionListener(new botonBorrarListener());
-
-        c.gridx = 0;
+        parteDer.add(botonEditar, c);
         c.gridy = 2;
-        c.fill = GridBagConstraints.NONE;
-        borradoClientes.add(botonBorrado, c);
+        parteDer.add(botonBorrar, c);
+        c.gridx = 1;
+        c.gridy = 0;
+        parteDer.add(botonAceptar, c);
+        c.gridy = 1;
+        parteDer.add(botonDescartar, c);
 
-        setRightComponent(borradoClientes);
-    }
+        c.gridx = 1;
+        c.gridy = 3;
+        c.insets = new Insets(10, 10, 10, 10);
+        c.anchor = GridBagConstraints.LAST_LINE_END;
+        parteDer.add(botonListar, c);
 
-    /**
-     * Crea y coloca los elementos del apartado de listado de clientes.
-     */
-    private void inicioPantallaClientesListado() {
-        JTable listado = new JTable(clientes.obtenerDataArray(), new String[]{"DNI", "Nombre", "Direccion", "Telefono", "VIP"});
+        add(parteDer);
 
-        JScrollPane listadoVehiculos = new JScrollPane(listado);
-        listado.setFillsViewportHeight(true);
-
-        setRightComponent(listadoVehiculos);
+        setVisible(true);
     }
 
     /**
      * Manejador de eventos de los botones de navegacion del menu de gestion de
-     * clientes.
+     * vehiculos.
      */
-    private class botonesMenuListener implements ActionListener {
+    private class BotonNavegacionListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             switch (e.getActionCommand()) {
-                case "Anadir":
-                    inicioPantallaClientesAlta();
+                case "Primero":
+                    iterador.primero();
+                    botonPrimero.setEnabled(false);
+                    botonAnterior.setEnabled(false);
+                    if (!botonSiguiente.isEnabled()) {
+                        botonSiguiente.setEnabled(true);
+                        botonUltimo.setEnabled(true);
+                    }
                     break;
-                case "Modificar":
-                    inicioPantallaClientesModificacion();
+                case "Anterior":
+                    iterador.anterior();
+                    if (!iterador.tieneAnterior()) {
+                        botonPrimero.setEnabled(false);
+                        botonAnterior.setEnabled(false);
+                    }
+                    if (iterador.tieneSiguiente() && !botonSiguiente.isEnabled()) {
+                        botonSiguiente.setEnabled(true);
+                        botonUltimo.setEnabled(true);
+                    }
                     break;
-                case "Borrar":
-                    inicioPantallaClientesBorrado();
+                case "Siguiente":
+                    iterador.siguiente();
+                    if (!iterador.tieneSiguiente()) {
+                        botonSiguiente.setEnabled(false);
+                        botonUltimo.setEnabled(false);
+                    }
+                    if (iterador.tieneAnterior() && !botonAnterior.isEnabled()) {
+                        botonAnterior.setEnabled(true);
+                        botonPrimero.setEnabled(true);
+                    }
                     break;
-                case "Lista":
-                    inicioPantallaClientesListado();
+                case "Ultimo":
+                    iterador.ultimo();
+                    botonUltimo.setEnabled(false);
+                    botonSiguiente.setEnabled(false);
+                    if (!botonAnterior.isEnabled()) {
+                        botonAnterior.setEnabled(true);
+                        botonPrimero.setEnabled(true);
+                    }
                     break;
             }
-        }
-
-    }
-
-    /**
-     * Manejador de eventos del boton de alta de clientes. Asegura que los datos
-     * sean validos al clicar, indicando los posibles errores o exito de la
-     * accion.
-     */
-    private class botonAltaListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
             try {
-                //Obtiene la informacion del cliente
-                String dni = obtenerDNI();
-                String nombre = obtenerNombre();
-                String direccion = obtenerDireccion();
-                String telefono = obtenerTelefono();
-                boolean VIP = obtenerVIP();
-                //Añade el cliente al listado
-                clientes.anyadirCliente(dni, nombre, direccion, telefono, VIP);
-                JOptionPane.showMessageDialog(rightComponent, "Cliente anyadido con los siguientes datos:\n"
-                        + "DNI: " + dni + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
-                        + "Telefono: " + telefono + "VIP: " + (VIP? "\u2713" : "\u2717"), 
-                        "Cliente anyadido", JOptionPane.INFORMATION_MESSAGE);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
-            } catch (ObjetoYaExistenteException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Ya existe el cliente", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                introDNI.setText("");
-                introNombre.setText("");
-                introDireccion.setText("");
-                introTelefono.setText("");
-                introVIP.setSelected(false);
+                seleccionActual();
+            } catch (NullPointerException ex) {
+                botonPrimero.setEnabled(false);
+                botonAnterior.setEnabled(false);
+                botonSiguiente.setEnabled(false);
+                botonUltimo.setEnabled(false);
             }
         }
+
     }
 
     /**
-     * Manejador de eventos del boton de modificacion de clientes. Asegura que
-     * los datos sean validos al clicar, indicando los posibles errores o exito
-     * de la accion.
-     */
-    private class botonModificarListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try {
-                //Obtiene la informacion del cliente
-                String DNI = obtenerDNI();
-                String nombre = obtenerNombre();
-                String direccion = obtenerDireccion();
-                String telefono = obtenerTelefono();
-                boolean VIP = obtenerVIP();
-                //Modifica el cliente
-                clientes.modificarCliente(DNI, nombre, direccion, telefono, VIP);
-                JOptionPane.showMessageDialog(rightComponent, "Modificado el cliente " + DNI + " con los siguientes datos:\n"
-                        + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
-                        + "Telefono: " + telefono + "VIP: " + (VIP? "\u2713" : "\u2717"), 
-                        "Cliente modificado", JOptionPane.INFORMATION_MESSAGE);
-            } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
-            } catch (ObjetoNoExistenteException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "No existe el cliente", JOptionPane.ERROR_MESSAGE);
-            } finally {
-                introDNI.setText("");
-                introNombre.setText("");
-                introDireccion.setText("");
-                introTelefono.setText("");
-                introVIP.setSelected(false);
-            }
-        }
-    }
-
-    /**
-     * Manejador de eventos del boton de borrado de clientes. Asegura que los
+     * Manejador de eventos del boton de alta de vehiculos. Asegura que los
      * datos sean validos al clicar, indicando los posibles errores o exito de
      * la accion.
      */
-    private class botonBorrarListener implements ActionListener {
+    private class BotonAnadirListerner implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            iterador.ultimo();
+
+            introDNI.setText("");
+            introDNI.requestFocus();
+            introNombre.setText("");
+            introDireccion.setText("");
+            introTelefono.setText("");
+            introVIP.setSelected(false);
+
+            introDNI.setEnabled(true);
+            introNombre.setEnabled(true);
+            introDireccion.setEnabled(true);
+            introTelefono.setEnabled(true);
+            introVIP.setEnabled(true);
+
+            botonAceptar.setEnabled(true);
+            botonDescartar.setEnabled(true);
+            botonAceptar.setActionCommand("Alta");
+            botonDescartar.setActionCommand("Alta");
+
+            botonAnadir.setEnabled(false);
+            botonEditar.setEnabled(false);
+            botonBorrar.setEnabled(false);
+            
+            botonPrimero.setEnabled(false);
+            botonAnterior.setEnabled(false);
+            botonSiguiente.setEnabled(false);
+            botonUltimo.setEnabled(false);
+        }
+    }
+
+    /**
+     * Manejador de eventos del boton de modificacion de vehiculos. Asegura que
+     * los datos sean validos al clicar, indicando los posibles errores o exito
+     * de la accion.
+     */
+    private class BotonEditarListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            introDNI.requestFocus();
+
+            introNombre.setEnabled(true);
+            introDireccion.setEnabled(true);
+            introTelefono.setEnabled(true);
+            introVIP.setEnabled(true);
+
+            botonAceptar.setEnabled(true);
+            botonDescartar.setEnabled(true);
+            botonAceptar.setActionCommand("Modificacion");
+            botonDescartar.setActionCommand("Modificacion");
+
+            botonAnadir.setEnabled(false);
+            botonEditar.setEnabled(false);
+            botonBorrar.setEnabled(false);
+            
+            botonPrimero.setEnabled(false);
+            botonAnterior.setEnabled(false);
+            botonSiguiente.setEnabled(false);
+            botonUltimo.setEnabled(false);
+        }
+    }
+
+    /**
+     * Manejador de eventos del boton de borrado de vehiculos. Asegura que los
+     * datos sean validos al clicar, indicando los posibles errores o exito de
+     * la accion.
+     */
+    private class BotonBorrarListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -440,33 +413,197 @@ public class PantallaClientes extends JSplitPane {
                 boolean eliminar = true;
                 if (clientes.obtenerCliente(DNI).isAlquilado()) {
                     //Informar si tiene vehiculos alquilados y confirmar eliminacion
-                    int resp = JOptionPane.showConfirmDialog(rightComponent, "El cliente que quieres leiminar tiene vehiculos alquilados.\n"
+                    int resp = JOptionPane.showConfirmDialog(PantallaClientes.this, "El cliente que quieres leiminar tiene vehiculos alquilados.\n"
                             + "¿Seguro que desea eliminarlo (se cancelara el alquiler sin agregarse al historial)?",
                             "Cliente alquilado", JOptionPane.YES_NO_OPTION);
                     if (resp == JOptionPane.YES_OPTION) {
                         alquileres.eliminarAlquilerPorDni(DNI);
                     } else {
                         eliminar = false;
-                        JOptionPane.showMessageDialog(rightComponent, "No se eliminara el cliente",
+                        JOptionPane.showMessageDialog(PantallaClientes.this, "No se eliminara el cliente",
                                 "Cliente no eliminado", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
                 if (eliminar) {
                     //Elimina el cliente
                     clientes.eliminarCliente(DNI);
-                    JOptionPane.showMessageDialog(rightComponent, "Cliente con DNI " + DNI + "eliminado.",
+                    JOptionPane.showMessageDialog(PantallaClientes.this, "Cliente con DNI " + DNI + "eliminado.",
                             "Cliente eliminado", JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (FormatoIncorrectoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
             } catch (AlquilerVehiculoException ex) {
-                JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo al eliminar el alquiler", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo al eliminar el alquiler", JOptionPane.ERROR_MESSAGE);
             } finally {
-                introDNI.setText("");
+                iterador.anterior();
+                if (iterador.getActual() == null) {
+                    seleccionVacia();
+                } else {
+                    seleccionActual();
+                }
             }
         }
+    }
+
+    /**
+     * Manejador de deventos del boton de listado de vehiculos. Muestra una
+     * ventana con un listado de todos los vehiculos existentetes.
+     */
+    private class BotonListarListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ventanaLista = new JDialog((JFrame) PantallaClientes.this.getParent().getParent().getParent().getParent().getParent(), "Listado de vehiculos", true);
+            ventanaLista.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+            JTable listado = new JTable(clientes.obtenerDataArray(), new String[]{"DNI", "Nombre", "Direccion", "Telefono", "VIP"});
+            TableColumn columnaTipo = listado.getColumnModel().getColumn(1);
+            columnaTipo.setCellEditor(new DefaultCellEditor(introNombre));
+
+            listado.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent me) {
+                    JTable tabla = (JTable) me.getSource();
+                    Point p = me.getPoint();
+                    int row = tabla.rowAtPoint(p);
+                    //Si se clica una vez ir al elemento
+                    if (me.getClickCount() == 1) {
+                        iterador.seleccionar((String) tabla.getValueAt(row, 0));
+                        seleccionActual();
+                    } //Si se clica dos veces editar el elemento
+                    else if (me.getClickCount() == 2) {
+                        iterador.seleccionar((String) tabla.getValueAt(row, 0));
+                        botonEditar.doClick();
+                        ventanaLista.dispose();
+                    }
+                }
+            });
+            JScrollPane listadoClientes = new JScrollPane(listado);
+            listado.setFillsViewportHeight(true);
+            listado.setEnabled(false);
+
+            ventanaLista.add(listadoClientes);
+
+            ventanaLista.pack();
+            ventanaLista.setVisible(true);
+        }
+
+    }
+
+    /**
+     * Manejador de eventos del boton de aceptar. Añadra un vehiculo a la
+     * coleccion o modificara uno existente.
+     */
+    private class BotonAceptarListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            switch (e.getActionCommand()) {
+                case "Alta":
+                    try {
+                        //Obtiene la informacion del cliente
+                        String dni = obtenerDNI();
+                        String nombre = obtenerNombre();
+                        String direccion = obtenerDireccion();
+                        String telefono = obtenerTelefono();
+                        boolean VIP = obtenerVIP();
+                        //Añade el cliente al listado
+                        clientes.anyadirCliente(dni, nombre, direccion, telefono, VIP);
+                        JOptionPane.showMessageDialog(PantallaClientes.this, "Cliente anyadido con los siguientes datos:\n"
+                                + "DNI: " + dni + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
+                                + "Telefono: " + telefono + "\nVIP: " + (VIP ? "\u2713" : "\u2717"),
+                                "Cliente anyadido", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (FormatoIncorrectoException ex) {
+                        JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+                    } catch (ObjetoYaExistenteException ex) {
+                        JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Ya existe el cliente", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        iterador.ultimo();
+                        seleccionActual();
+
+                        introDNI.setEnabled(false);
+                        introNombre.setEnabled(false);
+                        introDireccion.setEnabled(false);
+                        introTelefono.setEnabled(false);
+                        introVIP.setEnabled(false);
+
+                        botonAceptar.setEnabled(false);
+                        botonDescartar.setEnabled(false);
+
+                        botonAnadir.setEnabled(true);
+                        botonEditar.setEnabled(true);
+                        botonBorrar.setEnabled(true);
+                    }
+                    break;
+                case "Modificacion":
+                    try {
+                        //Obtiene la informacion del cliente
+                        String DNI = obtenerDNI();
+                        String nombre = obtenerNombre();
+                        String direccion = obtenerDireccion();
+                        String telefono = obtenerTelefono();
+                        boolean VIP = obtenerVIP();
+                        //Modifica el cliente
+                        clientes.modificarCliente(DNI, nombre, direccion, telefono, VIP);
+                        JOptionPane.showMessageDialog(PantallaClientes.this, "Modificado el cliente " + DNI + " con los siguientes datos:\n"
+                                + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
+                                + "Telefono: " + telefono + "\nVIP: " + (VIP ? "\u2713" : "\u2717"),
+                                "Cliente modificado", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (FormatoIncorrectoException ex) {
+                        JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
+                    } catch (ObjetoNoExistenteException ex) {
+                        JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "No existe el cliente", JOptionPane.ERROR_MESSAGE);
+                    } finally {
+                        seleccionActual();
+
+                        introDNI.setEnabled(false);
+                        introNombre.setEnabled(false);
+                        introDireccion.setEnabled(false);
+                        introTelefono.setEnabled(false);
+                        introVIP.setEnabled(false);
+
+                        botonAceptar.setEnabled(false);
+                        botonDescartar.setEnabled(false);
+
+                        botonAnadir.setEnabled(true);
+                        botonEditar.setEnabled(true);
+                        botonBorrar.setEnabled(true);
+                    }
+                    break;
+            }
+        }
+
+    }
+
+    /**
+     * Manejador de eventos del boton de descartar cambios.
+     */
+    private class BotonDescartarListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            seleccionActual();
+            introDNI.setEnabled(false);
+            introNombre.setEnabled(false);
+            introDireccion.setEnabled(false);
+            introTelefono.setEnabled(false);
+            introVIP.setEnabled(false);
+
+            botonAceptar.setEnabled(false);
+            botonDescartar.setEnabled(false);
+
+            botonAnadir.setEnabled(true);
+            botonEditar.setEnabled(true);
+            botonBorrar.setEnabled(true);
+
+            botonPrimero.setEnabled(true);
+            botonAnterior.setEnabled(true);
+            botonSiguiente.setEnabled(true);
+            botonUltimo.setEnabled(true);
+        }
+
     }
 
     /**
@@ -495,11 +632,13 @@ public class PantallaClientes extends JSplitPane {
      */
     private String obtenerNombre() throws FormatoIncorrectoException {
         String nombre = introNombre.getText();
+        //if (nombre.matches("\\D")) {
+        //  return nombre;            
+        //} else 
         if (nombre.equals("")) {
             throw new FormatoIncorrectoException("Debes introducir el nombre.");
-        } else if (!nombre.matches("\\D")) {
-            throw new FormatoIncorrectoException(nombre + " no es un nombre valido.");
         } else {
+            //  throw new FormatoIncorrectoException(nombre + " no es un nombre valido.");
             return nombre;
         }
     }
@@ -544,5 +683,37 @@ public class PantallaClientes extends JSplitPane {
      */
     private boolean obtenerVIP() {
         return introVIP.isSelected();
+    }
+
+    /**
+     * Deja los campos en un estado predeterminado.
+     */
+    private void seleccionVacia() {
+        introDNI.setText("");
+        introNombre.setText("");
+        introDireccion.setText("");
+        introTelefono.setText("");
+        introVIP.setSelected(false);
+    }
+
+    /**
+     * Llena los campos de datos con la informacion del vehiculo actual.
+     */
+    private void seleccionActual() {
+        String dni = iterador.getActual().getDni();
+        introDNI.setText(dni);
+        String nombre = iterador.getActual().getNombre();
+        introNombre.setText(nombre);
+        String direccion = iterador.getActual().getDireccion();
+        introDireccion.setText(direccion);
+        String telefono = iterador.getActual().getTlf();
+        introTelefono.setText(telefono);
+        introVIP.setSelected(iterador.getActual().isVip());
+
+        //Deja los botones en un estado correcto
+        botonUltimo.setEnabled(iterador.tieneSiguiente());
+        botonSiguiente.setEnabled(iterador.tieneSiguiente());
+        botonPrimero.setEnabled(iterador.tieneAnterior());
+        botonAnterior.setEnabled(iterador.tieneAnterior());
     }
 }
