@@ -18,6 +18,8 @@ import java.util.Iterator;
  *
  * @author Kevin
  */
+
+//TODO - Cambiar ficheros por base de datos
 public class ColeccionAlquileres {
 
     private static final String PATH = "ficheros/listaAlquileres.txt";

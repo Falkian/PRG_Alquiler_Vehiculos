@@ -17,6 +17,7 @@ import java.util.ArrayList;
  *
  * @author Kevin
  */
+//TODO - Cambiar ficheros por base de datos
 public class HistorialAlquileres {
 
     private static final String PATH = "ficheros/historialAlquileres.txt";

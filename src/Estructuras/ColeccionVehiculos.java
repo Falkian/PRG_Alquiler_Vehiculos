@@ -10,12 +10,15 @@ import Clases.Microbus;
 import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import Utilidades.ConexionMySQL;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -23,17 +26,20 @@ import java.util.ArrayList;
  *
  * @author Kevin
  */
+//TODO - Cambiar ficheros por base de datos
 public class ColeccionVehiculos {
 
     private static final String PATH = "ficheros/listaVehiculos.txt";
 
     private final ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
+    private final ConexionMySQL conexionMySQL;
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
      */
-    public ColeccionVehiculos() {
+    public ColeccionVehiculos() throws IOException, FileNotFoundException, ClassNotFoundException, SQLException {
         vehiculos = new ArrayList<>();
+        conexionMySQL = new ConexionMySQL();
     }
 
     /**
