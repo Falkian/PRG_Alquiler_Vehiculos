@@ -1,7 +1,5 @@
 package Clases;
 
-import Estructuras.Alquiler;
-
 /**
  * Registro de un alquiler realizado.
  */

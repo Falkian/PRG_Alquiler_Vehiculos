@@ -4,39 +4,34 @@ import Clases.Cliente;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
 import Utilidades.ConexionMySQL;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  * Coleccion de objetos de la clase Cliente.
  *
  * @author Kevin
  */
-//TODO - Cambiar ficheros por base de datos
 public class ColeccionClientes {
-
-    private static final String PATH = "ficheros/listaClientes.txt";
 
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes
     private final ConexionMySQL conexionMySQL;
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
+     *
+     * @param conexionMySQL conexion con la base de datos donde esta almacenada
+     * la informacion.
      */
-    public ColeccionClientes() throws IOException, FileNotFoundException, ClassNotFoundException, SQLException {
+    public ColeccionClientes(ConexionMySQL conexionMySQL) {
         clientes = new ArrayList<>();
-        conexionMySQL = new ConexionMySQL();
+        this.conexionMySQL = conexionMySQL;
     }
 
     /**
-     * Anayade un cliente a la coleccion.
+     * Anayade un cliente a la coleccion y lo guarda en la base de datos.
      *
      * @param dni dni del cliente
      * @param nombre nombre del cliente
@@ -44,13 +39,15 @@ public class ColeccionClientes {
      * @param tlf telefono del cliente
      * @param vip si del cliente es vip
      * @throws ObjetoYaExistenteException si el objeto a añadir ya existe.
-     */    
-    public void anyadirCliente(String dni, String nombre, String direccion, String tlf, boolean vip) throws ObjetoYaExistenteException {
+     * @throws java.sql.SQLException si hay un fallo en la introducicon en la
+     * base de datos.
+     */
+    public void anyadirCliente(String dni, String nombre, String direccion, String tlf, boolean vip) throws ObjetoYaExistenteException, SQLException {
         if (posicionCliente(dni) < 0) {
             Cliente c = new Cliente(dni, nombre, direccion, tlf);
             c.setVip(vip);
+            c.guardarEnBD(conexionMySQL);
             clientes.add(c);
-            guardar();
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -83,14 +80,15 @@ public class ColeccionClientes {
      * @param tlf telefono del cliente
      * @param vip si del cliente es vip
      * @throws ObjetoNoExistenteException si el vehiculo a modificar no existe.
+     * @throws java.sql.SQLException si hay un fallo en la sentencia SQL.
      */
-    public void modificarCliente(String DNI, String nombre, String direccion, String tlf, boolean vip) throws ObjetoNoExistenteException {
+    public void modificarCliente(String DNI, String nombre, String direccion, String tlf, boolean vip) throws ObjetoNoExistenteException, SQLException {
         for (Cliente cliente : clientes) {
             if (cliente.getDni().equals(DNI)) {
                 Cliente c = new Cliente(DNI, nombre, direccion, tlf);
                 c.setVip(vip);
+                c.actualizaEnBD(conexionMySQL);
                 cliente = c;
-                guardar();
                 return;
             }
         }
@@ -102,18 +100,19 @@ public class ColeccionClientes {
      *
      * @param dni el DNI del cliente.
      * @throws ObjetoNoExistenteException so no existe el cliente en la
-     * coleccion,
+     * coleccion.
+     * @throws java.sql.SQLException si hay algun fallo con la consulta SQL.
      */
-    public void eliminarCliente(String dni) throws ObjetoNoExistenteException {
+    public void eliminarCliente(String dni) throws ObjetoNoExistenteException, SQLException {
         int index = posicionCliente(dni);
         if (index >= 0) {
+            clientes.get(index).eliminaDeBD(conexionMySQL);
             clientes.remove(index);
-            guardar();
         } else {
             throw new ObjetoNoExistenteException("El cliente con dni " + dni + " no existe.");
         }
     }
-    
+
     /**
      * Devuelve un iterador para la coleccion de clientes.
      *
@@ -137,7 +136,7 @@ public class ColeccionClientes {
         }
         return ret;
     }
-    
+
     /**
      * Devuelve un array con los DNIs de los clientes de la coleccion.
      *
@@ -152,66 +151,28 @@ public class ColeccionClientes {
     }
 
     /**
-     * Carga la informacion del fichero en el programa
+     * Carga la informacion de la base de datos en el programa. *
      */
     public void cargar() {
-        File archivo = new File(PATH);
-        BufferedReader reader;
+        String sentencia = "SELECT * FROM clientes";
         try {
-            reader = new BufferedReader(new FileReader(archivo));
+            ResultSet resultSet = conexionMySQL.ejecutarConsulta(sentencia);
 
-            //Lee el encabezado del archivo e informa si esta vacio.
-            String str = reader.readLine();
-            if (str == null) {
-                //Archivo en blanco
-                return;
-            } else {
-                //Lee la primera linea del archivo e informa si no contiene datos.
-                str = reader.readLine();
-                if (str == null || str.equals("")) {
-                    //Archivo sin informacion
-                    return;
-                }
-                int linea = 1;
-                while (str != null && !str.equals("")) {
-                    String[] datos = str.split("\\t\\t");
-                    if (datos.length != 5) {
-                        //Datos de la linea incorrectos
-                    } else {
-                        Cliente c = new Cliente(datos[0].trim(), datos[1].trim(), datos[2].trim(), datos[3].trim());
-                        if (datos[4].equals("S")) {
-                            c.setVip(true);
-                        }
-                        clientes.add(c);
-                    }
-                    str = reader.readLine();
-                    linea++;
-                }
+            while (resultSet.next()) {
+                String DNI = resultSet.getString("dni");
+                String nombre = resultSet.getString("nombre");
+                String direccion = resultSet.getString("direccion");
+                String telefono = resultSet.getString("telefono");
+                boolean vip = resultSet.getString("vip").equals("S");
+
+                Cliente c = new Cliente(DNI, nombre, direccion, telefono);
+                c.setVip(vip);
+
+                clientes.add(c);
             }
-            reader.close();
-        } catch (IOException e) {
-            //Fallo de lectura
-        }
-    }
-
-    /**
-     * Guarda la informacion almacenada en la lista en un fichero.
-     */
-    public void guardar() {
-        File archivo = new File(PATH);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
-            writer.println("NumDNI\t\tNombre\t\tDireccion\t\tTelefono\t\tVIP");
-
-            for (Cliente cliente : clientes) {
-                String dni = cliente.getDni();
-                String nombre = cliente.getNombre();
-                String dir = cliente.getDireccion();
-                String tlf = cliente.getTlf();
-                String vip = cliente.isVip() ? "S" : "N";
-                writer.printf("%s\t\t%s\t\t%s\t\t%s\t\t%s%n", dni, nombre, dir, tlf, vip);
-            }
-        } catch (IOException e) {
-            //Fallo de escritura
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "No se pudieron cargar los clientes de la base de datos.\n"
+                    + "Error MySQL: " + e.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
         }
     }
 

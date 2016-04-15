@@ -1,6 +1,7 @@
 package GUI;
 
 import Estructuras.*;
+import Utilidades.ConexionMySQL;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -9,8 +10,6 @@ import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 
 /**
@@ -21,10 +20,12 @@ import javax.swing.*;
 public class GUI extends JFrame {
 
     //Constantes con los valores de los tipo de vehiculo
-    public static final int COCHE = 0;
-    public static final int MICROBUS = 1;
-    public static final int FURGONETA = 2;
-    public static final int CAMION = 3;
+    //public static final int COCHE = 0;
+    //public static final int MICROBUS = 1;
+    //public static final int FURGONETA = 2;
+    //public static final int CAMION = 3;
+    
+    private ConexionMySQL conexionMySQL = null;
 
     private ColeccionVehiculos vehiculos;       //Coleccion de vehiculos.
     private ColeccionClientes clientes;          //Coleccion de clientes.
@@ -38,11 +39,10 @@ public class GUI extends JFrame {
     private JButton botonAlquileres;
     private JButton botonFinanzas;
 
-    //private PantallaInicio pantallaInicio;          //Pestaña de inicio
-    private PantallaVehiculos pantallaVehiculos;    //Pestaña de gestion de vehiculos
-    private PantallaClientes pantallaClientes;      //Pestaña de gestion de clientes
-    private PantallaAlquileres pantallaAlquileres;  //Pestaña de gestion de alquileres
-    private PantallaFinanzas pantallaFinanzas;      //Pestaña de finanzas
+    private PantallaVehiculos pantallaVehiculos = null;    //Pestaña de gestion de vehiculos
+    private PantallaClientes pantallaClientes = null;      //Pestaña de gestion de clientes
+    private PantallaAlquileres pantallaAlquileres = null;  //Pestaña de gestion de alquileres
+    private PantallaFinanzas pantallaFinanzas = null;      //Pestaña de finanzas
 
     /**
      * Crea la ventana princiapl y carga los datos
@@ -51,8 +51,10 @@ public class GUI extends JFrame {
         super("Aplicación Alquiler");
 
         try {
+            conexionMySQL = new ConexionMySQL();
+            
             vehiculos = new ColeccionVehiculos();
-            clientes = new ColeccionClientes();
+            clientes = new ColeccionClientes(conexionMySQL);
             alquileres = new ColeccionAlquileres(vehiculos, clientes);
             historial = new HistorialAlquileres();
 
@@ -62,8 +64,6 @@ public class GUI extends JFrame {
             alquileres.cargar(vehiculos, clientes);
             historial.cargar(vehiculos, clientes);
 
-            //Inicia el programa en la pestaña de inicio
-            iniciar();
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "Error de carga de archivo", JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException ex) {
@@ -72,6 +72,9 @@ public class GUI extends JFrame {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "Error de SQL", JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(rootPane, ex.getMessage(), "Error de lectura del archivo", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            //Inicia el programa en la pestaña de inicio
+            iniciar();
         }
     }
 

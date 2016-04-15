@@ -1,4 +1,4 @@
-package Estructuras;
+package Clases;
 
 import Abstractas.Vehiculo;
 import Clases.Cliente;

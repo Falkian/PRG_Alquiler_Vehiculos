@@ -1,13 +1,17 @@
 package Clases;
 
 import Excepciones.AlquilerVehiculoException;
+import Utilidades.ConexionMySQL;
+import java.sql.SQLException;
 
 /**
  * Clase que representa a un cliente.
- * 
+ *
  * @author Kevin
  */
 public class Cliente {
+
+    private static final String NOMBRE_TABLA = "clientes";      //Tabla de la base de datos en la que se almacenan los clientes
 
     private final String dni;           //DNI del cliente
     private String nombre;              //Nombre del cliente
@@ -153,17 +157,47 @@ public class Cliente {
     }
 
     /**
+     * Guarda el cliente en la base de datos.
+     *
+     * @param conexionMySQL la conexion con la base de datos.
+     * @throws SQLException si hay un fallo al ejecutar la introduccion.
+     */
+    public void guardarEnBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES('" + dni + "', '"
+                + nombre + "', '" + direccion + "', '" + tlf + "', '"
+                + (vip ? "S" : "N") + "')";
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    /**
+     * Elimina el cliente de la base de datos.
+     *
+     * @param conexionMySQL la conexiono con la base de datos.
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia de
+     * eliminacion.
+     */
+    public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE dni = '" + dni + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    public void actualizaEnBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "UPDATE " + NOMBRE_TABLA + " SET nombre = '" + nombre + "', direccion = '"
+                + direccion + "', telefono = '" + tlf + "', vip = '" + (vip ? "S" : "N") + "'";
+    }
+
+    /**
      * Devuelve una cadena con la informacion del cliente.
      *
      * @return una cadena con la informacion del cliente.
      */
     public String obtenerInformacion() {
-        String info = "Nombre: " + nombre + ", DNI: " + dni + ", " +
-        "Direccion: " + direccion + ", Telefono: " + tlf;
+        String info = "Nombre: " + nombre + ", DNI: " + dni + ", "
+                + "Direccion: " + direccion + ", Telefono: " + tlf;
         info += vip ? "Es un cliente VIP" : "";
         return info;
     }
-    
+
     /**
      * Devuelve la informacion sobre el cliente en forma de array. Orden de la
      * informacion: DNI, nombre, direccion, telefono, vip

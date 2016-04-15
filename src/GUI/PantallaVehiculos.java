@@ -7,6 +7,7 @@ import Excepciones.AlquilerVehiculoException;
 import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
+import Utilidades.TiposVehiculos;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -84,7 +85,7 @@ public class PantallaVehiculos extends JPanel {
         introMatricula.setEnabled(false);
 
         textoTipo = new JLabel("Tipo");
-        introTipo = new JComboBox(new String[]{"Coche", "Microbus", "Furgoneta", "Camion"});
+        introTipo = new JComboBox(TiposVehiculos.values());
         introTipo.setEnabled(false);
 
         textoCaract = new JLabel("Plazas");
@@ -250,22 +251,23 @@ public class PantallaVehiculos extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            switch (introTipo.getSelectedIndex()) {
-                case GUI.COCHE:
+            switch ((TiposVehiculos) introTipo.getSelectedItem()) {
+                case Coche:
                     textoCaract.setText("Plazas");
-                    introCaract.setModel(new SpinnerNumberModel(2, 2, vehiculos.getPlazasMaxCoche(), 1));
+                    introCaract.setModel(new SpinnerNumberModel(2, (int) TiposVehiculos.Coche.getCaractMin(), (int) TiposVehiculos.Coche.getCaractMax(), 1));
                     break;
-                case GUI.MICROBUS:
+                case Microbus:
                     textoCaract.setText("Plazas");
-                    introCaract.setModel(new SpinnerNumberModel(5, 5, vehiculos.getPlazasMaxMicrobus(), 1));
+                    //TODO -  da error al cambiar a uno menor
+                    introCaract.setModel(new SpinnerNumberModel(5, (int) TiposVehiculos.Microbus.getCaractMin(), (int) TiposVehiculos.Microbus.getCaractMax(), 1));
                     break;
-                case GUI.FURGONETA:
+                case Furgoneta:
                     textoCaract.setText("PMA");
-                    introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxFurgoneta(), 10));
+                    introCaract.setModel(new SpinnerNumberModel(500.0, TiposVehiculos.Furgoneta.getCaractMin(), TiposVehiculos.Furgoneta.getCaractMax(), 10));
                     break;
-                case GUI.CAMION:
+                case Camion:
                     textoCaract.setText("PMA");
-                    introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxCamion(), 10));
+                    introCaract.setModel(new SpinnerNumberModel(1000.0, TiposVehiculos.Camion.getCaractMin(), TiposVehiculos.Camion.getCaractMax(), 10));
                     break;
             }
         }
@@ -346,7 +348,7 @@ public class PantallaVehiculos extends JPanel {
 
             introMatricula.setText("");
             introMatricula.requestFocus();
-            introTipo.setSelectedIndex(GUI.COCHE);
+            introTipo.setSelectedItem(TiposVehiculos.Coche.getTipo());
             introCaract.setValue(((SpinnerNumberModel) introCaract.getModel()).getMinimum());
 
             introMatricula.setEnabled(true);
@@ -628,7 +630,7 @@ public class PantallaVehiculos extends JPanel {
      */
     private void seleccionVacia() {
         introMatricula.setText("");
-        introTipo.setSelectedIndex(GUI.COCHE);
+        introTipo.setSelectedItem(TiposVehiculos.Coche.getTipo());
         introCaract.setValue(((SpinnerNumberModel) introCaract.getModel()).getMinimum());
     }
 
@@ -641,16 +643,16 @@ public class PantallaVehiculos extends JPanel {
         String tipo = iterador.getActual().getClass().getSimpleName();
         switch (tipo) {
             case "Coche":
-                introTipo.setSelectedIndex(GUI.COCHE);
+                introTipo.setSelectedItem(TiposVehiculos.Coche.getTipo());
                 break;
             case "Microbus":
-                introTipo.setSelectedIndex(GUI.MICROBUS);
+                introTipo.setSelectedItem(TiposVehiculos.Microbus.getTipo());
                 break;
             case "Furgoneta":
-                introTipo.setSelectedIndex(GUI.FURGONETA);
+                introTipo.setSelectedItem(TiposVehiculos.Furgoneta.getTipo());
                 break;
             case "Camion":
-                introTipo.setSelectedIndex(GUI.CAMION);
+                introTipo.setSelectedItem(TiposVehiculos.Camion.getTipo());
                 break;
         }
         switch (iterador.getActual().getClass().getSimpleName()) {

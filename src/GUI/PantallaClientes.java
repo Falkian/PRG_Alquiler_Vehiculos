@@ -15,6 +15,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
@@ -358,7 +361,7 @@ public class PantallaClientes extends JPanel {
             botonAnadir.setEnabled(false);
             botonEditar.setEnabled(false);
             botonBorrar.setEnabled(false);
-            
+
             botonPrimero.setEnabled(false);
             botonAnterior.setEnabled(false);
             botonSiguiente.setEnabled(false);
@@ -390,7 +393,7 @@ public class PantallaClientes extends JPanel {
             botonAnadir.setEnabled(false);
             botonEditar.setEnabled(false);
             botonBorrar.setEnabled(false);
-            
+
             botonPrimero.setEnabled(false);
             botonAnterior.setEnabled(false);
             botonSiguiente.setEnabled(false);
@@ -436,6 +439,9 @@ public class PantallaClientes extends JPanel {
                 JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
             } catch (AlquilerVehiculoException ex) {
                 JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo al eliminar el alquiler", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(PantallaClientes.this, "Fallo al eliminar el cliente de la base de datos.\n"
+                        + "ErrorSQL: " + ex.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
             } finally {
                 iterador.anterior();
                 if (iterador.getActual() == null) {
@@ -519,6 +525,9 @@ public class PantallaClientes extends JPanel {
                         JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
                     } catch (ObjetoYaExistenteException ex) {
                         JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Ya existe el cliente", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "Fallo al actualizar el cliente en la base de datos.\n"
+                                + "ErrorSQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         iterador.ultimo();
                         seleccionActual();
@@ -555,6 +564,9 @@ public class PantallaClientes extends JPanel {
                         JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
                     } catch (ObjetoNoExistenteException ex) {
                         JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "No existe el cliente", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(PantallaClientes.this, "Fallo al actualizar la informacion en la base de datos.\n"
+                                + "Error SQL: " + ex.getMessage(), "Error SQL", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         seleccionActual();
 

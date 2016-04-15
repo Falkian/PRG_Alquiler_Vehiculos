@@ -1,5 +1,6 @@
 package Estructuras;
 
+import Clases.Alquiler;
 import Clases.RegistroAlquiler;
 import Abstractas.Vehiculo;
 import Clases.Cliente;

@@ -18,7 +18,7 @@ import java.util.Properties;
 public class ConexionMySQL {
 
     private final String PATH = "ficheros/conexionmysql.properties";
-    
+
     private final String CONTROLLER;
     private final String NOMBRE_BD;
     private final String ENLACE_BD;
@@ -55,6 +55,27 @@ public class ConexionMySQL {
 
         connection = DriverManager.getConnection(ENLACE_BD + NOMBRE_BD, USUARIO, PASSWORD);
         statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+    }
+
+    /**
+     * Ejecuta la consulta MySQL pasada como parametro.
+     *
+     * @param consulta la sentencia de consulta MySQL a ejecutar.
+     * @return el resultado de la consulta.
+     * @throws SQLException si hay algun problema con la consulta.
+     */
+    public ResultSet ejecutarConsulta(String consulta) throws SQLException {
+        return statement.executeQuery(consulta);
+    }
+
+    /**
+     * Ejecuta una sentencia de actualizacion MySQL.
+     *
+     * @param sentencia la sentencia a ejecutar.
+     * @throws SQLException si hay algun fallo en la ejecucion.
+     */
+    public void ejecutaSentencia(String sentencia) throws SQLException {
+        statement.executeUpdate(sentencia);
     }
 
     /**
