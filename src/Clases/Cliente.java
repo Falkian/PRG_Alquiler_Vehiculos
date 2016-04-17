@@ -181,9 +181,16 @@ public class Cliente {
         conexionMySQL.ejecutaSentencia(sentencia);
     }
 
+    /**
+     * Actualiza los datos del cliente en la base de datos,
+     *
+     * @param conexionMySQL conexion con la base de datos.
+     * @throws SQLException si ahy algun fallo al ejecutar la instruccion.
+     */
     public void actualizaEnBD(ConexionMySQL conexionMySQL) throws SQLException {
         String sentencia = "UPDATE " + NOMBRE_TABLA + " SET nombre = '" + nombre + "', direccion = '"
-                + direccion + "', telefono = '" + tlf + "', vip = '" + (vip ? "S" : "N") + "'";
+                + direccion + "', telefono = '" + tlf + "', vip = '" + (vip ? "S" : "N") + "' WHERE dni = '" + dni + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
     }
 
     /**

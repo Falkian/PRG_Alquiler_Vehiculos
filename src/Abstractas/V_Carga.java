@@ -1,5 +1,8 @@
 package Abstractas;
 
+import Utilidades.ConexionMySQL;
+import java.sql.SQLException;
+
 /**
  * Clase abstracta V_Carga, define las propiedades y metodos particulares de los
  * vehiculos de carga.
@@ -7,6 +10,8 @@ package Abstractas;
  * @author Kevin
  */
 public abstract class V_Carga extends Vehiculo {
+
+    public static final String NOMBRE_TABLA = "transportescarga";
 
     private double PMA;         //Peso maximo autorizado
 
@@ -21,7 +26,7 @@ public abstract class V_Carga extends Vehiculo {
         super(matricula);
         this.PMA = PMA;
     }
-    
+
     /**
      * Devuleve el peso maximo autorizado.
      *
@@ -30,7 +35,7 @@ public abstract class V_Carga extends Vehiculo {
     public double getPMA() {
         return PMA;
     }
-    
+
     /**
      * Devuleve el peso maximo autorizado.
      *
@@ -80,5 +85,45 @@ public abstract class V_Carga extends Vehiculo {
     @Override
     public String[] dataToArray() {
         return new String[]{getMatricula(), getClass().getSimpleName(), "" + PMA};
+    }
+
+    /**
+     * Guarda un vehiculo en la base de datos.
+     *
+     * @param conexionMySQL la conexion con la base de datos.
+     * @param primeraVez si es la primera vez que se alquila el vehiculo.
+     * @param dniAlquilador el dni del cliente que tiene alquilado el vehiculo.
+     * NULL si no esta alquilado.
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    @Override
+    public void guardarEnBD(ConexionMySQL conexionMySQL, boolean primeraVez, String dniAlquilador) throws SQLException {
+        super.guardarEnBD(conexionMySQL, primeraVez, dniAlquilador);
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES ('" + getMatricula() + "', " + PMA + ")";
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    /**
+     * Elimina el vehiculo de la base de datos.
+     *
+     * @param conexionMySQL conexion con la base de datos,
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    @Override
+    public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE matricula = '" + getMatricula() + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
+        super.eliminaDeBD(conexionMySQL);
+    }
+
+    /**
+     * Actualiza el vehciulo en la base de datos.
+     *
+     * @param conexionMySQL conexion con la base de datos.
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    public void actualizaEnBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "UPDATE " + NOMBRE_TABLA + " SET pma = " + PMA + " WHERE matricula = '" + getMatricula() + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
     }
 }

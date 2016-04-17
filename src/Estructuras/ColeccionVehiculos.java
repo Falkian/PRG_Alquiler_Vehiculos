@@ -11,35 +11,34 @@ import Excepciones.FormatoIncorrectoException;
 import Excepciones.ObjetoNoExistenteException;
 import Excepciones.ObjetoYaExistenteException;
 import Utilidades.ConexionMySQL;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import Utilidades.TiposVehiculos;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import javax.swing.JOptionPane;
 
 /**
  * Coleccion de objetos de la clase Objeto.
  *
  * @author Kevin
  */
-//TODO - Cambiar ficheros por base de datos
 public class ColeccionVehiculos {
-
-    private static final String PATH = "ficheros/listaVehiculos.txt";
 
     private final ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
     private final ConexionMySQL conexionMySQL;
+    private final ConexionMySQL conexionMySQL2;
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
+     *
+     * @param conexionMySQL la conexion con la base de datos
+     * @param conexionMySQL2 segunda conexion con la base de datos.
      */
-    public ColeccionVehiculos() throws IOException, FileNotFoundException, ClassNotFoundException, SQLException {
+    public ColeccionVehiculos(ConexionMySQL conexionMySQL, ConexionMySQL conexionMySQL2) {
         vehiculos = new ArrayList<>();
-        conexionMySQL = new ConexionMySQL();
+        this.conexionMySQL = conexionMySQL;
+        this.conexionMySQL2 = conexionMySQL2;
     }
 
     /**
@@ -52,40 +51,58 @@ public class ColeccionVehiculos {
      * matricula
      * @throws FormatoIncorrectoException si las plazas o PMA no tienen un valor
      * valido
+     * @throws java.sql.SQLException si hay un fallo en la introduccion en la
+     * base de datos.
      */
-    public void anyadirVehiculo(String tipo, String matricula, double caract) throws ObjetoYaExistenteException, FormatoIncorrectoException {
+    public void anyadirVehiculo(TiposVehiculos tipo, String matricula, double caract) throws ObjetoYaExistenteException, FormatoIncorrectoException, SQLException {
         if (posicionVehiculo(matricula) < 0) {
             switch (tipo) {
-                case "Coche":
-                    if (caract < 2 || caract > Coche.PLAZAS_MAX) {
-                        throw new FormatoIncorrectoException("Las plazas de un coche deben estar entre 2 y " + Coche.PLAZAS_MAX);
+                case COCHE:
+                    double min = (int) TiposVehiculos.COCHE.getCaractMin();
+                    double max = (int) TiposVehiculos.COCHE.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("Las plazas de un coche deben estar entre " + (int) min + " y " + (int) max);
                     } else {
-                        vehiculos.add(new Coche(matricula, (int) caract));
+                        Coche c = new Coche(matricula, (int) caract);
+                        c.guardarEnBD(conexionMySQL, true, null);
+                        vehiculos.add(c);
                     }
                     break;
-                case "Microbus":
-                    if (caract < 2 || caract > Microbus.PLAZAS_MAX) {
-                        throw new FormatoIncorrectoException("Las plazas de un microbus deben estar entre 2 y " + Microbus.PLAZAS_MAX);
+                case MICROBUS:
+                    min = (int) TiposVehiculos.MICROBUS.getCaractMin();
+                    max = (int) TiposVehiculos.MICROBUS.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("Las plazas de un microbus deben estar entre " + (int) min + " y " + (int) max);
                     } else {
-                        vehiculos.add(new Microbus(matricula, (int) caract));
+                        Microbus m = new Microbus(matricula, (int) caract);
+                        m.guardarEnBD(conexionMySQL, true, null);
+                        vehiculos.add(m);
                     }
                     break;
-                case "Furgoneta":
-                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
-                        throw new FormatoIncorrectoException("El PMA de una furgoneta debe estar entre 500 y " + Furgoneta.PMA_MAX);
+                case FURGONETA:
+                    min = TiposVehiculos.FURGONETA.getCaractMin();
+                    max = TiposVehiculos.FURGONETA.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("El PMA de una furgoneta debe estar entre " + min + " y " + max);
                     } else {
-                        vehiculos.add(new Furgoneta(matricula, caract));
+                        Furgoneta f = new Furgoneta(matricula, caract);
+                        f.guardarEnBD(conexionMySQL, true, null);
+                        vehiculos.add(f);
                     }
                     break;
-                case "Camion":
-                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
-                        throw new FormatoIncorrectoException("El PMA de un camion debe estar entre 500 y " + Camion.PMA_MAX);
+                case CAMION:
+                    min = TiposVehiculos.CAMION.getCaractMin();
+                    max = TiposVehiculos.CAMION.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("El PMA de un camion debe estar entre " + min + " y " + max);
                     } else {
-                        vehiculos.add(new Camion(matricula, caract));
+                        Camion c = new Camion(matricula, caract);
+                        c.guardarEnBD(conexionMySQL, true, null);
+                        vehiculos.add(c);
                     }
                     break;
             }
-            guardar();
+            vehiculos.sort(new ComparadorVehiculo());
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -118,41 +135,58 @@ public class ColeccionVehiculos {
      * @throws ObjetoNoExistenteException si el vehiculo a modificar no existe.
      * @throws FormatoIncorrectoException si los datos no tienen el formato
      * adecuado
+     * @throws java.sql.SQLException si ahy un fallo al actualizar la base de
+     * datos.
      */
-    public void modificarVehiculo(String matricula, String tipo, double caract) throws ObjetoNoExistenteException, FormatoIncorrectoException {
+    public void modificarVehiculo(TiposVehiculos tipo, String matricula, double caract) throws ObjetoNoExistenteException, FormatoIncorrectoException, SQLException {
         int posicionVehiculo = posicionVehiculo(matricula);
-        if (posicionVehiculo < 0) {
+        if (posicionVehiculo >= 0) {
             switch (tipo) {
-                case "Coche":
-                    if (caract < 2 || caract > Coche.PLAZAS_MAX) {
-                        throw new FormatoIncorrectoException("Las plazas de un coche deben estar entre 2 y " + Coche.PLAZAS_MAX);
+                case COCHE:
+                    double min = (int) TiposVehiculos.COCHE.getCaractMin();
+                    double max = (int) TiposVehiculos.COCHE.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("Las plazas de un coche deben estar entre " + (int) min + " y " + (int) max);
                     } else {
-                        vehiculos.set(posicionVehiculo, new Coche(matricula, (int) caract));
+                        Coche c = new Coche(matricula, (int) caract);
+                        c.actualizaEnBD(conexionMySQL);
+                        vehiculos.set(posicionVehiculo, c);
                     }
                     break;
-                case "Microbus":
-                    if (caract < 2 || caract > Microbus.PLAZAS_MAX) {
-                        throw new FormatoIncorrectoException("Las plazas de un microbus deben estar entre 2 y " + Microbus.PLAZAS_MAX);
+                case MICROBUS:
+                    min = (int) TiposVehiculos.MICROBUS.getCaractMin();
+                    max = (int) TiposVehiculos.MICROBUS.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("Las plazas de un microbus deben estar entre " + (int) min + " y " + (int) max);
                     } else {
-                        vehiculos.set(posicionVehiculo, new Microbus(matricula, (int) caract));
+                        Microbus f = new Microbus(matricula, (int) caract);
+                        f.actualizaEnBD(conexionMySQL);
+                        vehiculos.set(posicionVehiculo, f);
                     }
                     break;
-                case "Furgoneta":
-                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
-                        throw new FormatoIncorrectoException("El PMA de una furgoneta debe estar entre 500 y " + Furgoneta.PMA_MAX);
+                case FURGONETA:
+                    min = TiposVehiculos.FURGONETA.getCaractMin();
+                    max = TiposVehiculos.FURGONETA.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("El PMA de una furgoneta debe estar entre " + min + " y " + max);
                     } else {
-                        vehiculos.set(posicionVehiculo, new Furgoneta(matricula, (int) caract));
+                        Furgoneta f = new Furgoneta(matricula, caract);
+                        f.actualizaEnBD(conexionMySQL);
+                        vehiculos.set(posicionVehiculo, f);
                     }
                     break;
-                case "Camion":
-                    if (caract < 500 || caract > Furgoneta.PMA_MAX) {
-                        throw new FormatoIncorrectoException("El PMA de un camion debe estar entre 500 y " + Camion.PMA_MAX);
+                case CAMION:
+                    min = TiposVehiculos.CAMION.getCaractMin();
+                    max = TiposVehiculos.CAMION.getCaractMax();
+                    if (caract < min || caract > max) {
+                        throw new FormatoIncorrectoException("El PMA de un camion debe estar entre " + min + " y " + max);
                     } else {
-                        vehiculos.set(posicionVehiculo, new Camion(matricula, (int) caract));
+                        Camion c = new Camion(matricula, caract);
+                        c.actualizaEnBD(conexionMySQL);
+                        vehiculos.set(posicionVehiculo, c);
                     }
                     break;
             }
-            guardar();
         } else {
             throw new ObjetoNoExistenteException();
         }
@@ -164,51 +198,17 @@ public class ColeccionVehiculos {
      * @param matricula la matricula del vehiculo.
      * @throws ObjetoNoExistenteException so no existe el vehiculo en la
      * coleccion.
+     * @throws java.sql.SQLException si ahy un fallo al eliminar de la base de
+     * datos.
      */
-    public void eliminarVehiculo(String matricula) throws ObjetoNoExistenteException {
+    public void eliminarVehiculo(String matricula) throws ObjetoNoExistenteException, SQLException {
         int index = posicionVehiculo(matricula);
         if (index >= 0) {
+            vehiculos.get(index).eliminaDeBD(conexionMySQL);
             vehiculos.remove(index);
-            guardar();
         } else {
             throw new ObjetoNoExistenteException("El vehiculo con matricula " + matricula + " no existe en el almacen.");
         }
-    }
-
-    /**
-     * Devuelve las plazas maximas de un coche.
-     *
-     * @return las plazas maximas de un coche.
-     */
-    public int getPlazasMaxCoche() {
-        return Coche.PLAZAS_MAX;
-    }
-
-    /**
-     * Devuelve las plazas maximas de un microbus.
-     *
-     * @return las plazas maximas de un microbus.
-     */
-    public int getPlazasMaxMicrobus() {
-        return Microbus.PLAZAS_MAX;
-    }
-
-    /**
-     * Devuelve el PMA maximo de una furgoneta.
-     *
-     * @return el PMA maximo de una furgoneta.
-     */
-    public int getPMAMaxFurgoneta() {
-        return Furgoneta.PMA_MAX;
-    }
-
-    /**
-     * Devuelve el PMA maximo de un camion.
-     *
-     * @return el PMA maximo de un camion.
-     */
-    public int getPMAMaxCamion() {
-        return Camion.PMA_MAX;
     }
 
     /**
@@ -268,77 +268,108 @@ public class ColeccionVehiculos {
      * Carga la informacion del fichero en el programa
      */
     public void cargar() {
-        File archivo = new File(PATH);
-        BufferedReader reader;
         try {
-            reader = new BufferedReader(new FileReader(archivo));
+            cargarCoches();
+            cargarMicrobuses();
+            cargarFurgonetas();
+            cargarCamiones();
 
-            //Lee el encabezado del archivo e informa si esta vacio.
-            String str = reader.readLine();
-            if (str == null) {
-                //Archivo en blanco
-                return;
-            } else {
-                //Lee la primera linea del archivo e informa si no contiene datos.
-                str = reader.readLine();
-                if (str == null || str.equals("")) {
-                    //Archivo sin informacion
-                    return;
-                }
-                int linea = 1;
-                while (str != null && !str.equals("")) {
-                    String[] datos = str.split("\\t\\t");
-                    if (datos.length != 3) {
-                        //Datos de la linea incorrectos
-                    } else {
-                        String tipo = datos[0].trim();
-                        String matricula = datos[1].trim();
-                        switch (tipo) {
-                            case "Coche":
-                                vehiculos.add(new Coche(matricula, Integer.parseInt(datos[2])));
-                                break;
-                            case "Microbus":
-                                vehiculos.add(new Microbus(matricula, Integer.parseInt(datos[2])));
-                                break;
-                            case "Furgoneta":
-                                vehiculos.add(new Furgoneta(matricula, Double.parseDouble(datos[2])));
-                                break;
-                            case "Camion":
-                                vehiculos.add(new Camion(matricula, Double.parseDouble(datos[2])));
-                                break;
-                        }
-                    }
-                    str = reader.readLine();
-                    linea++;
-                }
-            }
-            reader.close();
-        } catch (IOException e) {
-            //Fallo de lectura
+            vehiculos.sort(new ComparadorVehiculo());
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "No se pudieron cargar los vehiculos de la base de datos.\n"
+                    + "Error MySQL: " + e.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     * Guarda la informacion almacenada en la lista en un fichero.
+     * Carga los coches de la base de datos.
+     *
+     * @throws SQLException si hay un fallo en la consulta.
      */
-    public void guardar() {
-        File archivo = new File(PATH);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
-            writer.println("Vehiculo\t\tMatricula\t\tNumPlazas / PMA");
+    private void cargarCoches() throws SQLException {
+        String sentenciacoches = "SELECT * FROM " + Coche.NOMBRE_TABLA;
+        ResultSet resultcoches = conexionMySQL.ejecutarConsulta(sentenciacoches);
 
-            for (Vehiculo vehiculo : vehiculos) {
-                String tipo = vehiculo.getClass().getSimpleName();
-                writer.printf("%s\t\t%s\t\t", tipo, vehiculo.getMatricula());
-                if (vehiculo instanceof V_Transporte) {
-                    V_Transporte v = (V_Transporte) vehiculo;
-                    writer.println(v.getPlazas());
-                } else {
-                    V_Carga v = (V_Carga) vehiculo;
-                    writer.println(v.getPMA());
-                }
-            }
-        } catch (IOException e) {
-            //Fallo de escritura
+        while (resultcoches.next()) {
+            String matricula = resultcoches.getString("matricula");
+
+            String sentenciaPersonas = "SELECT * FROM " + V_Transporte.NOMBRE_TABLA + " WHERE matricula = '" + matricula + "'";
+            ResultSet resultTransporte = conexionMySQL2.ejecutarConsulta(sentenciaPersonas);
+
+            resultTransporte.next();
+            int plazas = resultTransporte.getInt("numplazas");
+
+            Coche coche = new Coche(matricula, plazas);
+            vehiculos.add(coche);
+        }
+    }
+
+    /**
+     * Carga los microbuses de la base de datos.
+     *
+     * @throws SQLException si hay un fallo en la consulta.
+     */
+    private void cargarMicrobuses() throws SQLException {
+        String sentenciabuses = "SELECT * FROM " + Microbus.NOMBRE_TABLA;
+        ResultSet resultbuses = conexionMySQL.ejecutarConsulta(sentenciabuses);
+
+        while (resultbuses.next()) {
+            String matricula = resultbuses.getString("matricula");
+
+            String sentenciaPersonas = "SELECT * FROM " + V_Transporte.NOMBRE_TABLA + " WHERE matricula = '" + matricula + "'";
+            ResultSet resultTransporte = conexionMySQL2.ejecutarConsulta(sentenciaPersonas);
+
+            resultTransporte.next();
+            int plazas = resultTransporte.getInt("numplazas");
+
+            Microbus microbus = new Microbus(matricula, plazas);
+            vehiculos.add(microbus);
+        }
+    }
+
+    /**
+     * Carga las furgonetas de la base de datos.
+     *
+     * @throws SQLException si hay un fallo en la consulta.
+     */
+    private void cargarFurgonetas() throws SQLException {
+        String sentenciafurgonetas = "SELECT * FROM " + Furgoneta.NOMBRE_TABLA;
+        ResultSet resultfurgonetas = conexionMySQL.ejecutarConsulta(sentenciafurgonetas);
+
+        while (resultfurgonetas.next()) {
+            String matricula = resultfurgonetas.getString("matricula");
+
+            String sentenciaPersonas = "SELECT * FROM " + V_Carga.NOMBRE_TABLA + " WHERE matricula = '" + matricula + "'";
+            ResultSet resultTransporte = conexionMySQL2.ejecutarConsulta(sentenciaPersonas);
+
+            resultTransporte.next();
+            double pma = resultTransporte.getDouble("pma");
+
+            Furgoneta furgoneta = new Furgoneta(matricula, pma);
+            vehiculos.add(furgoneta);
+        }
+    }
+
+    /**
+     * Carga los camiones de la base de datos.
+     *
+     * @throws SQLException si hay un fallo en la consulta.
+     */
+    private void cargarCamiones() throws SQLException {
+        String sentenciacamiones = "SELECT * FROM " + Camion.NOMBRE_TABLA;
+        ResultSet resultcamiones = conexionMySQL.ejecutarConsulta(sentenciacamiones);
+
+        while (resultcamiones.next()) {
+            String matricula = resultcamiones.getString("matricula");
+
+            String sentenciaPersonas = "SELECT * FROM " + V_Carga.NOMBRE_TABLA + " WHERE matricula = '" + matricula + "'";
+            ResultSet resultTransporte = conexionMySQL2.ejecutarConsulta(sentenciaPersonas);
+
+            resultTransporte.next();
+            double pma = resultTransporte.getDouble("pma");
+
+            Camion camion = new Camion(matricula, pma);
+            vehiculos.add(camion);
         }
     }
 
@@ -358,4 +389,11 @@ public class ColeccionVehiculos {
         return -1;
     }
 
+    private class ComparadorVehiculo implements Comparator<Vehiculo> {
+
+        @Override
+        public int compare(Vehiculo v1, Vehiculo v2) {
+            return v1.getMatricula().compareTo(v2.getMatricula());
+        }
+    }
 }

@@ -6,9 +6,8 @@ package Utilidades;
  *
  * @author Kevin
  */
-//TODO - sustituir constantes simbolicas por enum
 public enum TiposVehiculos {
-    Coche(2, 7), Microbus(5, 50), Furgoneta(500, 10000), Camion(1000, 100000);
+    COCHE(2, 7), MICROBUS(5, 50), FURGONETA(500, 10000), CAMION(1000, 100000);
     
     private final double caractMin;
     private final double caractMax;
@@ -19,7 +18,7 @@ public enum TiposVehiculos {
     }
     
     public double getCaractMin() {
-        return caractMax;
+        return caractMin;
     }
     
     public double getCaractMax() {
@@ -28,13 +27,13 @@ public enum TiposVehiculos {
     
     public String getTipo() {
         switch (this) {
-            case Coche:
+            case COCHE:
                 return "Coche";
-            case Microbus:
+            case MICROBUS:
                 return "Microbus";
-            case Furgoneta:
+            case FURGONETA:
                 return "Furgoneta";
-            case Camion:
+            case CAMION:
                 return "Camion";
             default:
                 return "Desconecido";

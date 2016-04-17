@@ -7,6 +7,7 @@ import Utilidades.ConexionMySQL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,6 +17,8 @@ import javax.swing.JOptionPane;
  */
 public class ColeccionClientes {
 
+    private static final String NOMBRE_TABLA = "clientes";
+    
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes
     private final ConexionMySQL conexionMySQL;
 
@@ -48,6 +51,7 @@ public class ColeccionClientes {
             c.setVip(vip);
             c.guardarEnBD(conexionMySQL);
             clientes.add(c);
+            clientes.sort(new ComparadorCliente());
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -86,9 +90,11 @@ public class ColeccionClientes {
         for (Cliente cliente : clientes) {
             if (cliente.getDni().equals(DNI)) {
                 Cliente c = new Cliente(DNI, nombre, direccion, tlf);
-                c.setVip(vip);
                 c.actualizaEnBD(conexionMySQL);
-                cliente = c;
+                cliente.setNombre(nombre);
+                cliente.setDireccion(direccion);
+                cliente.setTlf(tlf);
+                cliente.setVip(vip);
                 return;
             }
         }
@@ -154,7 +160,7 @@ public class ColeccionClientes {
      * Carga la informacion de la base de datos en el programa. *
      */
     public void cargar() {
-        String sentencia = "SELECT * FROM clientes";
+        String sentencia = "SELECT * FROM " + NOMBRE_TABLA;
         try {
             ResultSet resultSet = conexionMySQL.ejecutarConsulta(sentencia);
 
@@ -190,5 +196,13 @@ public class ColeccionClientes {
             }
         }
         return -1;
+    }
+    
+    private class ComparadorCliente implements Comparator<Cliente> {
+
+        @Override
+        public int compare(Cliente c1, Cliente c2) {
+            return c1.getDni().compareTo(c2.getDni());
+        }
     }
 }

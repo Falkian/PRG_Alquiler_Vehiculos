@@ -5,31 +5,35 @@ import Clases.RegistroAlquiler;
 import Abstractas.Vehiculo;
 import Clases.Cliente;
 import Excepciones.ObjetoNoExistenteException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import Utilidades.ConexionMySQL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /**
  * Clase que representa el histórico de todos los alquileres relizados.
  *
  * @author Kevin
  */
-//TODO - Cambiar ficheros por base de datos
 public class HistorialAlquileres {
 
-    private static final String PATH = "ficheros/historialAlquileres.txt";
+    private static final String NOMBRE_TABLA = "historialalquileres";
 
     private final ArrayList<RegistroAlquiler> historial;        //Coleccion de registros
+    private final ConexionMySQL conexionMySQL;
+    private final ConexionMySQL conexionMySQL2;
 
     /**
      * Constructor por defecto.
+     *
+     * @param conexionMySQL la conexion con la base de datos.
+     * @param conexionMySQL2 segunda conexion con la base de datos.
      */
-    public HistorialAlquileres() {
+    public HistorialAlquileres(ConexionMySQL conexionMySQL, ConexionMySQL conexionMySQL2) {
         historial = new ArrayList<>();
+        this.conexionMySQL = conexionMySQL;
+        this.conexionMySQL2 = conexionMySQL2;
     }
 
     /**
@@ -37,10 +41,29 @@ public class HistorialAlquileres {
      *
      * @param alquiler el alquiler a registrar.
      * @param dias la duración del alquiler.
+     * @return el precio del alquiler.
+     * @throws java.sql.SQLException si hay un fallo al actualizar l abase de datos.
      */
-    public void anyadirRegistro(Alquiler alquiler, int dias) {
+    public double anyadirRegistro(Alquiler alquiler, int dias) throws SQLException {
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " (matricula, dni, numdias) VALUES ('"
+                + alquiler.getVehiculo().getMatricula() + "', '" + alquiler.getCliente().getDni()
+                + "', " + dias + ")";
+
+        conexionMySQL.ejecutaSentencia(sentencia);
+        alquiler.getVehiculo().actualizarPrimeraVezEnBD(conexionMySQL, false);
         historial.add(new RegistroAlquiler(alquiler, dias));
-        guardar();
+
+        double preciob = alquiler.getVehiculo().alquilerTotal(dias);
+        double precio = preciob;
+
+        if (isPrimeraVez(alquiler.getVehiculo().getMatricula())) {
+            precio -= preciob * 0.25;
+        }
+        if (alquiler.getCliente().isVip()) {
+            precio -= preciob * 0.15;
+        }
+        
+        return precio;
     }
 
     /**
@@ -50,7 +73,6 @@ public class HistorialAlquileres {
      */
     public double getTotal() {
         double total = 0;
-        ArrayList<Vehiculo> aparecidos = new ArrayList<>();
         for (RegistroAlquiler registro : historial) {
             Vehiculo v = registro.getAlquiler().getVehiculo();
             double precio = v.alquilerTotal(registro.getDias());
@@ -58,8 +80,7 @@ public class HistorialAlquileres {
 
             double descuentoprimera = 0;
             //Comprueba si es la primera vez que se alquilo el vehiculo
-            if (!aparecidos.contains(registro.getAlquiler().getVehiculo())) {
-                aparecidos.add(registro.getAlquiler().getVehiculo());
+            if (isPrimeraVez(v.getMatricula())) {
                 descuentoprimera = precio * 0.25;
             }
 
@@ -133,81 +154,35 @@ public class HistorialAlquileres {
     /**
      * Carga la informacion del fichero en el programa
      *
-     * @param vehiculos
-     * @param clientes
+     * @param vehiculos coleccion de vehiculos.
+     * @param clientes coleccion de clientes.
      */
     public void cargar(ColeccionVehiculos vehiculos, ColeccionClientes clientes) {
-        File archivo = new File(PATH);
-        BufferedReader reader;
+        String sentencia = "SELECT * FROM " + NOMBRE_TABLA;
         try {
-            reader = new BufferedReader(new FileReader(archivo));
+            ResultSet resultSet = conexionMySQL.ejecutarConsulta(sentencia);
 
-            //Lee el encabezado e informa si esta vacio
-            String str = reader.readLine();
-            if (str == null) {
-                //Archivo en blanco
-            } else {
-                str = reader.readLine();
-                //Lee la primera linea del archivo e informa si no contiene datos.
-                if (str == null || str.equals("")) {
-                    //Archivo sin informacion
-                } else {
-                    int linea = 1;
-                    while (str != null && !str.equals("")) {
-                        String[] datos = str.split("\\t\\t");
-                        if (datos.length != 3) {
-                            //Datos de la linea incorrectos
-                        } else {
-                            String matricula = datos[0];
-                            String dni = datos[1];
-                            int dias = Integer.parseInt(datos[2]);
-                            try {
-                                Vehiculo v = vehiculos.obtenerVechiculo(matricula);
-                                Cliente c;
-                                try {
-                                    c = clientes.obtenerCliente(dni);
-                                } catch (ObjetoNoExistenteException e) {
-                                    c = null;
-                                    //Referencia a objeto no existente
-                                }
-                                historial.add(new RegistroAlquiler(new Alquiler(v, c), dias));
-                            } catch (ObjetoNoExistenteException e) {
-                                //Referencia a vehiculo no existente
-                            }
-                        }
-                        str = reader.readLine();
-                        linea++;
-                    }
+            while (resultSet.next()) {
+                String matricula = resultSet.getString("matricula");
+                String dni = resultSet.getString("dni");
+                int ndias = resultSet.getInt("numdias");
+
+                Vehiculo v = vehiculos.obtenerVechiculo(matricula);
+                Cliente c = null;
+                if (dni != null) {
+                    c = clientes.obtenerCliente(dni);
                 }
-            }
-            reader.close();
-        } catch (IOException e) {
-            //Error de lectura
-        }
-    }
+                Alquiler a = new Alquiler(v, c);
+                RegistroAlquiler r = new RegistroAlquiler(a, ndias);
 
-    /**
-     * Guarda la informacion almacenada en la lista en un fichero.
-     */
-    public void guardar() {
-        File archivo = new File(PATH);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
-            writer.println("Matricula\t\tCliente\t\tNumDias");
-
-            for (RegistroAlquiler registro : historial) {
-                String matricula = registro.getAlquiler().getVehiculo().getMatricula();
-                Cliente c = registro.getAlquiler().getCliente();
-                String dni;
-                if (c != null) {
-                    dni = c.getDni();
-                } else {
-                    dni = "Ya no existe.";
-                }
-                int dias = registro.getDias();
-                writer.println(matricula + "\t\t" + dni + "\t\t" + dias);
+                v.actualizarPrimeraVezEnBD(conexionMySQL2, false);
+                historial.add(r);
             }
-        } catch (IOException e) {
-            //Error de escritura
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "No se pudo cargar el historico de alquileres de la base de datos.\n"
+                    + "Error MySQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
+        } catch (ObjetoNoExistenteException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Objeto no existente", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

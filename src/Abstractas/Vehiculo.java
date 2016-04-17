@@ -1,6 +1,8 @@
 package Abstractas;
 
 import Excepciones.AlquilerVehiculoException;
+import Utilidades.ConexionMySQL;
+import java.sql.SQLException;
 
 /**
  * Clase abstracta Vechiculo, define las propiedades comunes a todos los tipos
@@ -9,6 +11,8 @@ import Excepciones.AlquilerVehiculoException;
  * @author Kevin
  */
 public abstract class Vehiculo {
+
+    private static final String NOMBRE_TABLA = "vehiculos";
 
     private final String matricula;           //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
@@ -51,8 +55,6 @@ public abstract class Vehiculo {
 
     /**
      * Alquila el vehiculo al cliente pasado.
-     *
-     * //* @param c el cliente al que se le alquila el vehiculo.
      *
      * @throws AlquilerVehiculoException si el vehiculo ya esta alquilado.
      */
@@ -99,6 +101,63 @@ public abstract class Vehiculo {
     }
 
     /**
+     * Guarda un vehiculo en la base de datos.
+     *
+     * @param conexionMySQL la conexion con la base de datos.
+     * @param primeraVez si es la primera vez que se alquila el vehiculo.
+     * @param dniAlquilador el dni del cliente que tiene alquilado el vehiculo.
+     * NULL si no esta alquilado.
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    public void guardarEnBD(ConexionMySQL conexionMySQL, boolean primeraVez, String dniAlquilador) throws SQLException {
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES ('" + matricula + "', '" + (primeraVez ? "N" : "S")
+                + "', " + (dniAlquilador != null ? "'" + dniAlquilador + "'" : "NULL") + ")";
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    /**
+     * Elimina el vehiculo de la base de datos.
+     *
+     * @param conexionMySQL conexion con la base de datos,
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE matricula = '" + matricula + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    /**
+     * Actualiza el cliente alquilador en la base de datos.
+     *
+     * @param conexionMySQL la conexion con la base de datos.
+     * @param dni el dni del cliente que alquila el vehiculo.
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    public void actualizarAlquiladorEnBD(ConexionMySQL conexionMySQL, String dni) throws SQLException {
+        String sentencia;
+        if (dni != null) {
+            sentencia = "UPDATE " + NOMBRE_TABLA + " SET clientealquilador = '" + dni + "' WHERE matricula = '" + matricula + "'";
+        } else {
+            sentencia = "UPDATE " + NOMBRE_TABLA + " SET clientealquilador = NULL WHERE matricula = '" + matricula + "'";
+        }
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    /**
+     * Actualiza si es la primera vez que se ha alquilado el vehiculo en la base
+     * de datos.
+     *
+     * @param conexionMySQL la conexion con la base de datos-
+     * @param primera si se ha alquilado alguna vez.
+     * @throws SQLException si hay un fallo al ejecutar la sentencia.
+     */
+    public void actualizarPrimeraVezEnBD(ConexionMySQL conexionMySQL, boolean primera) throws SQLException {
+        String sentencia = "UPDATE " + NOMBRE_TABLA + " SET alquiladoalgunavez = '" + (primera ? "N" : "S") + "' WHERE matricula = '"
+                + matricula + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    /**
      * Muestra incoformacion sobre el precio de alquilar el vechiulo durante una
      * cantidad de dias.
      *
@@ -114,4 +173,11 @@ public abstract class Vehiculo {
      * @return un array con la informacion del vehiculo
      */
     public abstract String[] dataToArray();
+
+    /**
+     * Devuelve el tipo de vehiculo como cadena.
+     *
+     * @return el tipo de vehiculo como cadena.
+     */
+    public abstract String getNombreTipo();
 }

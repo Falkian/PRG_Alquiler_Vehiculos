@@ -1,5 +1,8 @@
 package Abstractas;
 
+import Utilidades.ConexionMySQL;
+import java.sql.SQLException;
+
 /**
  * Clase abstracta V_Transporte, define las propiedades y metodos particulares
  * de los vehiculos de transporte.
@@ -7,6 +10,8 @@ package Abstractas;
  * @author Kevin
  */
 public abstract class V_Transporte extends Vehiculo {
+    
+    public static final String NOMBRE_TABLA = "transportespersonas";
 
     private int plazas;             //Numero de plazas del vehiculo.
 
@@ -80,5 +85,45 @@ public abstract class V_Transporte extends Vehiculo {
     @Override
     public String[] dataToArray() {
         return new String[]{getMatricula(), getClass().getSimpleName(), "" + plazas};
+    }
+
+    /**
+     * Guarda un vehiculo en la base de datos.
+     *
+     * @param conexionMySQL la conexion con la base de datos.
+     * @param primeraVez si es la primera vez que se alquila el vehiculo.
+     * @param dniAlquilador el dni del cliente que tiene alquilado el vehiculo.
+     * NULL si no esta alquilado.
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    @Override
+    public void guardarEnBD(ConexionMySQL conexionMySQL, boolean primeraVez, String dniAlquilador) throws SQLException {
+        super.guardarEnBD(conexionMySQL, primeraVez, dniAlquilador);
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES ('" + getMatricula() + "', " + plazas + ")";
+        conexionMySQL.ejecutaSentencia(sentencia);
+    }
+
+    /**
+     * Elimina el vehiculo de la base de datos.
+     *
+     * @param conexionMySQL conexion con la base de datos,
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    @Override
+    public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE matricula = '" + getMatricula() + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
+        super.eliminaDeBD(conexionMySQL);
+    }
+
+    /**
+     * Actualiza el vehciulo en la base de datos.
+     *
+     * @param conexionMySQL conexion con la base de datos.
+     * @throws SQLException si hay algun fallo al ejecutar la sentencia.
+     */
+    public void actualizaEnBD(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "UPDATE " + NOMBRE_TABLA + " SET numplazas = " + plazas + " WHERE matricula = '" + getMatricula() + "'";
+        conexionMySQL.ejecutaSentencia(sentencia);
     }
 }

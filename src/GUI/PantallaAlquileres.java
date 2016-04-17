@@ -12,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import javax.swing.*;
 
 /**
@@ -353,12 +354,16 @@ public class PantallaAlquileres extends JSplitPane {
                 String matricula = (String) introMatricula.getSelectedItem();
                 String DNI = (String) introDNI.getSelectedItem();
                 alquileres.anyadirAlquiler(matricula, DNI);
+                introMatricula.removeItem(matricula);
                 JOptionPane.showMessageDialog(rightComponent, "Vehiculo con matricula " + matricula + " alquilado al cliente "
                         + DNI + ".", "Vehiculo alquilado", JOptionPane.INFORMATION_MESSAGE);
             } catch (ObjetoNoExistenteException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Obejto no existente", JOptionPane.ERROR_MESSAGE);
             } catch (AlquilerVehiculoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo al alquilar el vehiculo", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "No se pudo actualizar la base de datos.\n"
+                        + "Error MySQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -376,12 +381,18 @@ public class PantallaAlquileres extends JSplitPane {
                 //Añade el alquiler al regsitro y lo devuelve
                 String matricula = (String) introMatricula.getSelectedItem();
                 int dias = obtenerDias();
-                historial.anyadirRegistro(alquileres.obtenerAlquilerPorMatricula(matricula), dias);
+                double precio = historial.anyadirRegistro(alquileres.obtenerAlquilerPorMatricula(matricula), dias);
                 alquileres.eliminarAlquilerPorMatricula(matricula);
+                introMatricula.removeItem(matricula);
+                JOptionPane.showMessageDialog(rightComponent, "Vehiculo con matricula " + matricula + " devuelto. \n"
+                        + "El precio ha sido de " + precio + "€.", "Vehiculo devuelto", JOptionPane.INFORMATION_MESSAGE);
             } catch (FormatoIncorrectoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
             } catch (AlquilerVehiculoException ex) {
                 JOptionPane.showMessageDialog(rightComponent, ex.getMessage(), "Fallo al alquilar el vehiculo", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "No se pudo actualizar la base de datos.\n"
+                        + "Error MySQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
             }
 
         }

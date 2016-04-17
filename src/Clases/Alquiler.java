@@ -1,7 +1,6 @@
 package Clases;
 
 import Abstractas.Vehiculo;
-import Clases.Cliente;
 
 /**
  * Representa un alquiler emparejando la matricula de un vehiculo con el dni de

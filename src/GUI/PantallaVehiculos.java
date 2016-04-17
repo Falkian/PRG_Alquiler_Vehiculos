@@ -16,6 +16,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
@@ -252,22 +255,25 @@ public class PantallaVehiculos extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             switch ((TiposVehiculos) introTipo.getSelectedItem()) {
-                case Coche:
+                case COCHE:
                     textoCaract.setText("Plazas");
-                    introCaract.setModel(new SpinnerNumberModel(2, (int) TiposVehiculos.Coche.getCaractMin(), (int) TiposVehiculos.Coche.getCaractMax(), 1));
+                    introCaract.setValue(2);
+                    introCaract.setModel(new SpinnerNumberModel(2, (int) TiposVehiculos.COCHE.getCaractMin(), (int) TiposVehiculos.COCHE.getCaractMax(), 1));
                     break;
-                case Microbus:
+                case MICROBUS:
                     textoCaract.setText("Plazas");
-                    //TODO -  da error al cambiar a uno menor
-                    introCaract.setModel(new SpinnerNumberModel(5, (int) TiposVehiculos.Microbus.getCaractMin(), (int) TiposVehiculos.Microbus.getCaractMax(), 1));
+                    introCaract.setValue(5);
+                    introCaract.setModel(new SpinnerNumberModel(5, (int) TiposVehiculos.MICROBUS.getCaractMin(), (int) TiposVehiculos.MICROBUS.getCaractMax(), 1));
                     break;
-                case Furgoneta:
+                case FURGONETA:
                     textoCaract.setText("PMA");
-                    introCaract.setModel(new SpinnerNumberModel(500.0, TiposVehiculos.Furgoneta.getCaractMin(), TiposVehiculos.Furgoneta.getCaractMax(), 10));
+                    introCaract.setValue((double) 500);
+                    introCaract.setModel(new SpinnerNumberModel(500.0, TiposVehiculos.FURGONETA.getCaractMin(), TiposVehiculos.FURGONETA.getCaractMax(), 10));
                     break;
-                case Camion:
+                case CAMION:
                     textoCaract.setText("PMA");
-                    introCaract.setModel(new SpinnerNumberModel(1000.0, TiposVehiculos.Camion.getCaractMin(), TiposVehiculos.Camion.getCaractMax(), 10));
+                    introCaract.setValue((double) 1000);
+                    introCaract.setModel(new SpinnerNumberModel(1000.0, TiposVehiculos.CAMION.getCaractMin(), TiposVehiculos.CAMION.getCaractMax(), 10));
                     break;
             }
         }
@@ -348,7 +354,7 @@ public class PantallaVehiculos extends JPanel {
 
             introMatricula.setText("");
             introMatricula.requestFocus();
-            introTipo.setSelectedItem(TiposVehiculos.Coche.getTipo());
+            introTipo.setSelectedItem(TiposVehiculos.COCHE.getTipo());
             introCaract.setValue(((SpinnerNumberModel) introCaract.getModel()).getMinimum());
 
             introMatricula.setEnabled(true);
@@ -433,6 +439,9 @@ public class PantallaVehiculos extends JPanel {
                 JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
             } catch (AlquilerVehiculoException ex) {
                 JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo al eliminar el alquiler", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "No se pudo eliminar el vehiculo de la base de datos.\n"
+                        + "Error MySQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
             } finally {
                 iterador.anterior();
                 if (iterador.getActual() == null) {
@@ -501,19 +510,25 @@ public class PantallaVehiculos extends JPanel {
                 case "Alta":
                     try {
                         //Obtiene la informacion del vehiculo
-                        String tipo = (String) introTipo.getSelectedItem();
+                        TiposVehiculos tipo = (TiposVehiculos) introTipo.getSelectedItem();
                         String matricula = obtenerMatricula();
                         double caract = obtenerCaracteristica();
                         vehiculos.anyadirVehiculo(tipo, matricula, caract);
-                        String info = tipo.equals("Coche") || tipo.equals("Microbus")
+                        iterador.seleccionar(matricula);
+                        String info = tipo == TiposVehiculos.COCHE || tipo == TiposVehiculos.MICROBUS
                                 ? " con " + (int) caract + " plazas" : " con PMA " + caract;
                         JOptionPane.showMessageDialog(zonaDatos, tipo + info + " anyadido", "Vehiculo anyadido", JOptionPane.INFORMATION_MESSAGE);
-                    } catch (FormatoIncorrectoException ex) {
+                    } catch (FormatoIncorrectoException ex) {                        
+                        iterador.ultimo();
                         JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
                     } catch (ObjetoYaExistenteException ex) {
-                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
-                    } finally {
                         iterador.ultimo();
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        iterador.ultimo();
+                        JOptionPane.showMessageDialog(null, "No se pudo guardar el vehiculo en la base de datos.\n"
+                                + "Error MySQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
+                    } finally {
                         seleccionActual();
                         introMatricula.setEnabled(false);
                         introTipo.setEnabled(false);
@@ -529,7 +544,7 @@ public class PantallaVehiculos extends JPanel {
                 case "Modificacion":
                     try {
                         //Obtiene la informacion del vehiculo
-                        String tipo = (String) introTipo.getSelectedItem();
+                        TiposVehiculos tipo = (TiposVehiculos) introTipo.getSelectedItem();
                         String matricula = iterador.getActual().getMatricula();
                         double caract = obtenerCaracteristica();
                         vehiculos.modificarVehiculo(tipo, matricula, caract);
@@ -537,7 +552,10 @@ public class PantallaVehiculos extends JPanel {
                     } catch (FormatoIncorrectoException ex) {
                         JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
                     } catch (ObjetoNoExistenteException ex) {
-                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Ya existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "No existe el vehiculo", JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException ex) {
+                        JOptionPane.showMessageDialog(null, "No se pudo modificar el vehiculo de la base de datos.\n"
+                                + "Error MySQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         seleccionActual();
                         introMatricula.setEnabled(false);
@@ -630,7 +648,7 @@ public class PantallaVehiculos extends JPanel {
      */
     private void seleccionVacia() {
         introMatricula.setText("");
-        introTipo.setSelectedItem(TiposVehiculos.Coche.getTipo());
+        introTipo.setSelectedItem(TiposVehiculos.COCHE.getTipo());
         introCaract.setValue(((SpinnerNumberModel) introCaract.getModel()).getMinimum());
     }
 
@@ -643,38 +661,38 @@ public class PantallaVehiculos extends JPanel {
         String tipo = iterador.getActual().getClass().getSimpleName();
         switch (tipo) {
             case "Coche":
-                introTipo.setSelectedItem(TiposVehiculos.Coche.getTipo());
+                introTipo.setSelectedItem(TiposVehiculos.COCHE);
                 break;
             case "Microbus":
-                introTipo.setSelectedItem(TiposVehiculos.Microbus.getTipo());
+                introTipo.setSelectedItem(TiposVehiculos.MICROBUS);
                 break;
             case "Furgoneta":
-                introTipo.setSelectedItem(TiposVehiculos.Furgoneta.getTipo());
+                introTipo.setSelectedItem(TiposVehiculos.FURGONETA);
                 break;
             case "Camion":
-                introTipo.setSelectedItem(TiposVehiculos.Camion.getTipo());
+                introTipo.setSelectedItem(TiposVehiculos.CAMION);
                 break;
         }
-        switch (iterador.getActual().getClass().getSimpleName()) {
+        switch (iterador.getActual().getNombreTipo()) {
             case "Coche":
                 textoCaract.setText("Plazas");
-                introCaract.setModel(new SpinnerNumberModel(2, 2, vehiculos.getPlazasMaxCoche(), 1));
-                introCaract.setValue((int) iterador.getActual().getCaracteristica());
+                introCaract.setValue(2);
+                introCaract.setModel(new SpinnerNumberModel(2, (int) TiposVehiculos.COCHE.getCaractMin(), (int) TiposVehiculos.COCHE.getCaractMax(), 1));
                 break;
             case "Microbus":
                 textoCaract.setText("Plazas");
-                introCaract.setModel(new SpinnerNumberModel(5, 5, vehiculos.getPlazasMaxMicrobus(), 1));
-                introCaract.setValue((int) iterador.getActual().getCaracteristica());
+                introCaract.setValue(5);
+                introCaract.setModel(new SpinnerNumberModel(5, (int) TiposVehiculos.MICROBUS.getCaractMin(), (int) TiposVehiculos.MICROBUS.getCaractMax(), 1));
                 break;
             case "Furgoneta":
                 textoCaract.setText("PMA");
-                introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxFurgoneta(), 10));
-                introCaract.setValue(iterador.getActual().getCaracteristica());
+                introCaract.setValue((double) 500);
+                introCaract.setModel(new SpinnerNumberModel(500.0, TiposVehiculos.FURGONETA.getCaractMin(), TiposVehiculos.FURGONETA.getCaractMax(), 10));
                 break;
             case "Camion":
                 textoCaract.setText("PMA");
-                introCaract.setModel(new SpinnerNumberModel(500.0, 500.0, vehiculos.getPMAMaxCamion(), 10));
-                introCaract.setValue(iterador.getActual().getCaracteristica());
+                introCaract.setValue((double) 1000);
+                introCaract.setModel(new SpinnerNumberModel(1000.0, TiposVehiculos.CAMION.getCaractMin(), TiposVehiculos.CAMION.getCaractMax(), 10));
                 break;
         }
 
@@ -685,5 +703,25 @@ public class PantallaVehiculos extends JPanel {
         en = iterador.tieneAnterior();
         botonPrimero.setEnabled(en);
         botonAnterior.setEnabled(en);
+    }
+
+    /**
+     * Deja la pantalla de clientes como si estubiese acabada de crear.
+     */
+    public void resetear() {
+
+        introMatricula.setEnabled(false);
+        introTipo.setEnabled(false);
+        introCaract.setEnabled(false);
+
+        botonAceptar.setEnabled(false);
+        botonDescartar.setEnabled(false);
+
+        botonAnadir.setEnabled(true);
+        botonEditar.setEnabled(true);
+        botonBorrar.setEnabled(true);
+
+        iterador.primero();
+        seleccionActual();
     }
 }

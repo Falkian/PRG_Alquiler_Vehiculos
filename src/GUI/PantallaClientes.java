@@ -16,8 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
@@ -517,19 +515,22 @@ public class PantallaClientes extends JPanel {
                         boolean VIP = obtenerVIP();
                         //Añade el cliente al listado
                         clientes.anyadirCliente(dni, nombre, direccion, telefono, VIP);
+                        iterador.seleccionar(dni);
                         JOptionPane.showMessageDialog(PantallaClientes.this, "Cliente anyadido con los siguientes datos:\n"
                                 + "DNI: " + dni + "\nNombre: " + nombre + "\nDireccion: " + direccion + "\n"
                                 + "Telefono: " + telefono + "\nVIP: " + (VIP ? "\u2713" : "\u2717"),
                                 "Cliente anyadido", JOptionPane.INFORMATION_MESSAGE);
                     } catch (FormatoIncorrectoException ex) {
+                        iterador.ultimo();
                         JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
                     } catch (ObjetoYaExistenteException ex) {
+                        iterador.ultimo();
                         JOptionPane.showMessageDialog(PantallaClientes.this, ex.getMessage(), "Ya existe el cliente", JOptionPane.ERROR_MESSAGE);
                     } catch (SQLException ex) {
+                        iterador.ultimo();
                         JOptionPane.showMessageDialog(null, "Fallo al actualizar el cliente en la base de datos.\n"
                                 + "ErrorSQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
                     } finally {
-                        iterador.ultimo();
                         seleccionActual();
 
                         introDNI.setEnabled(false);
@@ -609,11 +610,6 @@ public class PantallaClientes extends JPanel {
             botonAnadir.setEnabled(true);
             botonEditar.setEnabled(true);
             botonBorrar.setEnabled(true);
-
-            botonPrimero.setEnabled(true);
-            botonAnterior.setEnabled(true);
-            botonSiguiente.setEnabled(true);
-            botonUltimo.setEnabled(true);
         }
 
     }

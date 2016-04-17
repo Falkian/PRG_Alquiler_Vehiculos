@@ -18,12 +18,6 @@ import javax.swing.*;
  * @author Kevin
  */
 public class GUI extends JFrame {
-
-    //Constantes con los valores de los tipo de vehiculo
-    //public static final int COCHE = 0;
-    //public static final int MICROBUS = 1;
-    //public static final int FURGONETA = 2;
-    //public static final int CAMION = 3;
     
     private ConexionMySQL conexionMySQL = null;
 
@@ -53,10 +47,10 @@ public class GUI extends JFrame {
         try {
             conexionMySQL = new ConexionMySQL();
             
-            vehiculos = new ColeccionVehiculos();
+            vehiculos = new ColeccionVehiculos(conexionMySQL, new ConexionMySQL());
             clientes = new ColeccionClientes(conexionMySQL);
-            alquileres = new ColeccionAlquileres(vehiculos, clientes);
-            historial = new HistorialAlquileres();
+            alquileres = new ColeccionAlquileres(vehiculos, clientes, conexionMySQL);
+            historial = new HistorialAlquileres(conexionMySQL, new ConexionMySQL());
 
             //Carga los datos
             vehiculos.cargar();
@@ -159,16 +153,16 @@ public class GUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             switch (e.getActionCommand()) {
                 case "Vehiculos":
-                    menu.setRightComponent(pantallaVehiculos);
+                    menu.setRightComponent(new PantallaVehiculos(vehiculos, alquileres));
                     break;
                 case "Clientes":
-                    menu.setRightComponent(pantallaClientes);
+                    menu.setRightComponent(new PantallaClientes(clientes, alquileres));
                     break;
                 case "Alquileres":
-                    menu.setRightComponent(pantallaAlquileres);
+                    menu.setRightComponent(new PantallaAlquileres(alquileres, vehiculos, clientes, historial));
                     break;
                 case "Finanzas":
-                    menu.setRightComponent(pantallaFinanzas);
+                    menu.setRightComponent(new PantallaFinanzas(historial));
                     break;
             }
         }

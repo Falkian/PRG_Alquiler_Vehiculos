@@ -4,6 +4,7 @@ import Estructuras.HistorialAlquileres;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 /**
  * Clase que contiene el menu de finanzas
@@ -11,9 +12,11 @@ import javax.swing.*;
  * @author Kevin
  */
 public class PantallaFinanzas extends JPanel {
-    
+
     private final HistorialAlquileres historial;
-    
+
+    private JTable listado;
+
     /**
      * Crea e inicializa el menu de vehiculos.
      *
@@ -24,16 +27,16 @@ public class PantallaFinanzas extends JPanel {
         this.historial = historial;
         iniciar();
     }
-    
+
     /**
-     * Inicia la pantalla de finanzas, creando y colocando todos sus
-     * elementos. Empieza en el apartado de alta de vehiculos.
+     * Inicia la pantalla de finanzas, creando y colocando todos sus elementos.
+     * Empieza en el apartado de alta de vehiculos.
      */
     private void iniciar() {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         
-        JTable listado = new JTable(historial.obtenerDataArray(), new String[]{"Matricula", "DNI", "Dias", "Primer", "VIP", "Precio"});
+        listado = new JTable(historial.obtenerDataArray(), new String[]{"Matricula", "DNI", "Dias", "Primer", "VIP", "Precio"});
 
         JScrollPane listadoFinanzas = new JScrollPane(listado);
         listado.setFillsViewportHeight(true);
@@ -51,5 +54,4 @@ public class PantallaFinanzas extends JPanel {
         c.weighty = 0.1;
         add(new JLabel("Total: " + historial.getTotal() + "€"), c);
     }
-    
 }

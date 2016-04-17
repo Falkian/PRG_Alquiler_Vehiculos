@@ -5,27 +5,24 @@ import Abstractas.Vehiculo;
 import Clases.Cliente;
 import Excepciones.AlquilerVehiculoException;
 import Excepciones.ObjetoNoExistenteException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import Utilidades.ConexionMySQL;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import javax.swing.JOptionPane;
 
 /**
  * Coleccion de objetos de la clase Alquiler.
  *
  * @author Kevin
  */
-
-//TODO - Cambiar ficheros por base de datos
 public class ColeccionAlquileres {
 
-    private static final String PATH = "ficheros/listaAlquileres.txt";
+    private static final String NOMBRE_TABLA = "vehiculos";
 
     private final ArrayList<Alquiler> alquileres;       //Coleccion de alquielres
+    private final ConexionMySQL conexionMySQL;
 
     private final ColeccionVehiculos vehiculos;     //Coleccion de vehiculos
     private final ColeccionClientes clientes;       //Coleccion de clientes
@@ -33,29 +30,15 @@ public class ColeccionAlquileres {
     /**
      * Constructor de la coleccion de alquileres.
      *
-     * @param vehiculos la coleccion de vehiculos
-     * @param clientes la coleccion de clientes
+     * @param vehiculos la coleccion de vehiculos.
+     * @param clientes la coleccion de clientes.
+     * @param conexionMySQL la conexion con la base de datos.
      */
-    public ColeccionAlquileres(ColeccionVehiculos vehiculos, ColeccionClientes clientes) {
+    public ColeccionAlquileres(ColeccionVehiculos vehiculos, ColeccionClientes clientes, ConexionMySQL conexionMySQL) {
         alquileres = new ArrayList<>();
         this.vehiculos = vehiculos;
         this.clientes = clientes;
-    }
-
-    /**
-     * Añade un alquiler con un cliente y un vechiculo dados, y los alquila
-     * automaticamente.
-     *
-     * @param v el vechiculo que se alquila.
-     * @param c el cliente que alquila.
-     * @throws AlquilerVehiculoException si el vehiculo o cliente ya estan
-     * alquilados.
-     */
-    public void anyadirAlquiler(Vehiculo v, Cliente c) throws AlquilerVehiculoException {
-        alquileres.add(new Alquiler(v, c));
-        v.alquilar();
-        c.alquilar();
-        guardar();
+        this.conexionMySQL = conexionMySQL;
     }
 
     /**
@@ -68,14 +51,16 @@ public class ColeccionAlquileres {
      * la coleccion.
      * @throws AlquilerVehiculoException si el cliente no tiene vehiculos
      * alquilados.
+     * @throws java.sql.SQLException si hay un fallo al actualizar la base de
+     * datos.
      */
-    public void anyadirAlquiler(String matricula, String dni) throws ObjetoNoExistenteException, AlquilerVehiculoException {
+    public void anyadirAlquiler(String matricula, String dni) throws ObjetoNoExistenteException, AlquilerVehiculoException, SQLException {
         Vehiculo v = vehiculos.obtenerVechiculo(matricula);
         Cliente c = clientes.obtenerCliente(dni);
-        alquileres.add(new Alquiler(v, c));
+        v.actualizarAlquiladorEnBD(conexionMySQL, dni);
         v.alquilar();
         c.alquilar();
-        guardar();
+        alquileres.add(new Alquiler(v, c));
     }
 
     /**
@@ -123,18 +108,20 @@ public class ColeccionAlquileres {
      *
      * @param matricula que identifica al vehiculo.
      * @throws AlquilerVehiculoException si el vehiculo no esta alquilado.
+     * @throws java.sql.SQLException si ahy un fallo al actualizar la base de
+     * datos.
      */
-    public void eliminarAlquilerPorMatricula(String matricula) throws AlquilerVehiculoException {
+    public void eliminarAlquilerPorMatricula(String matricula) throws AlquilerVehiculoException, SQLException {
         Iterator<Alquiler> iter = alquileres.listIterator();
         while (iter.hasNext()) {
             Alquiler alquiler = iter.next();
             if (alquiler.getVehiculo().getMatricula().equals(matricula)) {
+                alquiler.getVehiculo().actualizarAlquiladorEnBD(conexionMySQL, null);
                 alquiler.getCliente().devolverVehiculo();
                 alquiler.getVehiculo().devolver();
-                alquileres.remove(alquiler);
+                iter.remove();
             }
         }
-        guardar();
     }
 
     /**
@@ -144,18 +131,20 @@ public class ColeccionAlquileres {
      * @param dni que identifica al cliente.
      * @throws AlquilerVehiculoException si el cliente no tiene vehiculos
      * alquilados.
+     * @throws java.sql.SQLException si ahy un fallo al actualizar la base de
+     * datos.
      */
-    public void eliminarAlquilerPorDni(String dni) throws AlquilerVehiculoException {
+    public void eliminarAlquilerPorDni(String dni) throws AlquilerVehiculoException, SQLException {
         Iterator<Alquiler> i = alquileres.iterator();
         while (i.hasNext()) {
             Alquiler alquiler = i.next();
             if (alquiler.getCliente().getDni().equals(dni)) {
+                alquiler.getVehiculo().actualizarAlquiladorEnBD(conexionMySQL, null);
                 alquiler.getCliente().devolverVehiculo();
                 alquiler.getVehiculo().devolver();
                 i.remove();
             }
         }
-        guardar();
     }
 
     /**
@@ -175,7 +164,7 @@ public class ColeccionAlquileres {
         }
         return precio;
     }
-    
+
     /**
      * Devuelve un array que contiene las matriculas de los vehiculos
      * alquilados.
@@ -199,64 +188,30 @@ public class ColeccionAlquileres {
      * existentes.
      */
     public void cargar(ColeccionVehiculos vehiculos, ColeccionClientes clientes) {
-        File archivo = new File(PATH);
-        BufferedReader reader;
+        String sentencia = "SELECT * FROM " + NOMBRE_TABLA;
         try {
-            reader = new BufferedReader(new FileReader(archivo));
+            ResultSet resultSet = conexionMySQL.ejecutarConsulta(sentencia);
 
-            //Lee el encabezado del archivo e informa si esta vacio
-            String str = reader.readLine();
-            if (str == null) {
-                //Archio de alquileres vacio
-                return;
-            } else {
-                //Lee la primera linea e informa si esta vacia
-                if ((str = reader.readLine()) == null || str.equals("")) {
-                    //Archivo de alquilereres sin informacion
-                    return;
-                }
-                int linea = 1;
-                while (str != null && !str.equals("")) {
-                    String[] datos = str.split("\\t\\t");
-                    if (datos.length != 2) {
-                        //Datos de la linea incorrectos
-                    } else {
-                        try {
-                            String matricula = datos[0].trim();
-                            Vehiculo v = vehiculos.obtenerVechiculo(matricula);
-                            String dni = datos[1].trim();
-                            Cliente c = clientes.obtenerCliente(dni);
-                            anyadirAlquiler(v, c);
-                        } catch (ObjetoNoExistenteException e) {
-                            //Datos de la linea incorrectos
-                        } catch (AlquilerVehiculoException e) {
-                            //Fallo en el alquiler
-                        }
-                    }
-                    str = reader.readLine();
-                    linea++;
+            while (resultSet.next()) {
+                String matricula = resultSet.getString("matricula");
+                String dni = resultSet.getString("clientealquilador");
+
+                if (dni != null) {
+                    Vehiculo v = vehiculos.obtenerVechiculo(matricula);
+                    Cliente c = clientes.obtenerCliente(dni);
+                    v.alquilar();
+                    c.alquilar();
+                    Alquiler a = new Alquiler(v, c);
+                    alquileres.add(a);
                 }
             }
-            reader.close();
-        } catch (IOException e) {
-            //Error de lectura del aqchivo
-        }
-    }
-
-    /**
-     * Guarda la informacion en un fichero.
-     */
-    public void guardar() {
-        File archivo = new File(PATH);
-        try (PrintWriter writer = new PrintWriter(new FileWriter(archivo))) {
-            writer.println("Matricula\t\tCliente");
-
-            for (Alquiler alquiler : alquileres) {
-                writer.printf("%s\t\t%s%n", alquiler.getVehiculo().getMatricula(), alquiler.getCliente().getDni());
-            }
-
-        } catch (IOException e) {
-            //Fallo al escribir en el archivo
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Fallo al cargar los alquileres de la base de datos.\n"
+                    + "Error MySQL: " + ex.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
+        } catch (ObjetoNoExistenteException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Objeto no existente", JOptionPane.ERROR_MESSAGE);
+        } catch (AlquilerVehiculoException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error de alquiler", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
