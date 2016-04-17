@@ -17,16 +17,16 @@ import java.util.Properties;
  */
 public class ConexionMySQL {
 
-    private final String PATH = "ficheros/conexionmysql.properties";
+    private final String PATH = "ficheros/conexionmysql.properties";    //Ruta del fichero de configuracion
 
-    private final String CONTROLLER;
-    private final String NOMBRE_BD;
-    private final String ENLACE_BD;
-    private final String USUARIO;
-    private final String PASSWORD;
+    private final String CONTROLLER;    //Driver de la base de datos
+    private final String NOMBRE_BD;     //Nombre de la base de datos
+    private final String ENLACE_BD;     //Direccion de la base de datos
+    private final String USUARIO;       //Usuario de la base de datos
+    private final String PASSWORD;      //Contraseña del usuario
 
-    private final Connection connection;
-    private final Statement statement;
+    private final Connection connection;    //Conexion con la base de datos
+    private final Statement statement;      //Objeto de sentencias
 
     /**
      * Crea una conexion con una base de datos cuyas propiedades estan definidas

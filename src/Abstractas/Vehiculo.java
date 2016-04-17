@@ -12,9 +12,9 @@ import java.sql.SQLException;
  */
 public abstract class Vehiculo {
 
-    private static final String NOMBRE_TABLA = "vehiculos";
+    private static final String NOMBRE_TABLA = "vehiculos";     //Nombre de la tabla en la base de datos
 
-    private final String matricula;           //Maricula del vehiculo
+    private final String matricula;      //Maricula del vehiculo
     private boolean alquilado;          //Define si esta alquilado o no
 
     /**
@@ -156,15 +156,6 @@ public abstract class Vehiculo {
                 + matricula + "'";
         conexionMySQL.ejecutaSentencia(sentencia);
     }
-
-    /**
-     * Muestra incoformacion sobre el precio de alquilar el vechiulo durante una
-     * cantidad de dias.
-     *
-     * @param dias los dias por los que se alquilara.
-     * @param alquiler el precio del alquiler del vechiculo.
-     */
-    public abstract void mostrarInfoAlquiler(int dias, double alquiler);
 
     /**
      * Devuelve la informacion sobre el vehiculo en forma de array. Orden de la

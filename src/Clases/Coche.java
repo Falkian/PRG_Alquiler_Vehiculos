@@ -12,8 +12,8 @@ import java.sql.SQLException;
  */
 public class Coche extends V_Transporte {
 
-    private static final TiposVehiculos TIPO__VEHICULO = TiposVehiculos.COCHE;
-    public static final String NOMBRE_TABLA = "coches";
+    private static final TiposVehiculos TIPO__VEHICULO = TiposVehiculos.COCHE;  //Tipo de vehiculo
+    public static final String NOMBRE_TABLA_COCHES = "coches";      //Tabla de la base de datos
 
     /**
      * Inicializa el coche con la matricula y el numero de plazas dados.
@@ -25,12 +25,11 @@ public class Coche extends V_Transporte {
         super(matricula, plazas);
     }
 
-    @Override
-    public void mostrarInfoAlquiler(int dias, double alquiler) {
-        System.out.println("El vehiculo es un coche de " + getPlazas() + " plazas "
-                + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-    }
-
+    /**
+     * Devuelve el tipo del vehiculo como una cadena.
+     *
+     * @return el tipo de vehiculo.
+     */
     @Override
     public String getNombreTipo() {
         return TIPO__VEHICULO.getTipo();
@@ -48,7 +47,7 @@ public class Coche extends V_Transporte {
     @Override
     public void guardarEnBD(ConexionMySQL conexionMySQL, boolean primeraVez, String dniAlquilador) throws SQLException {
         super.guardarEnBD(conexionMySQL, primeraVez, dniAlquilador);
-        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES ('" + getMatricula() + "')";
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA_COCHES + " VALUES ('" + getMatricula() + "')";
         conexionMySQL.ejecutaSentencia(sentencia);
     }
 
@@ -60,7 +59,7 @@ public class Coche extends V_Transporte {
      */
     @Override
     public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
-        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE matricula = '" + getMatricula() + "'";
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA_COCHES + " WHERE matricula = '" + getMatricula() + "'";
         conexionMySQL.ejecutaSentencia(sentencia);
         super.eliminaDeBD(conexionMySQL);
     }

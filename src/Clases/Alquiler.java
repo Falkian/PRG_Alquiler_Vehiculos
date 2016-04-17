@@ -10,11 +10,11 @@ import Abstractas.Vehiculo;
  */
 public class Alquiler {
 
-    private final Vehiculo vehiculo;
-    private final Cliente cliente;
+    private final Vehiculo vehiculo;    //Vehiculo alquilado
+    private final Cliente cliente;      //CLiente que alquila
 
     /**
-     * Crea un alquiler con el cliente y vechiulos dados.
+     * Crea un alquiler con el cliente y vehiculos dados.
      *
      * @param vehiculo el vehiculo alquilado.
      * @param cliente el cliente que alquila.

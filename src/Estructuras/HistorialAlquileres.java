@@ -18,11 +18,11 @@ import javax.swing.JOptionPane;
  */
 public class HistorialAlquileres {
 
-    private static final String NOMBRE_TABLA = "historialalquileres";
+    private static final String NOMBRE_TABLA = "historialalquileres";   //Tabla en la base de datos
 
     private final ArrayList<RegistroAlquiler> historial;        //Coleccion de registros
-    private final ConexionMySQL conexionMySQL;
-    private final ConexionMySQL conexionMySQL2;
+    private final ConexionMySQL conexionMySQL;                  //Conexion con la base de datos
+    private final ConexionMySQL conexionMySQL2;                 //Segunda conexion, para poder mantener dos resultados simultatneamente
 
     /**
      * Constructor por defecto.

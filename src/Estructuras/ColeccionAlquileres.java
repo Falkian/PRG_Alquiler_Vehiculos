@@ -19,7 +19,7 @@ import javax.swing.JOptionPane;
  */
 public class ColeccionAlquileres {
 
-    private static final String NOMBRE_TABLA = "vehiculos";
+    private static final String NOMBRE_TABLA = "vehiculos"; //Tabla en la base de datos
 
     private final ArrayList<Alquiler> alquileres;       //Coleccion de alquielres
     private final ConexionMySQL conexionMySQL;

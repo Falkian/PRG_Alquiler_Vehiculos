@@ -1,9 +1,5 @@
 package Excepciones;
 
-/**
- *
- * @author Kevin
- */
 public class BaseDeDatosException extends Exception {
     
     public BaseDeDatosException() {

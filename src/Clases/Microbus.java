@@ -12,8 +12,8 @@ import java.sql.SQLException;
  */
 public class Microbus extends V_Transporte {
 
-    public static final TiposVehiculos TIPO_VEHICULO = TiposVehiculos.MICROBUS;
-    public static final String NOMBRE_TABLA = "microbuses";
+    public static final TiposVehiculos TIPO_VEHICULO = TiposVehiculos.MICROBUS; //Tipo de vehiculo
+    public static final String NOMBRE_TABLA_MICROBUSES = "microbuses";     //Tabla en la base de datos
 
     /**
      * Inicializa el bus con la matricula y el numero de plazas dados.
@@ -36,17 +36,16 @@ public class Microbus extends V_Transporte {
         return super.alquilerTotal(+2 * super.getPlazas());
     }
 
-    @Override
-    public void mostrarInfoAlquiler(int dias, double alquiler) {
-        System.out.println("El vehiculo es un microbus de " + getPlazas() + " plazas "
-                + "y el alquiler para " + dias + " dias es de " + alquiler + "euros.");
-    }
-
+    /**
+     * Devuelve el tipo del vehciulo como una cadena.
+     *
+     * @return el tipo del vehiculo.
+     */
     @Override
     public String getNombreTipo() {
         return TIPO_VEHICULO.getTipo();
     }
-    
+
     /**
      * Guarda un vehiculo en la base de datos.
      *
@@ -59,7 +58,7 @@ public class Microbus extends V_Transporte {
     @Override
     public void guardarEnBD(ConexionMySQL conexionMySQL, boolean primeraVez, String dniAlquilador) throws SQLException {
         super.guardarEnBD(conexionMySQL, primeraVez, dniAlquilador);
-        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES ('" + getMatricula() + "')";
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA_MICROBUSES + " VALUES ('" + getMatricula() + "')";
         conexionMySQL.ejecutaSentencia(sentencia);
     }
 
@@ -71,7 +70,7 @@ public class Microbus extends V_Transporte {
      */
     @Override
     public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
-        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE matricula = '" + getMatricula() + "'";
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA_MICROBUSES + " WHERE matricula = '" + getMatricula() + "'";
         conexionMySQL.ejecutaSentencia(sentencia);
         super.eliminaDeBD(conexionMySQL);
     }

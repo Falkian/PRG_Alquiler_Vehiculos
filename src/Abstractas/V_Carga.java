@@ -11,7 +11,7 @@ import java.sql.SQLException;
  */
 public abstract class V_Carga extends Vehiculo {
 
-    public static final String NOMBRE_TABLA = "transportescarga";
+    public static final String NOMBRE_TABLA = "transportescarga";   //Nombre de la tabla en la base de datos
 
     private double PMA;         //Peso maximo autorizado
 

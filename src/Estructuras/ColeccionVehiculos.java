@@ -25,9 +25,9 @@ import javax.swing.JOptionPane;
  */
 public class ColeccionVehiculos {
 
-    private final ArrayList<Vehiculo> vehiculos;      //Coleccion de vehiculos.
-    private final ConexionMySQL conexionMySQL;
-    private final ConexionMySQL conexionMySQL2;
+    private final ArrayList<Vehiculo> vehiculos;        //Coleccion de vehiculos.
+    private final ConexionMySQL conexionMySQL;          //Conexion con la base de datos
+    private final ConexionMySQL conexionMySQL2;         //Segunda conexion con la base de datos, utilizada para poder mantener dos resultados simultaneamente
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
@@ -55,6 +55,7 @@ public class ColeccionVehiculos {
      * base de datos.
      */
     public void anyadirVehiculo(TiposVehiculos tipo, String matricula, double caract) throws ObjetoYaExistenteException, FormatoIncorrectoException, SQLException {
+        //Si el vehiculo no existe en la coleccion lo añade, si ya existe lanza una excepcion
         if (posicionVehiculo(matricula) < 0) {
             switch (tipo) {
                 case COCHE:
@@ -287,7 +288,7 @@ public class ColeccionVehiculos {
      * @throws SQLException si hay un fallo en la consulta.
      */
     private void cargarCoches() throws SQLException {
-        String sentenciacoches = "SELECT * FROM " + Coche.NOMBRE_TABLA;
+        String sentenciacoches = "SELECT * FROM " + Coche.NOMBRE_TABLA_COCHES;
         ResultSet resultcoches = conexionMySQL.ejecutarConsulta(sentenciacoches);
 
         while (resultcoches.next()) {
@@ -310,7 +311,7 @@ public class ColeccionVehiculos {
      * @throws SQLException si hay un fallo en la consulta.
      */
     private void cargarMicrobuses() throws SQLException {
-        String sentenciabuses = "SELECT * FROM " + Microbus.NOMBRE_TABLA;
+        String sentenciabuses = "SELECT * FROM " + Microbus.NOMBRE_TABLA_MICROBUSES;
         ResultSet resultbuses = conexionMySQL.ejecutarConsulta(sentenciabuses);
 
         while (resultbuses.next()) {
@@ -333,7 +334,7 @@ public class ColeccionVehiculos {
      * @throws SQLException si hay un fallo en la consulta.
      */
     private void cargarFurgonetas() throws SQLException {
-        String sentenciafurgonetas = "SELECT * FROM " + Furgoneta.NOMBRE_TABLA;
+        String sentenciafurgonetas = "SELECT * FROM " + Furgoneta.NOMBRE_TABLA_FURGONETAS;
         ResultSet resultfurgonetas = conexionMySQL.ejecutarConsulta(sentenciafurgonetas);
 
         while (resultfurgonetas.next()) {
@@ -356,7 +357,7 @@ public class ColeccionVehiculos {
      * @throws SQLException si hay un fallo en la consulta.
      */
     private void cargarCamiones() throws SQLException {
-        String sentenciacamiones = "SELECT * FROM " + Camion.NOMBRE_TABLA;
+        String sentenciacamiones = "SELECT * FROM " + Camion.NOMBRE_TABLA_CAMIONES;
         ResultSet resultcamiones = conexionMySQL.ejecutarConsulta(sentenciacamiones);
 
         while (resultcamiones.next()) {

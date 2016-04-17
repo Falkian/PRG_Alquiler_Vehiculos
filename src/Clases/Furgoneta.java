@@ -12,8 +12,8 @@ import java.sql.SQLException;
  */
 public class Furgoneta extends V_Carga {
 
-    public static final TiposVehiculos TIPO_VEHICULO = TiposVehiculos.FURGONETA;
-    public static final String NOMBRE_TABLA = "furgonetas";
+    public static final TiposVehiculos TIPO_VEHICULO = TiposVehiculos.FURGONETA;    //Tipo de vehiculo
+    public static final String NOMBRE_TABLA_FURGONETAS = "furgonetas";      //Tabla en la base de datos
 
     /**
      * Inicializa la furgoneta con la matricula y PMA dados.
@@ -25,12 +25,11 @@ public class Furgoneta extends V_Carga {
         super(matricula, PMA);
     }
 
-    @Override
-    public void mostrarInfoAlquiler(int dias, double alquiler) {
-        System.out.println("El vehiculo es una furgoneta con PMA " + getPMA() + "kilos "
-                + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-    }
-
+    /**
+     * Devuelve el tipo del vehiculo como una cadena.
+     *
+     * @return el tipo del vehciulo.
+     */
     @Override
     public String getNombreTipo() {
         return TIPO_VEHICULO.getTipo();
@@ -48,7 +47,7 @@ public class Furgoneta extends V_Carga {
     @Override
     public void guardarEnBD(ConexionMySQL conexionMySQL, boolean primeraVez, String dniAlquilador) throws SQLException {
         super.guardarEnBD(conexionMySQL, primeraVez, dniAlquilador);
-        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES ('" + getMatricula() + "')";
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA_FURGONETAS + " VALUES ('" + getMatricula() + "')";
         conexionMySQL.ejecutaSentencia(sentencia);
     }
 
@@ -60,7 +59,7 @@ public class Furgoneta extends V_Carga {
      */
     @Override
     public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
-        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE matricula = '" + getMatricula() + "'";
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA_FURGONETAS + " WHERE matricula = '" + getMatricula() + "'";
         conexionMySQL.ejecutaSentencia(sentencia);
         super.eliminaDeBD(conexionMySQL);
     }

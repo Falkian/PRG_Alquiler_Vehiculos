@@ -17,10 +17,10 @@ import javax.swing.JOptionPane;
  */
 public class ColeccionClientes {
 
-    private static final String NOMBRE_TABLA = "clientes";
-    
+    private static final String NOMBRE_TABLA = "clientes";  //Tabl aen la base de datos
+
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes
-    private final ConexionMySQL conexionMySQL;
+    private final ConexionMySQL conexionMySQL;             //Conexion con la base de datos
 
     /**
      * Inicializa la coleccion con un tamanyo determinado.
@@ -197,7 +197,10 @@ public class ColeccionClientes {
         }
         return -1;
     }
-    
+
+    /**
+     * Clase para comparar dos clientes y poder ordenarlos por DNI.
+     */
     private class ComparadorCliente implements Comparator<Cliente> {
 
         @Override

@@ -12,8 +12,8 @@ import java.sql.SQLException;
  */
 public class Camion extends V_Carga {
 
-    private static final TiposVehiculos TIPO_VEHICULO = TiposVehiculos.CAMION;
-    public static final String NOMBRE_TABLA = "camiones";
+    private static final TiposVehiculos TIPO_VEHICULO = TiposVehiculos.CAMION;  //Tipo de vehiculo
+    public static final String NOMBRE_TABLA_CAMIONES = "camiones";
 
     /**
      * Inicializa el camion con la matricula y PMA dados.
@@ -36,12 +36,11 @@ public class Camion extends V_Carga {
         return super.alquilerTotal(dias) + 40;
     }
 
-    @Override
-    public void mostrarInfoAlquiler(int dias, double alquiler) {
-        System.out.println("El vehiculo es un camion con PMA " + getPMA() + "kilos "
-                + "y el alquiler para " + dias + " dias es de " + alquiler + " euros.");
-    }
-
+    /**
+     * Devuelve el tipo del vehiculo como una cadena.
+     *
+     * @return el tipo del vehiculo.
+     */
     @Override
     public String getNombreTipo() {
         return TIPO_VEHICULO.getTipo();
@@ -59,7 +58,7 @@ public class Camion extends V_Carga {
     @Override
     public void guardarEnBD(ConexionMySQL conexionMySQL, boolean primeraVez, String dniAlquilador) throws SQLException {
         super.guardarEnBD(conexionMySQL, primeraVez, dniAlquilador);
-        String sentencia = "INSERT INTO " + NOMBRE_TABLA + " VALUES ('" + getMatricula() + "')";
+        String sentencia = "INSERT INTO " + NOMBRE_TABLA_CAMIONES + " VALUES ('" + getMatricula() + "')";
         conexionMySQL.ejecutaSentencia(sentencia);
     }
 
@@ -71,7 +70,7 @@ public class Camion extends V_Carga {
      */
     @Override
     public void eliminaDeBD(ConexionMySQL conexionMySQL) throws SQLException {
-        String sentencia = "DELETE FROM " + NOMBRE_TABLA + " WHERE matricula = '" + getMatricula() + "'";
+        String sentencia = "DELETE FROM " + NOMBRE_TABLA_CAMIONES + " WHERE matricula = '" + getMatricula() + "'";
         conexionMySQL.ejecutaSentencia(sentencia);
         super.eliminaDeBD(conexionMySQL);
     }
