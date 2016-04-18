@@ -658,41 +658,31 @@ public class PantallaVehiculos extends JPanel {
     private void seleccionActual() {
         String matricula = iterador.getActual().getMatricula();
         introMatricula.setText(matricula);
-        String tipo = iterador.getActual().getClass().getSimpleName();
+        String tipo = iterador.getActual().getNombreTipo();
         switch (tipo) {
             case "Coche":
                 introTipo.setSelectedItem(TiposVehiculos.COCHE);
+                textoCaract.setText("Plazas");
+                introCaract.setModel(new SpinnerNumberModel(2, (int) TiposVehiculos.COCHE.getCaractMin(), (int) TiposVehiculos.COCHE.getCaractMax(), 1));
+                introCaract.setValue((int) iterador.getActual().getCaracteristica());
                 break;
             case "Microbus":
                 introTipo.setSelectedItem(TiposVehiculos.MICROBUS);
+                textoCaract.setText("Plazas");
+                introCaract.setModel(new SpinnerNumberModel(5, (int) TiposVehiculos.MICROBUS.getCaractMin(), (int) TiposVehiculos.MICROBUS.getCaractMax(), 1));
+                introCaract.setValue((int) iterador.getActual().getCaracteristica());
                 break;
             case "Furgoneta":
                 introTipo.setSelectedItem(TiposVehiculos.FURGONETA);
+                textoCaract.setText("PMA");
+                introCaract.setModel(new SpinnerNumberModel(500.0, TiposVehiculos.FURGONETA.getCaractMin(), TiposVehiculos.FURGONETA.getCaractMax(), 10));
+                introCaract.setValue(iterador.getActual().getCaracteristica());
                 break;
             case "Camion":
                 introTipo.setSelectedItem(TiposVehiculos.CAMION);
-                break;
-        }
-        switch (iterador.getActual().getNombreTipo()) {
-            case "Coche":
-                textoCaract.setText("Plazas");
-                introCaract.setValue(2);
-                introCaract.setModel(new SpinnerNumberModel(2, (int) TiposVehiculos.COCHE.getCaractMin(), (int) TiposVehiculos.COCHE.getCaractMax(), 1));
-                break;
-            case "Microbus":
-                textoCaract.setText("Plazas");
-                introCaract.setValue(5);
-                introCaract.setModel(new SpinnerNumberModel(5, (int) TiposVehiculos.MICROBUS.getCaractMin(), (int) TiposVehiculos.MICROBUS.getCaractMax(), 1));
-                break;
-            case "Furgoneta":
                 textoCaract.setText("PMA");
-                introCaract.setValue((double) 500);
-                introCaract.setModel(new SpinnerNumberModel(500.0, TiposVehiculos.FURGONETA.getCaractMin(), TiposVehiculos.FURGONETA.getCaractMax(), 10));
-                break;
-            case "Camion":
-                textoCaract.setText("PMA");
-                introCaract.setValue((double) 1000);
                 introCaract.setModel(new SpinnerNumberModel(1000.0, TiposVehiculos.CAMION.getCaractMin(), TiposVehiculos.CAMION.getCaractMax(), 10));
+                introCaract.setValue(iterador.getActual().getCaracteristica());
                 break;
         }
 

@@ -2,6 +2,7 @@ package Abstractas;
 
 import Excepciones.AlquilerVehiculoException;
 import Utilidades.ConexionMySQL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -51,6 +52,40 @@ public abstract class Vehiculo {
      */
     public boolean isAlquilado() {
         return alquilado;
+    }
+
+    /**
+     * Devuelve si el vehiculo se ha alquilado alguna vez.
+     *
+     * @param conexionMySQL conexion con la base de datos.
+     * @return true si ha sido alquilado; false en caso contrario.
+     * @throws SQLException si hay un fallo al ejecutar la sentencia.
+     */
+    public boolean getAlquiladoAlgunaVez(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "SELECT alquiladoalgunavez FROM " + NOMBRE_TABLA + " WHERE matricula = '" + matricula + "'";
+        ResultSet resultSet = conexionMySQL.ejecutarConsulta(sentencia);
+
+        if (resultSet.next()) {
+            return resultSet.getString("alquiladoalgunavez").equals("S");
+        }
+        return true;        
+    }
+
+    /**
+     * Devuelve el DNI del cliente que tiene alquilado el vehiculo, o null si no
+     * esta alquilado.
+     *
+     * @param conexionMySQL conexion con la base de datos.
+     * @return true si ha sido alquilado; false en caso contrario.
+     * @throws SQLException si hay un fallo al ejecutar la sentencia.
+     */
+    public String getDNIAlquilador(ConexionMySQL conexionMySQL) throws SQLException {
+        String sentencia = "SELECT * FROM vehiculos WHERE matricula = '" + matricula + "'";
+        ResultSet resultSet = conexionMySQL.ejecutarConsulta(sentencia);
+
+        resultSet.next();
+
+        return resultSet.getString("clientealquilador");
     }
 
     /**

@@ -17,6 +17,7 @@ import javax.swing.*;
  *
  * @author Kevin
  */
+//TODO - Revisar el uso de sort como metodo de ArrayList en todos los ficheros
 public class GUI extends JFrame {
     
     private ConexionMySQL conexionMySQL = null;

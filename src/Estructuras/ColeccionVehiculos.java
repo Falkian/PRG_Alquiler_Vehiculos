@@ -15,6 +15,7 @@ import Utilidades.TiposVehiculos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.JOptionPane;
 
@@ -103,7 +104,8 @@ public class ColeccionVehiculos {
                     }
                     break;
             }
-            vehiculos.sort(new ComparadorVehiculo());
+            //vehiculos.sort(new ComparadorVehiculo());
+            Collections.sort(vehiculos, new ComparadorVehiculo());
         } else {
             throw new ObjetoYaExistenteException();
         }
@@ -141,6 +143,11 @@ public class ColeccionVehiculos {
      */
     public void modificarVehiculo(TiposVehiculos tipo, String matricula, double caract) throws ObjetoNoExistenteException, FormatoIncorrectoException, SQLException {
         int posicionVehiculo = posicionVehiculo(matricula);
+        Vehiculo vViejo = vehiculos.get(posicionVehiculo);
+        String tipoViejo = vViejo.getNombreTipo();
+        boolean alquiladoalgunavez = vViejo.getAlquiladoAlgunaVez(conexionMySQL);
+        String clientealquilador = vViejo.getDNIAlquilador(conexionMySQL);
+        
         if (posicionVehiculo >= 0) {
             switch (tipo) {
                 case COCHE:
@@ -150,7 +157,12 @@ public class ColeccionVehiculos {
                         throw new FormatoIncorrectoException("Las plazas de un coche deben estar entre " + (int) min + " y " + (int) max);
                     } else {
                         Coche c = new Coche(matricula, (int) caract);
-                        c.actualizaEnBD(conexionMySQL);
+                        if (tipoViejo.equals(tipo.getTipo())) {
+                            c.actualizaEnBD(conexionMySQL);
+                        } else {
+                            vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
+                            c.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                        }
                         vehiculos.set(posicionVehiculo, c);
                     }
                     break;
@@ -160,9 +172,14 @@ public class ColeccionVehiculos {
                     if (caract < min || caract > max) {
                         throw new FormatoIncorrectoException("Las plazas de un microbus deben estar entre " + (int) min + " y " + (int) max);
                     } else {
-                        Microbus f = new Microbus(matricula, (int) caract);
-                        f.actualizaEnBD(conexionMySQL);
-                        vehiculos.set(posicionVehiculo, f);
+                        Microbus m = new Microbus(matricula, (int) caract);
+                        if (tipoViejo.equals(tipo.getTipo())) {
+                            m.actualizaEnBD(conexionMySQL);
+                        } else {
+                            vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
+                            m.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                        }
+                        vehiculos.set(posicionVehiculo, m);
                     }
                     break;
                 case FURGONETA:
@@ -172,7 +189,12 @@ public class ColeccionVehiculos {
                         throw new FormatoIncorrectoException("El PMA de una furgoneta debe estar entre " + min + " y " + max);
                     } else {
                         Furgoneta f = new Furgoneta(matricula, caract);
-                        f.actualizaEnBD(conexionMySQL);
+                        if (tipoViejo.equals(tipo.getTipo())) {
+                            f.actualizaEnBD(conexionMySQL);
+                        } else {
+                            vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
+                            f.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                        }
                         vehiculos.set(posicionVehiculo, f);
                     }
                     break;
@@ -183,7 +205,12 @@ public class ColeccionVehiculos {
                         throw new FormatoIncorrectoException("El PMA de un camion debe estar entre " + min + " y " + max);
                     } else {
                         Camion c = new Camion(matricula, caract);
-                        c.actualizaEnBD(conexionMySQL);
+                        if (tipoViejo.equals(tipo.getTipo())) {
+                            c.actualizaEnBD(conexionMySQL);
+                        } else {
+                            vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
+                            c.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                        }
                         vehiculos.set(posicionVehiculo, c);
                     }
                     break;
@@ -275,7 +302,8 @@ public class ColeccionVehiculos {
             cargarFurgonetas();
             cargarCamiones();
 
-            vehiculos.sort(new ComparadorVehiculo());
+            //vehiculos.sort(new ComparadorVehiculo());
+            Collections.sort(vehiculos, new ComparadorVehiculo());
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "No se pudieron cargar los vehiculos de la base de datos.\n"
                     + "Error MySQL: " + e.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);
@@ -390,6 +418,9 @@ public class ColeccionVehiculos {
         return -1;
     }
 
+    /**
+     * Clase para comparar dos vehiculos y poder ordenarlos por matricula.
+     */
     private class ComparadorVehiculo implements Comparator<Vehiculo> {
 
         @Override

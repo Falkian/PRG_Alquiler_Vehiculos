@@ -7,6 +7,7 @@ import Utilidades.ConexionMySQL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import javax.swing.JOptionPane;
 
@@ -16,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author Kevin
  */
 public class ColeccionClientes {
-
+    
     private static final String NOMBRE_TABLA = "clientes";  //Tabl aen la base de datos
 
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes
@@ -51,7 +52,8 @@ public class ColeccionClientes {
             c.setVip(vip);
             c.guardarEnBD(conexionMySQL);
             clientes.add(c);
-            clientes.sort(new ComparadorCliente());
+            //clientes.sort(new ComparadorCliente());
+            Collections.sort(clientes, new ComparadorCliente());
         } else {
             throw new ObjetoYaExistenteException();
         }
