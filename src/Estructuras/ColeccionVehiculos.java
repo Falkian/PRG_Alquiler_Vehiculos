@@ -104,15 +104,7 @@ public class ColeccionVehiculos {
                     }
                     break;
             }
-            //El metodo sort de ArrayList solo esta disponible a partir de Java 8
-            String jc = System.getProperty("java.version");
-            if (jc.startsWith("1.8")) {
-                vehiculos.sort(new ComparadorVehiculo());
-            } else {
-                Collections.sort(vehiculos, new ComparadorVehiculo());
-            }
-        } else {
-            throw new ObjetoYaExistenteException();
+            Collections.sort(vehiculos, new ComparadorVehiculo());
         }
     }
 
@@ -150,7 +142,7 @@ public class ColeccionVehiculos {
         int posicionVehiculo = posicionVehiculo(matricula);
         Vehiculo vViejo = vehiculos.get(posicionVehiculo);
         String tipoViejo = vViejo.getNombreTipo();
-        boolean alquiladoalgunavez = vViejo.getAlquiladoAlgunaVez(conexionMySQL);
+        boolean primeravez = !vViejo.getAlquiladoAlgunaVez(conexionMySQL);
         String clientealquilador = vViejo.getDNIAlquilador(conexionMySQL);
 
         if (posicionVehiculo >= 0) {
@@ -166,7 +158,7 @@ public class ColeccionVehiculos {
                             c.actualizaEnBD(conexionMySQL);
                         } else {
                             vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
-                            c.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                            c.guardarEnBD(conexionMySQL, primeravez, clientealquilador);
                         }
                         vehiculos.set(posicionVehiculo, c);
                     }
@@ -182,7 +174,7 @@ public class ColeccionVehiculos {
                             m.actualizaEnBD(conexionMySQL);
                         } else {
                             vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
-                            m.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                            m.guardarEnBD(conexionMySQL, primeravez, clientealquilador);
                         }
                         vehiculos.set(posicionVehiculo, m);
                     }
@@ -198,7 +190,7 @@ public class ColeccionVehiculos {
                             f.actualizaEnBD(conexionMySQL);
                         } else {
                             vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
-                            f.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                            f.guardarEnBD(conexionMySQL, primeravez, clientealquilador);
                         }
                         vehiculos.set(posicionVehiculo, f);
                     }
@@ -214,7 +206,7 @@ public class ColeccionVehiculos {
                             c.actualizaEnBD(conexionMySQL);
                         } else {
                             vehiculos.get(posicionVehiculo).eliminaDeBD(conexionMySQL);
-                            c.guardarEnBD(conexionMySQL, alquiladoalgunavez, clientealquilador);
+                            c.guardarEnBD(conexionMySQL, primeravez, clientealquilador);
                         }
                         vehiculos.set(posicionVehiculo, c);
                     }
@@ -307,13 +299,7 @@ public class ColeccionVehiculos {
             cargarFurgonetas();
             cargarCamiones();
 
-            //El metodo sort de ArrayList solo esta disponible a partir de Java 8
-            String jc = System.getProperty("java.version");
-            if (jc.startsWith("1.8")) {
-                vehiculos.sort(new ComparadorVehiculo());
-            } else {
-                Collections.sort(vehiculos, new ComparadorVehiculo());
-            }
+            Collections.sort(vehiculos, new ComparadorVehiculo());
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "No se pudieron cargar los vehiculos de la base de datos.\n"
                     + "Error MySQL: " + e.getMessage(), "Error MySQL", JOptionPane.ERROR_MESSAGE);

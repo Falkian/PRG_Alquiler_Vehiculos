@@ -52,13 +52,7 @@ public class ColeccionClientes {
             c.setVip(vip);
             c.guardarEnBD(conexionMySQL);
             clientes.add(c);
-            //El metodo sort de ArrayList solo esta disponible a partir de Java 8
-            String jc = System.getProperty("java.version");
-            if (jc.startsWith("1.8")) {
-                clientes.sort(new ComparadorCliente());
-            } else {
-                Collections.sort(clientes, new ComparadorCliente());
-            }
+            Collections.sort(clientes, new ComparadorCliente());
         } else {
             throw new ObjetoYaExistenteException();
         }
