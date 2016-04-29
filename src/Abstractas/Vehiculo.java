@@ -68,7 +68,7 @@ public abstract class Vehiculo {
         if (resultSet.next()) {
             return resultSet.getString("alquiladoalgunavez").equals("S");
         }
-        return true;        
+        return true;
     }
 
     /**

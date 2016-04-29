@@ -5,7 +5,7 @@ import Abstractas.Vehiculo;
 /**
  * Representa un alquiler emparejando la matricula de un vehiculo con el dni de
  * un cliente.
- * 
+ *
  * @author Kevin
  */
 public class Alquiler {

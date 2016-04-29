@@ -42,7 +42,8 @@ public class HistorialAlquileres {
      * @param alquiler el alquiler a registrar.
      * @param dias la duración del alquiler.
      * @return el precio del alquiler.
-     * @throws java.sql.SQLException si hay un fallo al actualizar l abase de datos.
+     * @throws java.sql.SQLException si hay un fallo al actualizar l abase de
+     * datos.
      */
     public double anyadirRegistro(Alquiler alquiler, int dias) throws SQLException {
         String sentencia = "INSERT INTO " + NOMBRE_TABLA + " (matricula, dni, numdias) VALUES ('"
@@ -62,7 +63,7 @@ public class HistorialAlquileres {
         if (alquiler.getCliente().isVip()) {
             precio -= preciob * 0.15;
         }
-        
+
         return precio;
     }
 

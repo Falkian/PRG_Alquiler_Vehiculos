@@ -18,7 +18,7 @@ import javax.swing.*;
  * @author Kevin
  */
 public class GUI extends JFrame {
-    
+
     private ConexionMySQL conexionMySQL = null;
 
     private ColeccionVehiculos vehiculos;       //Coleccion de vehiculos.
@@ -46,7 +46,7 @@ public class GUI extends JFrame {
 
         try {
             conexionMySQL = new ConexionMySQL();
-            
+
             vehiculos = new ColeccionVehiculos(conexionMySQL, new ConexionMySQL());
             clientes = new ColeccionClientes(conexionMySQL);
             alquileres = new ColeccionAlquileres(vehiculos, clientes, conexionMySQL);

@@ -4,7 +4,6 @@ import Estructuras.HistorialAlquileres;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 /**
  * Clase que contiene el menu de finanzas
@@ -35,7 +34,7 @@ public class PantallaFinanzas extends JPanel {
     private void iniciar() {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        
+
         listado = new JTable(historial.obtenerDataArray(), new String[]{"Matricula", "DNI", "Dias", "Primer", "VIP", "Precio"});
 
         JScrollPane listadoFinanzas = new JScrollPane(listado);

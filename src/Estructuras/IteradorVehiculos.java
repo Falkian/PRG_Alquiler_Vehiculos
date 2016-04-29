@@ -19,7 +19,7 @@ public class IteradorVehiculos extends Iterador<Vehiculo> {
     public IteradorVehiculos(ArrayList<Vehiculo> lista) {
         super(lista);
     }
-    
+
     /**
      * Posiciona el iterador sobre el elemento identificado por la matricula
      * dada. Si no se encuentra se posiciona en la ultima posicion.

@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Iterador para recorrer los elementos de una coleccion.
  *
  * @author Kevin
- * @param <E> tipo de objetos sobre  los que se iterara.
+ * @param <E> tipo de objetos sobre los que se iterara.
  */
 public abstract class Iterador<E> {
 
@@ -22,7 +22,7 @@ public abstract class Iterador<E> {
         this.lista = lista;
         posicion = 0;
     }
-    
+
     /**
      * Posiciona el iterador en el primer elemento.
      */

@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
  * @author Kevin
  */
 public class ColeccionClientes {
-    
+
     private static final String NOMBRE_TABLA = "clientes";  //Tabl aen la base de datos
 
     private final ArrayList<Cliente> clientes;             //Coleccion de clientes

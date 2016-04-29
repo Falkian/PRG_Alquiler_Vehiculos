@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * @author Kevin
  */
 public abstract class V_Transporte extends Vehiculo {
-    
+
     public static final String NOMBRE_TABLA = "transportespersonas";    //Nombre de la tabla en la base de datos
 
     private int plazas;             //Numero de plazas del vehiculo.

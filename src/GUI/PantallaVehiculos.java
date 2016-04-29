@@ -17,8 +17,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
 
@@ -518,7 +516,7 @@ public class PantallaVehiculos extends JPanel {
                         String info = tipo == TiposVehiculos.COCHE || tipo == TiposVehiculos.MICROBUS
                                 ? " con " + (int) caract + " plazas" : " con PMA " + caract;
                         JOptionPane.showMessageDialog(zonaDatos, tipo + info + " anyadido", "Vehiculo anyadido", JOptionPane.INFORMATION_MESSAGE);
-                    } catch (FormatoIncorrectoException ex) {                        
+                    } catch (FormatoIncorrectoException ex) {
                         iterador.ultimo();
                         JOptionPane.showMessageDialog(PantallaVehiculos.this, ex.getMessage(), "Fallo en el formato de los datos", JOptionPane.ERROR_MESSAGE);
                     } catch (ObjetoYaExistenteException ex) {
